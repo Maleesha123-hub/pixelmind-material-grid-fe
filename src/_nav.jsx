@@ -13,24 +13,26 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
-  cilBell,
-  cilCalculator,
-  cilChartPie,
-  cilCursor,
-  cilDescription,
-  cilDrop,
-  cilMoney,
-  cibCashapp,
-  cibTrainerroad,
-  cilExternalLink,
-  cilNotes,
-  cilPencil,
-  cilPuzzle,
   cilSpeedometer,
-  cilStar,
-  cilWifiSignal3,
   cilTruck,
-  cilViewColumn,
+  cilTransfer,
+  cilHistory,
+  cilFactory,
+  cilCloudUpload,
+  cilDescription,
+  cilPeople,
+  cilGroup,
+  cilUser,
+  cilCarAlt,
+  cilTags,
+  cilTag,
+  cilGrid,
+  cilBarcode,
+  cilBalanceScale,
+  cilMap,
+  cilUserPlus,
+  cilShieldAlt,
+  cilLockLocked,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -61,14 +63,14 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
  * // Navigation group with children
  * {
  *   component: CNavGroup,
- *   name: 'Base',
- *   to: '/base',
- *   icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+ *   name: 'Transport Trips',
+ *   to: '/transport-trips',
+ *   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
  *   items: [
  *     {
  *       component: CNavItem,
- *       name: 'Cards',
- *       to: '/base/cards',
+ *       name: 'Process Trip',
+ *       to: '/transport-trips/process-trip',
  *     },
  *   ],
  * }
@@ -77,7 +79,7 @@ import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
  * // Section title
  * {
  *   component: CNavTitle,
- *   name: 'Theme',
+ *   name: 'OPERATIONS',
  * }
  */
 const _nav = [
@@ -86,14 +88,10 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    badge: {
-      color: 'info',
-      text: 'NEW',
-    },
   },
   {
     component: CNavTitle,
-    name: 'MAIN',
+    name: 'OPERATIONS',
   },
   {
     component: CNavGroup,
@@ -105,94 +103,111 @@ const _nav = [
         component: CNavItem,
         name: 'Process Trip',
         to: '/transport-trips/process-trip',
+        icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'Trip History',
         to: '/transport-trips/trip-history',
+        icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
       },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Logistics',
+    to: '/logistics',
+    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+    items: [
       {
         component: CNavItem,
-        name: 'Routes',
-        to: '/transport-trips/route',
+        name: 'Bulk Upload',
+        to: '/logistics/bulk-upload',
+        icon: <CIcon icon={cilCloudUpload} customClassName="nav-icon" />,
       },
     ],
   },
   {
     component: CNavItem,
     name: 'Receipts',
-    to: '/theme/typography',
-    icon: <CIcon icon={cibCashapp} customClassName="nav-icon" />,
+    to: '/receipts',
+    icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
-    name: 'SETTINGS',
+    name: 'MASTER DATA',
   },
   {
     component: CNavGroup,
     name: 'Persons',
-    to: '/base',
-    icon: <CIcon icon={cilViewColumn} customClassName="nav-icon" />,
+    to: '/persons',
+    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Person Type',
-        to: '/base/accordion',
+        to: '/persons/person-type',
+        icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'Person',
-        to: '/base/breadcrumbs',
+        to: '/persons/person',
+        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
       },
     ],
   },
   {
     component: CNavGroup,
     name: 'Vehicles',
-    to: '/base',
-    icon: <CIcon icon={cilViewColumn} customClassName="nav-icon" />,
+    to: '/vehicles',
+    icon: <CIcon icon={cilCarAlt} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Vehicle Type',
-        to: '/base/accordion',
+        to: '/vehicles/vehicle-type',
+        icon: <CIcon icon={cilTags} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'Vehicle',
-        to: '/base/breadcrumbs',
+        to: '/vehicles/vehicle',
+        icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
       },
     ],
   },
   {
     component: CNavGroup,
     name: 'Items',
-    to: '/base',
-    icon: <CIcon icon={cilViewColumn} customClassName="nav-icon" />,
+    to: '/items',
+    icon: <CIcon icon={cilGrid} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Category',
-        to: '/base/accordion',
+        to: '/items/category',
+        icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'Item',
-        to: '/base/breadcrumbs',
+        to: '/items/item',
+        icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
       },
     ],
   },
   {
     component: CNavItem,
     name: 'Unit Types',
-    to: '/theme/typography',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    to: '/unit-types',
+    icon: <CIcon icon={cilBalanceScale} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Routes',
-    to: '/theme/typography',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    to: '/transport-trips/route',
+    icon: <CIcon icon={cilMap} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -201,20 +216,20 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Users',
-    to: '/theme/typography',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    to: '/users',
+    icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'User Roles',
-    to: '/theme/typography',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    to: '/user-roles',
+    icon: <CIcon icon={cilShieldAlt} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Permissions',
-    to: '/theme/typography',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    to: '/permissions',
+    icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
   },
 ]
 

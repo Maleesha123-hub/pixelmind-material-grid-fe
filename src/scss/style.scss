@@ -55,6 +55,18 @@ body {
   min-height: calc(3rem + 1px); // stylelint-disable-line function-disallowed-list
 }
 
+// Sidebar sub-item indentation
+// Adds a subtle right-shift to nested nav items so they're clearly
+// distinguishable from their parent group items.
+.sidebar .nav-group-items .nav-link {
+  padding-inline-start: calc(var(--cui-sidebar-nav-link-padding-x, 1rem) + 1.75rem);
+}
+
+// Keep the nav-icon-bullet (bullet dot) aligned properly within the indent
+.sidebar .nav-group-items .nav-icon {
+  margin-inline-start: 0;
+}
+
 @include color-mode(dark) {
   body {
     background-color: var(--cui-dark-bg-subtle);
