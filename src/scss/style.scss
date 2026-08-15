@@ -3,8 +3,61 @@
 @use "@coreui/chartjs/scss/coreui-chartjs";
 @use "vendors/simplebar";
 
+// ═════════════════════════════════════════════════════════════════════════════
+// INDUSTRIAL MATERIALS & HARDWARE LOGISTICS THEME
+// Materials: Sand, Cement, Steel Rebar, Quarry Dust, Aggregate, Bricks, Logistics Fleet
+// ═════════════════════════════════════════════════════════════════════════════
+
+:root {
+  // Industrial Steel & Slate (Foundational Machinery)
+  --mg-steel-950: #0b0f19;
+  --mg-steel-900: #0f172a;
+  --mg-steel-800: #1e293b;
+  --mg-steel-700: #334155;
+  --mg-steel-600: #475569;
+  --mg-steel-500: #64748b;
+  --mg-steel-400: #94a3b8;
+  --mg-steel-300: #cbd5e1;
+  --mg-steel-200: #e2e8f0;
+  --mg-steel-100: #f1f5f9;
+  --mg-steel-50:  #f8fafc;
+
+  // River Sand & Quarry Machinery Amber (Primary Action Accent)
+  --mg-amber-600: #d97706;
+  --mg-amber-500: #f59e0b;
+  --mg-amber-400: #fbbf24;
+  --mg-amber-100: #fef3c7;
+  --mg-amber-50:  #fffbeb;
+
+  // Portland Cement / Concrete Gray
+  --mg-cement-base: #64748b;
+  --mg-cement-light: #f1f5f9;
+
+  // Structural Rebar Blue
+  --mg-rebar-blue: #0284c7;
+  --mg-rebar-blue-light: #e0f2fe;
+
+  // Operations & Safety Emerald
+  --mg-emerald: #059669;
+  --mg-emerald-light: #ecfdf5;
+
+  // Clay / Brick / Terracotta
+  --mg-terracotta: #ea580c;
+
+  // CoreUI Overrides
+  --cui-primary: #d97706;
+  --cui-primary-rgb: 217, 119, 6;
+  --cui-primary-hover: #b45309;
+  --cui-body-bg: #f8fafc;
+  --cui-tertiary-bg: #f1f5f9;
+  --cui-border-color: #e2e8f0;
+}
+
 body {
-  background-color: var(--cui-tertiary-bg);
+  background-color: var(--cui-body-bg);
+  color: var(--mg-steel-900);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .wrapper {
@@ -12,34 +65,171 @@ body {
   padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
   will-change: auto;
   @include transition(padding .15s);
+  background-color: var(--cui-body-bg);
 }
 
-.header>.container-fluid,
-.sidebar-header {
-  min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
-}
+// ─── Header Styling ────────────────────────────────────────────────────────
+.header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid var(--mg-steel-200) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 
-.sidebar-brand-full {
-  margin-left: 3px;
-}
+  > .container-fluid,
+  .sidebar-header {
+    min-height: calc(4rem + 1px);
+  }
 
-.sidebar-header {
-  .nav-underline-border {
-    --cui-nav-underline-border-link-padding-x: 1rem;
-    --cui-nav-underline-border-gap: 0;
+  > .container-fluid + .container-fluid {
+    min-height: 2.75rem;
+    background-color: var(--mg-steel-50);
+    border-top: 1px solid var(--mg-steel-100);
   }
 
   .nav-link {
-    display: flex;
-    align-items: center;
-    min-height: calc(4rem + 1px); // stylelint-disable-line function-disallowed-list
+    color: var(--mg-steel-600);
+    font-weight: 500;
+    transition: color 0.15s;
+
+    &:hover,
+    &.active {
+      color: var(--mg-amber-600);
+    }
   }
 }
 
-.sidebar-toggler {
-  margin-inline-start: auto;
+// ─── Sidebar Industrial Theme ───────────────────────────────────────────────
+.sidebar {
+  --cui-sidebar-bg: #0f172a;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+  border-right: 1px solid var(--mg-steel-700) !important;
+  box-shadow: 2px 0 16px rgba(15, 23, 42, 0.15);
+
+  .sidebar-header {
+    background-color: rgba(15, 23, 42, 0.95);
+    border-bottom: 1px solid var(--mg-steel-700) !important;
+    min-height: calc(4rem + 1px);
+  }
+
+  // Brand Logo Badge
+  .mg-brand-badge {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);
+    flex-shrink: 0;
+
+    &--sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+  }
+
+  .mg-brand-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #ffffff;
+    line-height: 1.1;
+  }
+
+  .mg-brand-subtitle {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--mg-amber-500);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  // Section Dividers (OPERATIONS, MASTER DATA, etc.)
+  .nav-title {
+    color: var(--mg-steel-400) !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.09em !important;
+    text-transform: uppercase !important;
+    padding-top: 1.1rem;
+    padding-bottom: 0.4rem;
+    opacity: 0.9;
+  }
+
+  // Nav Items
+  .nav-link {
+    color: #cbd5e1;
+    font-size: 0.86rem;
+    font-weight: 500;
+    border-radius: 8px;
+    margin: 2px 10px;
+    padding: 0.55rem 0.85rem;
+    transition: all 0.15s ease-in-out;
+
+    .nav-icon {
+      color: #94a3b8;
+      transition: color 0.15s;
+    }
+
+    &:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.07);
+
+      .nav-icon {
+        color: var(--mg-amber-500);
+      }
+    }
+
+    &.active {
+      color: #ffffff !important;
+      font-weight: 600;
+      background: linear-gradient(90deg, rgba(217, 119, 6, 0.28) 0%, rgba(217, 119, 6, 0.06) 100%) !important;
+      border-inline-start: 3px solid var(--mg-amber-500);
+
+      .nav-icon {
+        color: var(--mg-amber-500) !important;
+      }
+    }
+  }
+
+  // Nested Sub-Items Group Container
+  .nav-group-items {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin: 2px 8px;
+    padding: 4px 0;
+
+    .nav-link {
+      padding-inline-start: calc(var(--cui-sidebar-nav-link-padding-x, 1rem) + 1.25rem);
+      font-size: 0.82rem;
+      margin: 1px 4px;
+    }
+
+    .nav-icon {
+      margin-inline-start: 0;
+    }
+  }
+
+  // Footer Toggler
+  .sidebar-footer {
+    background-color: rgba(15, 23, 42, 0.95);
+    border-top: 1px solid var(--mg-steel-700) !important;
+
+    .sidebar-toggler {
+      margin-inline-start: auto;
+      color: #94a3b8;
+
+      &:hover {
+        color: var(--mg-amber-500);
+      }
+    }
+  }
 }
 
+// Narrow Sidebar
 .sidebar-narrow,
 .sidebar-narrow-unfoldable:not(:hover) {
   .sidebar-toggler {
@@ -47,32 +237,321 @@ body {
   }
 }
 
-.header>.container-fluid+.container-fluid {
-  min-height: 3rem;
-}
-
+// ─── Footer ─────────────────────────────────────────────────────────────────
 .footer {
-  min-height: calc(3rem + 1px); // stylelint-disable-line function-disallowed-list
+  min-height: calc(3rem + 1px);
+  background-color: #ffffff;
+  border-top: 1px solid var(--mg-steel-200);
+  color: var(--mg-steel-500);
+  font-size: 0.82rem;
+
+  strong {
+    color: var(--mg-steel-800);
+  }
 }
 
-// Sidebar sub-item indentation
-// Adds a subtle right-shift to nested nav items so they're clearly
-// distinguishable from their parent group items.
-.sidebar .nav-group-items .nav-link {
-  padding-inline-start: calc(var(--cui-sidebar-nav-link-padding-x, 1rem) + 1.75rem);
+// ─── Cards & Containers ────────────────────────────────────────────────────
+.card {
+  border: 1px solid var(--mg-steel-200);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-// Keep the nav-icon-bullet (bullet dot) aligned properly within the indent
-.sidebar .nav-group-items .nav-icon {
-  margin-inline-start: 0;
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--mg-steel-200);
+  font-weight: 600;
+  color: var(--mg-steel-800);
+}
+
+// ─── Buttons ───────────────────────────────────────────────────────────────
+.btn-primary {
+  background: linear-gradient(135deg, var(--mg-amber-600) 0%, #b45309 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+  transition: all 0.15s;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45);
+    color: #ffffff;
+  }
+}
+
+// ─── Dark Mode Full System Overrides ──────────────────────────────────────────
+[data-coreui-theme="dark"],
+[data-coreui-theme="dark"] body,
+[data-coreui-theme="dark"] .wrapper,
+[data-coreui-theme="dark"] .body,
+[data-coreui-theme="dark"] #root {
+  --cui-body-bg: #0b0f19 !important;
+  --cui-body-color: #e2e8f0 !important;
+  --cui-tertiary-bg: #0f172a !important;
+  --cui-border-color: #334155 !important;
+  background-color: #0b0f19 !important;
+  color: #e2e8f0 !important;
 }
 
 @include color-mode(dark) {
-  body {
-    background-color: var(--cui-dark-bg-subtle);
+  html,
+  body,
+  #root,
+  .wrapper,
+  .body {
+    background-color: var(--mg-steel-950) !important;
+    color: #e2e8f0 !important;
+  }
+
+  .header {
+    background-color: var(--mg-steel-900) !important;
+    border-bottom-color: var(--mg-steel-800) !important;
+
+    > .container-fluid {
+      background-color: var(--mg-steel-900) !important;
+    }
+
+    > .container-fluid + .container-fluid {
+      background-color: var(--mg-steel-950) !important;
+      border-top-color: var(--mg-steel-800) !important;
+    }
+
+    .nav-link {
+      color: #cbd5e1;
+
+      &:hover,
+      &.active {
+        color: var(--mg-amber-400);
+      }
+    }
+  }
+
+  // Breadcrumbs
+  .breadcrumb {
+    .breadcrumb-item {
+      color: #94a3b8;
+
+      a {
+        color: #cbd5e1;
+        text-decoration: none;
+
+        &:hover {
+          color: var(--mg-amber-400);
+        }
+      }
+
+      &.active {
+        color: var(--mg-amber-500);
+      }
+
+      & + .breadcrumb-item::before {
+        color: #64748b;
+      }
+    }
+  }
+
+  .card {
+    background-color: var(--mg-steel-900) !important;
+    border-color: var(--mg-steel-700) !important;
+    color: #f1f5f9;
+  }
+
+  .card-header {
+    background-color: var(--mg-steel-900) !important;
+    border-bottom-color: var(--mg-steel-700) !important;
+    color: #f8fafc;
+  }
+
+  .card-body {
+    color: #e2e8f0;
   }
 
   .footer {
-    --cui-footer-bg: var(--cui-body-bg);
+    --cui-footer-bg: var(--mg-steel-900);
+    background-color: var(--mg-steel-900) !important;
+    border-top-color: var(--mg-steel-800) !important;
+    color: #94a3b8;
+
+    strong {
+      color: #e2e8f0;
+    }
+  }
+
+  // Headings & Page Titles
+  h1, h2, h3, h4, h5, h6,
+  .rc-page-title,
+  .bu-page-title,
+  .pt-page-title {
+    color: #f8fafc !important;
+  }
+
+  .rc-page-subtitle,
+  .bu-page-subtitle,
+  .pt-page-subtitle,
+  .text-body-secondary {
+    color: #94a3b8 !important;
+  }
+
+  // Form Controls in Dark Mode
+  .form-control,
+  .form-select {
+    background-color: var(--mg-steel-950) !important;
+    border-color: var(--mg-steel-700) !important;
+    color: #f8fafc !important;
+
+    &:focus {
+      border-color: var(--mg-amber-500) !important;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+    }
+
+    &::placeholder {
+      color: #64748b !important;
+    }
+  }
+
+  .form-label {
+    color: #cbd5e1 !important;
+  }
+
+  .dropdown-menu {
+    background-color: var(--mg-steel-900);
+    border-color: var(--mg-steel-700);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+    .dropdown-item {
+      color: #cbd5e1;
+
+      &:hover {
+        background-color: var(--mg-steel-800);
+        color: #ffffff;
+      }
+
+      &.active {
+        background-color: var(--mg-amber-600);
+        color: #ffffff;
+      }
+    }
+  }
+
+  .modal-content {
+    background-color: var(--mg-steel-900);
+    border-color: var(--mg-steel-700);
+    color: #f8fafc;
+  }
+
+  .modal-header {
+    border-bottom-color: var(--mg-steel-700);
+  }
+
+  .modal-footer {
+    border-top-color: var(--mg-steel-700);
+  }
+}
+
+// ─── React Select Industrial System ──────────────────────────────────────────
+.mg-select__control {
+  min-height: 42px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--mg-steel-300, #cbd5e1) !important;
+  background-color: #ffffff !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    border-color: var(--mg-amber-600) !important;
+  }
+
+  &--is-focused {
+    border-color: var(--mg-amber-600) !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2) !important;
+  }
+}
+
+.mg-select__single-value {
+  color: var(--mg-steel-900, #0f172a) !important;
+  font-size: 0.875rem !important;
+}
+
+.mg-select__input-container {
+  color: var(--mg-steel-900, #0f172a) !important;
+}
+
+.mg-select__placeholder {
+  color: #94a3b8 !important;
+  font-size: 0.875rem !important;
+}
+
+.mg-select__menu {
+  background-color: #ffffff !important;
+  border: 1px solid var(--mg-steel-200, #e2e8f0) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15) !important;
+  z-index: 9999 !important;
+}
+
+.mg-select__option {
+  font-size: 0.875rem !important;
+  color: var(--mg-steel-800, #1e293b) !important;
+  cursor: pointer !important;
+
+  &--is-focused {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+  }
+
+  &--is-selected {
+    background-color: var(--mg-amber-600) !important;
+    color: #ffffff !important;
+  }
+}
+
+// React Select in Dark Mode
+[data-coreui-theme="dark"] {
+  .mg-select__control {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+
+    &:hover {
+      border-color: var(--mg-amber-500) !important;
+    }
+
+    &--is-focused {
+      border-color: var(--mg-amber-500) !important;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+    }
+  }
+
+  .mg-select__single-value {
+    color: #f8fafc !important;
+  }
+
+  .mg-select__input-container {
+    color: #f8fafc !important;
+  }
+
+  .mg-select__placeholder {
+    color: #64748b !important;
+  }
+
+  .mg-select__menu {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .mg-select__option {
+    color: #e2e8f0 !important;
+
+    &--is-focused {
+      background-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+
+    &--is-selected {
+      background-color: var(--mg-amber-600) !important;
+      color: #ffffff !important;
+    }
   }
 }

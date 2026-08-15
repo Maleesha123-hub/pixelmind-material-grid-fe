@@ -1,0 +1,650 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Bulk Upload Page — BulkUpload.css
+   Industrial Materials & Logistics Excel Import System
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.bu-page {
+  padding: 1.25rem;
+  max-width: 1360px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Page Header ─────────────────────────────────────────────────────────── */
+.bu-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.bu-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bu-header-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
+  flex-shrink: 0;
+}
+
+.bu-page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.bu-page-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+/* ── Tab Switcher ────────────────────────────────────────────────────────── */
+.bu-tab-container {
+  display: flex;
+  gap: 0.75rem;
+  background: #ffffff;
+  padding: 0.4rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.bu-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.bu-tab-btn:hover {
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.bu-tab-btn--active {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+}
+
+.bu-tab-badge {
+  font-size: 0.7rem;
+  padding: 0.2em 0.6em;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.bu-tab-badge--amber {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.bu-tab-badge--blue {
+  background: rgba(2, 132, 199, 0.2);
+  color: #38bdf8;
+}
+
+/* ── Drop Zone Card ──────────────────────────────────────────────────────── */
+.bu-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.bu-card-header {
+  background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bu-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.bu-card-body {
+  padding: 1.25rem;
+}
+
+/* ── Drag & Drop Box ─────────────────────────────────────────────────────── */
+.bu-dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.bu-dropzone:hover,
+.bu-dropzone--dragover {
+  border-color: #d97706;
+  background: #fffbeb;
+  transform: scale(1.002);
+}
+
+.bu-dropzone-icon {
+  width: 60px;
+  height: 60px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d97706;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+}
+
+.bu-dropzone-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.35rem;
+}
+
+.bu-dropzone-desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.bu-file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ── Action Buttons ──────────────────────────────────────────────────────── */
+.bu-btn-download {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s;
+}
+
+.bu-btn-download:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.bu-btn-demo {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s;
+}
+
+.bu-btn-demo:hover {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.bu-btn-primary {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border: none;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.6rem 1.6rem;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s;
+}
+
+.bu-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
+}
+
+.bu-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ── Columns Checklist ───────────────────────────────────────────────────── */
+.bu-columns-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+.bu-col-chip {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.bu-col-chip--matched {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.bu-col-chip--missing {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* ── KPI Summary Cards ───────────────────────────────────────────────────── */
+.bu-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.bu-kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bu-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.bu-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 0.4rem;
+}
+
+.bu-kpi-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.bu-kpi-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+}
+
+.bu-kpi-card--amber {
+  border-left: 4px solid #d97706;
+}
+
+.bu-kpi-card--emerald {
+  border-left: 4px solid #059669;
+}
+
+.bu-kpi-card--blue {
+  border-left: 4px solid #0284c7;
+}
+
+.bu-kpi-card--red {
+  border-left: 4px solid #dc2626;
+}
+
+.bu-kpi-card--slate {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+  border-left: 4px solid #f59e0b;
+}
+
+.bu-kpi-card--slate .bu-kpi-label {
+  color: #94a3b8;
+}
+
+.bu-kpi-card--slate .bu-kpi-value {
+  color: #f59e0b;
+}
+
+.bu-kpi-card--slate .bu-kpi-sub {
+  color: #cbd5e1;
+}
+
+/* ── Data Table ──────────────────────────────────────────────────────────── */
+.bu-table-container {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.bu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.bu-table th {
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  text-align: left;
+}
+
+.bu-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.bu-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.bu-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+.bu-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25em 0.65em;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.bu-badge--land {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  font-weight: 800;
+}
+
+.bu-badge--cube-high {
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 800;
+}
+
+.bu-badge--cube-low {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 800;
+}
+
+.bu-badge--cube-norm {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.bu-badge--location {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.bu-badge--expense {
+  background: #fff1f2;
+  color: #be123c;
+  font-weight: 700;
+}
+
+.bu-table-summary-row {
+  background: #f8fafc !important;
+  font-weight: 800;
+  border-top: 2px solid #cbd5e1 !important;
+}
+
+.bu-table-summary-row td {
+  color: #0f172a !important;
+}
+
+/* ── Search Bar ──────────────────────────────────────────────────────────── */
+.bu-search-input {
+  max-width: 280px;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.8rem;
+}
+
+.bu-search-input:focus {
+  border-color: #d97706;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .bu-page {
+    padding: 0.75rem;
+  }
+
+  .bu-tab-container {
+    flex-direction: column;
+  }
+
+  .bu-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bu-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ── Dark Theme Overrides ─────────────────────────────────────────────────── */
+[data-coreui-theme="dark"] {
+  .bu-page-title {
+    color: #f8fafc;
+  }
+
+  .bu-page-subtitle {
+    color: #94a3b8;
+  }
+
+  .bu-tab-container {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .bu-tab-btn {
+    color: #94a3b8;
+
+    &:hover {
+      background: #334155;
+      color: #f8fafc;
+    }
+  }
+
+  .bu-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .bu-card-header {
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    border-bottom-color: #334155;
+  }
+
+  .bu-card-title {
+    color: #f8fafc;
+  }
+
+  .bu-dropzone {
+    background: #0f172a;
+    border-color: #334155;
+
+    &:hover,
+    &.bu-dropzone--dragover {
+      background: rgba(217, 119, 6, 0.08);
+      border-color: #f59e0b;
+    }
+  }
+
+  .bu-dropzone-icon {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .bu-dropzone-title {
+    color: #f8fafc;
+  }
+
+  .bu-dropzone-desc {
+    color: #94a3b8;
+  }
+
+  .bu-btn-download {
+    background: #0f172a;
+    border-color: #334155;
+    color: #cbd5e1;
+
+    &:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+  }
+
+  .bu-columns-checklist {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .bu-col-chip--matched {
+    background: rgba(5, 150, 105, 0.15);
+    color: #34d399;
+    border-color: rgba(5, 150, 105, 0.35);
+  }
+
+  .bu-col-chip--missing {
+    background: rgba(220, 38, 38, 0.15);
+    color: #f87171;
+    border-color: rgba(220, 38, 38, 0.35);
+  }
+
+  .bu-search-input {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+  }
+
+  .bu-table-container {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .bu-table th {
+    background: #0f172a;
+    color: #cbd5e1;
+    border-bottom-color: #334155;
+  }
+
+  .bu-table td {
+    border-bottom-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .bu-table tr:hover {
+    background-color: #334155;
+  }
+
+  .bu-table-summary-row {
+    background: #0f172a !important;
+    border-top-color: #475569 !important;
+
+    td {
+      color: #f8fafc !important;
+    }
+  }
+
+  .bu-badge--land {
+    background: #0f172a;
+    color: #cbd5e1;
+    border-color: #334155;
+  }
+
+  .bu-badge--cube-norm {
+    background: #0f172a;
+    color: #cbd5e1;
+  }
+}

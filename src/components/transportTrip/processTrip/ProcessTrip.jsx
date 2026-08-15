@@ -72,25 +72,33 @@ const CUSTOMERS = [
   { value: 4, label: 'ICTAD Projects' },
 ]
 
-// ─── Select Styles ─────────────────────────────────────────────────────────
+// ─── Select Styles (Industrial Amber & Steel Palette) ────────────────────────
 const selectStyles = {
   control: (base, state) => ({
     ...base,
     minHeight: '42px',
     borderRadius: '8px',
-    borderColor: state.isFocused ? '#321fdb' : '#c4c9d4',
-    boxShadow: state.isFocused ? '0 0 0 3px rgba(50,31,219,0.12)' : 'none',
+    borderColor: state.isFocused ? '#d97706' : '#cbd5e1',
+    boxShadow: state.isFocused ? '0 0 0 3px rgba(217,119,6,0.15)' : 'none',
     fontSize: '0.875rem',
-    '&:hover': { borderColor: '#321fdb' },
+    backgroundColor: '#ffffff',
+    '&:hover': { borderColor: '#d97706' },
   }),
-  menu: (base) => ({ ...base, borderRadius: '10px', zIndex: 9999 }),
+  menu: (base) => ({
+    ...base,
+    borderRadius: '10px',
+    zIndex: 9999,
+    boxShadow: '0 10px 25px rgba(15, 23, 42, 0.12)',
+    border: '1px solid #e2e8f0',
+  }),
   option: (base, state) => ({
     ...base,
-    backgroundColor: state.isSelected ? '#321fdb' : state.isFocused ? '#f0f1ff' : 'white',
-    color: state.isSelected ? 'white' : '#2c2c54',
+    backgroundColor: state.isSelected ? '#d97706' : state.isFocused ? '#fef3c7' : 'white',
+    color: state.isSelected ? 'white' : '#1e293b',
     fontSize: '0.875rem',
+    cursor: 'pointer',
   }),
-  placeholder: (base) => ({ ...base, color: '#9da5b1', fontSize: '0.875rem' }),
+  placeholder: (base) => ({ ...base, color: '#94a3b8', fontSize: '0.875rem' }),
 }
 
 // ─── Empty item row template ─────────────────────────────────────────────────
@@ -233,7 +241,7 @@ const ProcessTrip = () => {
                   onChange={handleRouteChange}
                   placeholder="Search and select route…"
                   isClearable
-                  styles={selectStyles}
+                  classNamePrefix="mg-select"
                 />
                 {/* Distance Badge — main highlight */}
                 {route && (
@@ -266,7 +274,7 @@ const ProcessTrip = () => {
                   onChange={setCustomer}
                   placeholder="Search customer…"
                   isClearable
-                  styles={selectStyles}
+                  classNamePrefix="mg-select"
                 />
               </CCol>
 
@@ -283,7 +291,7 @@ const ProcessTrip = () => {
                   onChange={setDriver}
                   placeholder="Search driver…"
                   isClearable
-                  styles={selectStyles}
+                  classNamePrefix="mg-select"
                 />
               </CCol>
 
@@ -300,7 +308,7 @@ const ProcessTrip = () => {
                   onChange={setVehicle}
                   placeholder="Search vehicle…"
                   isClearable
-                  styles={selectStyles}
+                  classNamePrefix="mg-select"
                 />
               </CCol>
 
@@ -377,7 +385,7 @@ const ProcessTrip = () => {
                       onChange={(val) => updateItem(item.id, 'supplierItem', val)}
                       placeholder="Search item…"
                       isClearable
-                      styles={selectStyles}
+                      classNamePrefix="mg-select"
                     />
                     {item.supplierItem && (
                       <span className="pt-item-unit-hint">Unit: {item.supplierItem.unit}</span>

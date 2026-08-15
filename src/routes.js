@@ -24,6 +24,12 @@ const tripHistory = React.lazy(() => import('./components/transportTrip/tripHist
 const Route = React.lazy(() => import('./components/transportTrip/route/Route.jsx'))
 
 
+// Logistics
+const BulkUpload = React.lazy(() => import('./components/logistics/bulkUpload/BulkUpload.jsx'))
+
+// Receipts
+const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
+
 /**
  * Array of route configuration objects
  *
@@ -47,6 +53,8 @@ export const routes = [
   { path: '/transport-trips/route', name: 'Route', element: Route },
   { path: '/transport-trips/process-trip', name: 'Process Trip', element: processTrip },
   { path: '/transport-trips/trip-history', name: 'Trip History', element: tripHistory },
+  { path: '/logistics/bulk-upload', name: 'Bulk Upload', element: BulkUpload },
+  { path: '/receipts', name: 'Receipts', element: Receipts },
 ]
 
 export default routes

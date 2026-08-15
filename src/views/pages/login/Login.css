@@ -1,0 +1,318 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Login Page — Login.css
+   PixelMind Solutions • Material Grid Hardware & Logistics
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.mg-login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 15% 20%, #1e293b 0%, #0f172a 60%, #020617 100%);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Subtle background industrial grid pattern */
+.mg-login-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* Glowing ambient blobs behind card */
+.mg-login-ambient-1 {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, rgba(217, 119, 6, 0) 70%);
+  top: -80px;
+  right: -80px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mg-login-ambient-2 {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, rgba(2, 132, 199, 0) 70%);
+  bottom: -100px;
+  left: -100px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ── Main Container Card ─────────────────────────────────────────────────── */
+.mg-login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2.5rem 2.25rem;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(245, 158, 11, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 10;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ── Brand Logo & Header ─────────────────────────────────────────────────── */
+.mg-login-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mg-login-logo-badge {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  box-shadow: 
+    0 8px 24px rgba(217, 119, 6, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.mg-login-logo-badge::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 21px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.6), transparent);
+  z-index: -1;
+}
+
+.mg-product-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.mg-product-title span {
+  color: #f59e0b;
+}
+
+.mg-company-sub {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-top: 0.35rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.mg-company-sub strong {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+/* ── Login Form Elements ─────────────────────────────────────────────────── */
+.mg-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.mg-form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 0.45rem;
+  display: block;
+}
+
+.mg-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mg-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: #94a3b8;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.mg-input {
+  width: 100%;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 1.5px solid #334155 !important;
+  border-radius: 12px !important;
+  padding: 0 1rem 0 2.85rem !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.mg-input::placeholder {
+  color: #64748b !important;
+}
+
+.mg-input:focus {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+  outline: none !important;
+}
+
+.mg-input:focus + .mg-input-icon,
+.mg-input-box:focus-within .mg-input-icon {
+  color: #f59e0b;
+}
+
+/* Toggle Password Visibility */
+.mg-pw-toggle {
+  position: absolute;
+  right: 0.85rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mg-pw-toggle:hover {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* ── Form Actions ────────────────────────────────────────────────────────── */
+.mg-form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  font-size: 0.82rem;
+}
+
+.mg-remember-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mg-checkbox {
+  accent-color: #d97706;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mg-forgot-link {
+  color: #f59e0b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.mg-forgot-link:hover {
+  color: #fbbf24;
+  text-decoration: underline;
+}
+
+/* ── Submit Button ───────────────────────────────────────────────────────── */
+.mg-btn-submit {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.mg-btn-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(217, 119, 6, 0.45);
+}
+
+.mg-btn-submit:active {
+  transform: translateY(0);
+}
+
+.mg-btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ── Login Footer ────────────────────────────────────────────────────────── */
+.mg-login-footer {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-size: 0.76rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.mg-login-footer strong {
+  color: #cbd5e1;
+}
+
+.mg-portal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .mg-login-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+}

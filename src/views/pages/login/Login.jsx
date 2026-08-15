@@ -1,84 +1,177 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import {
-  CButton,
-  CCard,
-  CCardBody,
-  CCardGroup,
-  CCol,
-  CContainer,
-  CForm,
-  CFormInput,
-  CInputGroup,
-  CInputGroupText,
-  CRow,
-} from '@coreui/react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { CAlert, CSpinner } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import {
+  cilUser,
+  cilLockLocked,
+  cilTruck,
+  cilArrowRight,
+  cilWarning,
+  cilShieldAlt,
+} from '@coreui/icons'
+import './Login.css'
 
 const Login = () => {
+  const navigate = useNavigate()
+
+  // Form State — Only Username & Password
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleLogin = (e) => {
+    e.preventDefault()
+    setErrorMessage('')
+
+    if (!username.trim()) {
+      setErrorMessage('Please enter your username.')
+      return
+    }
+
+    if (!password) {
+      setErrorMessage('Please enter your password.')
+      return
+    }
+
+    setIsLoading(true)
+
+    // Simulate standard authentication flow
+    setTimeout(() => {
+      setIsLoading(false)
+      // Navigate to main application dashboard
+      navigate('/dashboard')
+    }, 600)
+  }
+
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
-      <CContainer>
-        <CRow className="justify-content-center">
-          <CCol md={8}>
-            <CCardGroup>
-              <CCard className="p-4">
-                <CCardBody>
-                  <CForm>
-                    <h1>Login</h1>
-                    <p className="text-body-secondary">Sign In to your account</p>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupText>
-                        <CIcon icon={cilUser} />
-                      </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
-                    </CInputGroup>
-                    <CInputGroup className="mb-4">
-                      <CInputGroupText>
-                        <CIcon icon={cilLockLocked} />
-                      </CInputGroupText>
-                      <CFormInput
-                        type="password"
-                        placeholder="Password"
-                        autoComplete="current-password"
-                      />
-                    </CInputGroup>
-                    <CRow>
-                      <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
-                          Login
-                        </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
-                          Forgot password?
-                        </CButton>
-                      </CCol>
-                    </CRow>
-                  </CForm>
-                </CCardBody>
-              </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
-                    <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
-                      </CButton>
-                    </Link>
-                  </div>
-                </CCardBody>
-              </CCard>
-            </CCardGroup>
-          </CCol>
-        </CRow>
-      </CContainer>
+    <div className="mg-login-wrapper">
+      {/* Background Ambient Glows */}
+      <div className="mg-login-ambient-1" />
+      <div className="mg-login-ambient-2" />
+
+      <div className="mg-login-card">
+        {/* Brand Header */}
+        <div className="mg-login-brand">
+          <div className="mg-login-logo-badge">
+            <CIcon icon={cilTruck} size="xxl" />
+          </div>
+          <div>
+            <div className="mg-portal-badge">
+              <CIcon icon={cilShieldAlt} size="sm" />
+              <span>Enterprise Logistics Portal</span>
+            </div>
+            <h1 className="mg-product-title">
+              MATERIAL <span>GRID</span>
+            </h1>
+            <p className="mg-company-sub">
+              Developed by <strong>PixelMind Solutions</strong>
+            </p>
+          </div>
+        </div>
+
+        {/* Error Alert */}
+        {errorMessage && (
+          <CAlert color="danger" dismissible onClose={() => setErrorMessage('')} className="mb-3 py-2 px-3 text-start" style={{ fontSize: '0.82rem' }}>
+            <CIcon icon={cilWarning} className="me-2" />
+            {errorMessage}
+          </CAlert>
+        )}
+
+        {/* Login Form */}
+        <form onSubmit={handleLogin}>
+          {/* Username Field */}
+          <div className="mg-form-group">
+            <label className="mg-form-label" htmlFor="username">
+              Username
+            </label>
+            <div className="mg-input-box">
+              <div className="mg-input-icon">
+                <CIcon icon={cilUser} />
+              </div>
+              <input
+                id="username"
+                type="text"
+                className="mg-input"
+                placeholder="Enter your username"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Password Field */}
+          <div className="mg-form-group">
+            <label className="mg-form-label" htmlFor="password">
+              Password
+            </label>
+            <div className="mg-input-box">
+              <div className="mg-input-icon">
+                <CIcon icon={cilLockLocked} />
+              </div>
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                className="mg-input"
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                className="mg-pw-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
+
+          {/* Remember Me Option */}
+          <div className="mg-form-options">
+            <label className="mg-remember-label">
+              <input
+                type="checkbox"
+                className="mg-checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Remember this device</span>
+            </label>
+          </div>
+
+          {/* Submit Button */}
+          <button type="submit" className="mg-btn-submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <CSpinner size="sm" />
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign In to Material Grid</span>
+                <CIcon icon={cilArrowRight} />
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Footer info */}
+        <div className="mg-login-footer">
+          <div>
+            <strong>Material Grid</strong> &copy; {new Date().getFullYear()}
+          </div>
+          <div>Proprietary Logistics Management &bull; PixelMind Solutions</div>
+        </div>
+      </div>
     </div>
   )
 }

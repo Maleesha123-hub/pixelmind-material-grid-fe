@@ -93,26 +93,26 @@ const _nav = [
     component: CNavTitle,
     name: 'OPERATIONS',
   },
-  {
-    component: CNavGroup,
-    name: 'Transport Trips',
-    to: '/transport-trips',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Process Trip',
-        to: '/transport-trips/process-trip',
-        icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
-      },
-      {
-        component: CNavItem,
-        name: 'Trip History',
-        to: '/transport-trips/trip-history',
-        icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
-      },
-    ],
-  },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Transport Trips',
+  //   to: '/transport-trips',
+  //   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Process Trip',
+  //       to: '/transport-trips/process-trip',
+  //       icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Trip History',
+  //       to: '/transport-trips/trip-history',
+  //       icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
+  //     },
+  //   ],
+  // },
   {
     component: CNavGroup,
     name: 'Logistics',
@@ -133,104 +133,104 @@ const _nav = [
     to: '/receipts',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
-  {
-    component: CNavTitle,
-    name: 'MASTER DATA',
-  },
-  {
-    component: CNavGroup,
-    name: 'Persons',
-    to: '/persons',
-    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Person Type',
-        to: '/persons/person-type',
-        icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
-      },
-      {
-        component: CNavItem,
-        name: 'Person',
-        to: '/persons/person',
-        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Vehicles',
-    to: '/vehicles',
-    icon: <CIcon icon={cilCarAlt} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Vehicle Type',
-        to: '/vehicles/vehicle-type',
-        icon: <CIcon icon={cilTags} customClassName="nav-icon" />,
-      },
-      {
-        component: CNavItem,
-        name: 'Vehicle',
-        to: '/vehicles/vehicle',
-        icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Items',
-    to: '/items',
-    icon: <CIcon icon={cilGrid} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Category',
-        to: '/items/category',
-        icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
-      },
-      {
-        component: CNavItem,
-        name: 'Item',
-        to: '/items/item',
-        icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
-      },
-    ],
-  },
-  {
-    component: CNavItem,
-    name: 'Unit Types',
-    to: '/unit-types',
-    icon: <CIcon icon={cilBalanceScale} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Routes',
-    to: '/transport-trips/route',
-    icon: <CIcon icon={cilMap} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavTitle,
-    name: 'USER MANAGEMENT',
-  },
-  {
-    component: CNavItem,
-    name: 'Users',
-    to: '/users',
-    icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'User Roles',
-    to: '/user-roles',
-    icon: <CIcon icon={cilShieldAlt} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Permissions',
-    to: '/permissions',
-    icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavTitle,
+  //   name: 'MASTER DATA',
+  // },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Persons',
+  //   to: '/persons',
+  //   icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Person Type',
+  //       to: '/persons/person-type',
+  //       icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Person',
+  //       to: '/persons/person',
+  //       icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Vehicles',
+  //   to: '/vehicles',
+  //   icon: <CIcon icon={cilCarAlt} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Vehicle Type',
+  //       to: '/vehicles/vehicle-type',
+  //       icon: <CIcon icon={cilTags} customClassName="nav-icon" />,
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Vehicle',
+  //       to: '/vehicles/vehicle',
+  //       icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Items',
+  //   to: '/items',
+  //   icon: <CIcon icon={cilGrid} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Category',
+  //       to: '/items/category',
+  //       icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Item',
+  //       to: '/items/item',
+  //       icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Unit Types',
+  //   to: '/unit-types',
+  //   icon: <CIcon icon={cilBalanceScale} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Routes',
+  //   to: '/transport-trips/route',
+  //   icon: <CIcon icon={cilMap} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavTitle,
+  //   name: 'USER MANAGEMENT',
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Users',
+  //   to: '/users',
+  //   icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'User Roles',
+  //   to: '/user-roles',
+  //   icon: <CIcon icon={cilShieldAlt} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Permissions',
+  //   to: '/permissions',
+  //   icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
+  // },
 ]
 
 export default _nav

@@ -31,6 +31,7 @@ import {
   CSidebarToggler,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import { cilTruck } from '@coreui/icons'
 
 import { AppSidebarNav } from './AppSidebarNav'
 
@@ -68,10 +69,22 @@ const AppSidebar = () => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
     >
-      <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/">
-          <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
-          <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
+      <CSidebarHeader className="border-bottom px-3 d-flex align-items-center justify-content-between">
+        <CSidebarBrand to="/" className="d-flex align-items-center text-decoration-none">
+          <div className="sidebar-brand-full d-flex align-items-center gap-2">
+            <div className="mg-brand-badge">
+              <CIcon icon={cilTruck} size="lg" />
+            </div>
+            <div className="d-flex flex-column text-start">
+              <span className="mg-brand-title">MATERIAL GRID</span>
+              <span className="mg-brand-subtitle">Hardware & Logistics</span>
+            </div>
+          </div>
+          <div className="sidebar-brand-narrow">
+            <div className="mg-brand-badge mg-brand-badge--sm">
+              <CIcon icon={cilTruck} size="sm" />
+            </div>
+          </div>
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

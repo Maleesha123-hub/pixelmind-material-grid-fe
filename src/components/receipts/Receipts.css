@@ -1,0 +1,615 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Receipts Page — Receipts.css
+   Industrial Materials & Hardware Logistics Receipts System
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.rc-page {
+  padding: 1.25rem;
+  max-width: 1360px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Page Header ─────────────────────────────────────────────────────────── */
+.rc-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rc-header-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
+  flex-shrink: 0;
+}
+
+.rc-page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.rc-page-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+/* ── Filter Card ─────────────────────────────────────────────────────────── */
+.rc-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.rc-card-header {
+  background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rc-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.rc-card-body {
+  padding: 1.25rem;
+}
+
+/* ── Form Controls ───────────────────────────────────────────────────────── */
+.rc-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.rc-input {
+  border-radius: 8px !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  font-size: 0.875rem !important;
+  height: 42px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.rc-input:focus {
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+}
+
+/* ── Action Buttons ──────────────────────────────────────────────────────── */
+.rc-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.5rem;
+}
+
+.rc-btn-preview {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  color: #f59e0b;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.6rem 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  transition: all 0.15s ease-in-out;
+}
+
+.rc-btn-preview:hover {
+  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  color: #fbbf24;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.3);
+}
+
+.rc-btn-download {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border: none;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+  transition: all 0.15s ease-in-out;
+}
+
+.rc-btn-download:hover {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
+}
+
+.rc-btn-reset {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.55rem 1.1rem;
+  transition: all 0.15s;
+}
+
+.rc-btn-reset:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* ── KPI Grid ────────────────────────────────────────────────────────────── */
+.rc-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.rc-kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rc-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.rc-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 0.4rem;
+}
+
+.rc-kpi-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.rc-kpi-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+}
+
+.rc-kpi-card--amber {
+  border-left: 4px solid #d97706;
+}
+
+.rc-kpi-card--blue {
+  border-left: 4px solid #0284c7;
+}
+
+.rc-kpi-card--emerald {
+  border-left: 4px solid #059669;
+}
+
+.rc-kpi-card--red {
+  border-left: 4px solid #dc2626;
+}
+
+.rc-kpi-card--slate {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+  border-left: 4px solid #f59e0b;
+}
+
+.rc-kpi-card--slate .rc-kpi-label {
+  color: #94a3b8;
+}
+
+.rc-kpi-card--slate .rc-kpi-value {
+  color: #f59e0b;
+}
+
+.rc-kpi-card--slate .rc-kpi-sub {
+  color: #cbd5e1;
+}
+
+/* ── Records Table ───────────────────────────────────────────────────────── */
+.rc-table-container {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.rc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.rc-table th {
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  text-align: left;
+}
+
+.rc-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.rc-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.rc-table tr:last-child td {
+  border-bottom: none;
+}
+
+.rc-table-summary-row {
+  background: #f8fafc !important;
+  font-weight: 800;
+  border-top: 2px solid #cbd5e1 !important;
+}
+
+.rc-table-summary-row td {
+  color: #0f172a !important;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+.rc-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25em 0.65em;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.rc-badge--vehicle {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  font-weight: 800;
+}
+
+.rc-badge--paid {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.rc-badge--pending {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.rc-badge--voucher {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+/* ── Mini Action Buttons in Table ────────────────────────────────────────── */
+.rc-mini-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s;
+}
+
+.rc-mini-btn--view {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.rc-mini-btn--view:hover {
+  background: #1e293b;
+  color: #f59e0b;
+}
+
+.rc-mini-btn--download {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.rc-mini-btn--download:hover {
+  background: #d97706;
+  color: #ffffff;
+}
+
+/* ── PDF Preview Modal Styling ───────────────────────────────────────────── */
+.rc-pdf-preview-wrapper {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 600px;
+  width: 100%;
+}
+
+.rc-pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Fallback HTML Receipt Layout (Inside Modal) */
+.rc-receipt-sheet {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 2rem;
+  color: #0f172a;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+}
+
+.rc-receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.rc-receipt-company-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.rc-receipt-company-sub {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.2rem;
+}
+
+.rc-receipt-voucher-box {
+  text-align: right;
+}
+
+.rc-receipt-voucher-no {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #d97706;
+}
+
+.rc-receipt-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.82rem;
+}
+
+.rc-receipt-total-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rc-receipt-signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+}
+
+.rc-sign-line {
+  border-top: 1px dashed #64748b;
+  width: 200px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #64748b;
+  padding-top: 0.35rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .rc-page {
+    padding: 0.75rem;
+  }
+
+  .rc-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rc-action-bar {
+    width: 100%;
+  }
+
+  .rc-btn-preview,
+  .rc-btn-download {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rc-receipt-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rc-pdf-preview-wrapper {
+    height: 400px;
+  }
+}
+
+/* ── Dark Theme Overrides ─────────────────────────────────────────────────── */
+[data-coreui-theme="dark"] {
+  .rc-page-title {
+    color: #f8fafc;
+  }
+
+  .rc-page-subtitle {
+    color: #94a3b8;
+  }
+
+  .rc-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .rc-card-header {
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    border-bottom-color: #334155;
+  }
+
+  .rc-card-title {
+    color: #f8fafc;
+  }
+
+  .rc-label {
+    color: #cbd5e1;
+  }
+
+  .rc-input {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+  }
+
+  .rc-btn-reset {
+    background: #0f172a;
+    border-color: #334155;
+    color: #cbd5e1;
+
+    &:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+  }
+
+  .rc-kpi-card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .rc-kpi-label {
+    color: #94a3b8;
+  }
+
+  .rc-kpi-value {
+    color: #f8fafc;
+  }
+
+  .rc-table-container {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .rc-table th {
+    background: #0f172a;
+    color: #cbd5e1;
+    border-bottom-color: #334155;
+  }
+
+  .rc-table td {
+    border-bottom-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .rc-table tr:hover {
+    background-color: #334155;
+  }
+
+  .rc-table-summary-row {
+    background: #0f172a !important;
+    border-top-color: #475569 !important;
+
+    td {
+      color: #f8fafc !important;
+    }
+  }
+
+  .rc-badge--vehicle {
+    background: #0f172a;
+    color: #cbd5e1;
+    border-color: #334155;
+  }
+
+  .rc-mini-btn--view {
+    background: #0f172a;
+    color: #cbd5e1;
+
+    &:hover {
+      background: #334155;
+      color: #f59e0b;
+    }
+  }
+}
