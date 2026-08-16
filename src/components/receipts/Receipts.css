@@ -106,7 +106,12 @@
   color: #0f172a !important;
   font-size: 0.875rem !important;
   height: 42px;
+  cursor: pointer !important;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.rc-input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer !important;
 }
 
 .rc-input:focus {

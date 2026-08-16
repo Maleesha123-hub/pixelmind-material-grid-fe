@@ -457,6 +457,7 @@ body {
   border: 1px solid var(--mg-steel-300, #cbd5e1) !important;
   background-color: #ffffff !important;
   box-shadow: none !important;
+  cursor: pointer !important;
   transition: all 0.2s ease !important;
 
   &:hover {
@@ -469,18 +470,40 @@ body {
   }
 }
 
+.mg-select__value-container,
+.mg-select__indicators,
+.mg-select__indicator {
+  cursor: pointer !important;
+}
+
 .mg-select__single-value {
   color: var(--mg-steel-900, #0f172a) !important;
   font-size: 0.875rem !important;
+  cursor: pointer !important;
 }
 
 .mg-select__input-container {
   color: var(--mg-steel-900, #0f172a) !important;
+  cursor: pointer !important;
+
+  input {
+    cursor: pointer !important;
+  }
 }
 
 .mg-select__placeholder {
   color: #94a3b8 !important;
   font-size: 0.875rem !important;
+  cursor: pointer !important;
+}
+
+// ─── Global Date Input Pointer Style ─────────────────────────────────────────
+input[type="date"] {
+  cursor: pointer !important;
+
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer !important;
+  }
 }
 
 .mg-select__menu {
