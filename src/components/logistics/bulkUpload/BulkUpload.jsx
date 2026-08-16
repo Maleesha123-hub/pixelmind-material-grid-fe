@@ -25,6 +25,7 @@ import {
   cilInfo,
 } from '@coreui/icons'
 import './BulkUpload.css'
+import Swal from 'sweetalert2'
 
 
 
@@ -47,8 +48,7 @@ const BulkUpload = () => {
   const [tripsDragOver, setTripsDragOver] = useState(false)
   const [tripsSearch, setTripsSearch] = useState('')
   const [tripsLoading, setTripsLoading] = useState(false)
-  const [tripsSuccessMsg, setTripsSuccessMsg] = useState('')
-  const [tripsErrorMsg, setTripsErrorMsg] = useState('')
+
   const tripFileInputRef = useRef(null)
 
   // Uploader 2 State (Expenses)
@@ -57,8 +57,7 @@ const BulkUpload = () => {
   const [expensesDragOver, setExpensesDragOver] = useState(false)
   const [expensesSearch, setExpensesSearch] = useState('')
   const [expensesLoading, setExpensesLoading] = useState(false)
-  const [expensesSuccessMsg, setExpensesSuccessMsg] = useState('')
-  const [expensesErrorMsg, setExpensesErrorMsg] = useState('')
+
   const expenseFileInputRef = useRef(null)
 
   // ─── Format Currency ──────────────────────────────────────────────────────
@@ -72,8 +71,6 @@ const BulkUpload = () => {
     if (!file) return
     setTripsLoading(true)
     setTripsFileName(file.name)
-    setTripsSuccessMsg('')
-    setTripsErrorMsg('')
 
     try {
       // 1. Send file to backend Spring Boot service
@@ -124,10 +121,24 @@ const BulkUpload = () => {
       }
       reader.readAsArrayBuffer(file)
 
-      setTripsSuccessMsg(backendResponse.message || `Material Transport Trips Sheet "${file.name}" uploaded successfully!`)
+      Swal.fire({
+        icon: 'success',
+        title: 'Upload Successful!',
+        text: backendResponse.message || `"${file.name}" was saved to the system successfully.`,
+        confirmButtonText: 'Continue',
+        confirmButtonColor: '#f59e0b',
+        timer: 4000,
+        timerProgressBar: true,
+      })
     } catch (err) {
       console.error('Trip upload error:', err)
-      setTripsErrorMsg(`Upload failed: ${err.message || 'Unable to connect to backend service.'}`)
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: err.message || 'Unable to connect to backend service. Please try again.',
+        confirmButtonText: 'OK, got it',
+        confirmButtonColor: '#dc2626',
+      })
     } finally {
       setTripsLoading(false)
     }
@@ -138,8 +149,6 @@ const BulkUpload = () => {
     if (!file) return
     setExpensesLoading(true)
     setExpensesFileName(file.name)
-    setExpensesSuccessMsg('')
-    setExpensesErrorMsg('')
 
     try {
       // 1. Send file to backend Spring Boot service
@@ -174,10 +183,24 @@ const BulkUpload = () => {
       }
       reader.readAsArrayBuffer(file)
 
-      setExpensesSuccessMsg(backendResponse || `Daily Expenses Sheet "${file.name}" uploaded successfully!`)
+      Swal.fire({
+        icon: 'success',
+        title: 'Expenses Uploaded!',
+        text: backendResponse || `"${file.name}" was saved to the system successfully.`,
+        confirmButtonText: 'Continue',
+        confirmButtonColor: '#0ea5e9',
+        timer: 4000,
+        timerProgressBar: true,
+      })
     } catch (err) {
       console.error('Expense upload error:', err)
-      setExpensesErrorMsg(`Upload failed: ${err.message || 'Unable to connect to backend service.'}`)
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: err.message || 'Unable to connect to backend service. Please try again.',
+        confirmButtonText: 'OK, got it',
+        confirmButtonColor: '#dc2626',
+      })
     } finally {
       setExpensesLoading(false)
     }
@@ -291,20 +314,6 @@ const BulkUpload = () => {
          ══════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'trips' && (
         <>
-          {tripsSuccessMsg && (
-            <CAlert color="success" dismissible onClose={() => setTripsSuccessMsg('')} className="mb-3">
-              <CIcon icon={cilCheckCircle} className="me-2" />
-              {tripsSuccessMsg}
-            </CAlert>
-          )}
-
-          {tripsErrorMsg && (
-            <CAlert color="danger" dismissible onClose={() => setTripsErrorMsg('')} className="mb-3">
-              <CIcon icon={cilWarning} className="me-2" />
-              {tripsErrorMsg}
-            </CAlert>
-          )}
-
           {/* Upload Card */}
           <CCard className="bu-card">
             <CCardHeader className="bu-card-header">
@@ -381,20 +390,6 @@ const BulkUpload = () => {
          ══════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'expenses' && (
         <>
-          {expensesSuccessMsg && (
-            <CAlert color="success" dismissible onClose={() => setExpensesSuccessMsg('')} className="mb-3">
-              <CIcon icon={cilCheckCircle} className="me-2" />
-              {expensesSuccessMsg}
-            </CAlert>
-          )}
-
-          {expensesErrorMsg && (
-            <CAlert color="danger" dismissible onClose={() => setExpensesErrorMsg('')} className="mb-3">
-              <CIcon icon={cilWarning} className="me-2" />
-              {expensesErrorMsg}
-            </CAlert>
-          )}
-
           {/* Upload Card */}
           <CCard className="bu-card">
             <CCardHeader className="bu-card-header">
