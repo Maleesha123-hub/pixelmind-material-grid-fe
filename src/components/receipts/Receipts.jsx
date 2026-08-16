@@ -102,8 +102,7 @@ const selectStyles = {
 
 const Receipts = () => {
   // ─── Filter State ─────────────────────────────────────────────────────────
-  const [fromDate, setFromDate] = useState('2026-08-01')
-  const [toDate, setToDate] = useState('2026-08-16')
+  const [fromDate, setFromDate] = useState('2026-08-07')
   const [selectedVehicle, setSelectedVehicle] = useState(VEHICLE_OPTIONS[0]) // Default: All Vehicles
   const [tableSearch, setTableSearch] = useState('')
 
@@ -121,9 +120,8 @@ const Receipts = () => {
   // ─── Filtered Records ─────────────────────────────────────────────────────
   const filteredRecords = useMemo(() => {
     return MOCK_RECEIPT_ITEMS.filter((item) => {
-      // Date filter
+      // Date filter — show records on or after selected date
       if (fromDate && item.date < fromDate) return false
-      if (toDate && item.date > toDate) return false
 
       // Vehicle filter
       if (selectedVehicle && selectedVehicle.value !== 'ALL') {
@@ -143,7 +141,7 @@ const Receipts = () => {
 
       return true
     })
-  }, [fromDate, toDate, selectedVehicle, tableSearch])
+  }, [fromDate, selectedVehicle, tableSearch])
 
   // ─── Summary Totals ───────────────────────────────────────────────────────
   const totalTrips = filteredRecords.length
@@ -197,7 +195,7 @@ const Receipts = () => {
 
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(15, 23, 42)
-    doc.text(`${fromDate || 'START'} to ${toDate || 'CURRENT'}`, 18, 49)
+    doc.text(`${fromDate || 'ALL DATES'}`, 18, 49)
     doc.text(`${vehLabel}`, 78, 49)
     doc.text(`${recordsToPrint.length} Trips (${totalCubes.toFixed(1)} Cubes)`, 140, 49)
 
@@ -345,7 +343,7 @@ const Receipts = () => {
         ? selectedVehicle.value
         : 'All_Vehicles'
 
-    const fileName = `Material_Grid_Receipt_${vehName}_${fromDate}_to_${toDate}.pdf`
+    const fileName = `Material_Grid_Receipt_${vehName}_${fromDate}.pdf`
     doc.save(fileName)
   }
 
@@ -377,8 +375,7 @@ const Receipts = () => {
             <button
               className="rc-btn-reset"
               onClick={() => {
-                setFromDate('2026-08-01')
-                setToDate('2026-08-16')
+                setFromDate('2026-08-07')
                 setSelectedVehicle(VEHICLE_OPTIONS[0])
                 setTableSearch('')
               }}
@@ -390,11 +387,11 @@ const Receipts = () => {
 
         <CCardBody className="rc-card-body">
           <CRow className="g-3">
-            {/* From Date */}
-            <CCol xs={12} md={4}>
+            {/* Date */}
+            <CCol xs={12} md={6}>
               <CFormLabel className="rc-label">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
-                From Date
+                Date
               </CFormLabel>
               <CFormInput
                 type="date"
@@ -404,22 +401,8 @@ const Receipts = () => {
               />
             </CCol>
 
-            {/* To Date */}
-            <CCol xs={12} md={4}>
-              <CFormLabel className="rc-label">
-                <CIcon icon={cilCalendar} size="sm" className="text-warning" />
-                To Date
-              </CFormLabel>
-              <CFormInput
-                type="date"
-                className="rc-input"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-              />
-            </CCol>
-
             {/* Searchable Vehicle Dropdown */}
-            <CCol xs={12} md={4}>
+            <CCol xs={12} md={6}>
               <CFormLabel className="rc-label">
                 <CIcon icon={cilTruck} size="sm" className="text-warning" />
                 Vehicle Number (Searchable)
