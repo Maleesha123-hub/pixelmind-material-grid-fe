@@ -1,5 +1,8 @@
-import React, { useState, useMemo } from 'react'
-import Select from 'react-select'
+import React, { useState, useMemo, useEffect } from 'react'
+import AsyncSelect from 'react-select/async'
+import vehicleService from '../../service/vehicleService'
+import receiptService from '../../service/receiptService'
+import Swal from 'sweetalert2'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import {
@@ -34,24 +37,8 @@ import {
 } from '@coreui/icons'
 import './Receipts.css'
 
-// ─── Mock Vehicle Options ───────────────────────────────────────────────────
-const VEHICLE_OPTIONS = [
-  { value: 'ALL', label: 'All Vehicles (Consolidated Receipt)' },
-  { value: 'LC-4838', label: 'LC-4838 — Tipper 10T (Driver: Kamal Perera)' },
-  { value: 'LI-8902', label: 'LI-8902 — Lorry 15T (Driver: Sunil Silva)' },
-  { value: 'LM-4535', label: 'LM-4535 — Dumper 20T (Driver: Ranjith Fernando)' },
-  { value: 'LK-5177', label: 'LK-5177 — Tipper 8T (Driver: Nimal Jayasinghe)' },
-  { value: 'LM-6460', label: 'LM-6460 — Heavy Dumper 25T (Driver: Anura Kumara)' },
-  { value: 'LM-4687', label: 'LM-4687 — Lorry 10T (Driver: Bandara M.)' },
-  { value: 'LJ-0993', label: 'LJ-0993 — Tipper 12T (Driver: Sarath Fonseka)' },
-  { value: 'LI-9587', label: 'LI-9587 — Lorry 10T (Driver: Pradeep Kumara)' },
-  { value: 'LI-5827', label: 'LI-5827 — Tipper 8T (Driver: Chaminda V.)' },
-  { value: 'LM-4565', label: 'LM-4565 — Lorry 15T (Driver: Gamini D.)' },
-  { value: 'LN-5891', label: 'LN-5891 — Tipper 10T (Driver: Asela P.)' },
-  { value: 'LO-4415', label: 'LO-4415 — Dumper 18T (Driver: Thushara K.)' },
-  { value: 'LM-9680', label: 'LM-9680 — Tipper 10T (Driver: Chandana S.)' },
-  { value: 'LF-3769', label: 'LF-3769 — Lorry 20T (Driver: Mahinda R.)' },
-]
+// ─── Default Consolidated Option ────────────────────────────────────────────
+const DEFAULT_VEHICLE_OPTION = { value: 'ALL', label: 'All Vehicles (Consolidated Receipt)' }
 
 // ─── Initial Sample Receipts / Trips Dataset ────────────────────────────────
 const MOCK_RECEIPT_ITEMS = [
@@ -101,15 +88,51 @@ const selectStyles = {
 }
 
 const Receipts = () => {
+  // Helper to format vehicle response items into React-Select options
+  const formatVehicleOption = (v) => {
+    const num = v.vehicleNumber || v.vehicleNo || v.registrationNumber || v.regNo || v.number || v.id
+    const type = v.vehicleType || v.type || v.model || ''
+    const driver = v.driverName || v.driver || ''
+
+    let label = num
+    if (type) label += ` — ${type}`
+    if (driver) label += ` (Driver: ${driver})`
+
+    return {
+      value: num,
+      label,
+      data: v,
+    }
+  }
+
+  // ─── Async Vehicle Loader (Calls backend /search?query=... on typing) ─────
+  const loadVehicleOptions = async (inputValue) => {
+    try {
+      const vehicles = await vehicleService.searchVehicles(inputValue)
+      const list = Array.isArray(vehicles) ? vehicles.map(formatVehicleOption) : []
+
+      // If no query or searching 'all', include default consolidated option
+      if (!inputValue || inputValue.trim() === '' || inputValue.toLowerCase().includes('all')) {
+        return [DEFAULT_VEHICLE_OPTION, ...list]
+      }
+      return list
+    } catch (err) {
+      console.error('Vehicle search API error:', err)
+      return [DEFAULT_VEHICLE_OPTION]
+    }
+  }
+
   // ─── Filter State ─────────────────────────────────────────────────────────
   const [fromDate, setFromDate] = useState('2026-08-07')
-  const [selectedVehicle, setSelectedVehicle] = useState(VEHICLE_OPTIONS[0]) // Default: All Vehicles
+  const [selectedVehicle, setSelectedVehicle] = useState(DEFAULT_VEHICLE_OPTION) // Default: All Vehicles
   const [tableSearch, setTableSearch] = useState('')
 
   // ─── Modal Preview State ──────────────────────────────────────────────────
   const [previewModalVisible, setPreviewModalVisible] = useState(false)
   const [previewPdfUrl, setPreviewPdfUrl] = useState(null)
   const [previewMeta, setPreviewMeta] = useState(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [downloadLoading, setDownloadLoading] = useState(false)
 
   // ─── Format Currency ──────────────────────────────────────────────────────
   const formatLKR = (num) => {
@@ -124,8 +147,10 @@ const Receipts = () => {
       if (fromDate && item.date < fromDate) return false
 
       // Vehicle filter
-      if (selectedVehicle && selectedVehicle.value !== 'ALL') {
-        if (item.vehicleNumber !== selectedVehicle.value) return false
+      if (selectedVehicle && selectedVehicle.value && selectedVehicle.value !== 'ALL') {
+        const itemVeh = (item.vehicleNumber || '').toLowerCase().replace(/[\s\-_]/g, '')
+        const selVeh = (selectedVehicle.value || '').toLowerCase().replace(/[\s\-_]/g, '')
+        if (itemVeh !== selVeh) return false
       }
 
       // Search term
@@ -151,10 +176,54 @@ const Receipts = () => {
   const totalNetPayable = filteredRecords.reduce((sum, r) => sum + (Number(r.payableAmount) || 0), 0)
 
   // ─── PDF Receipt Generator Function ───────────────────────────────────────
-  const generatePdfDoc = (recordsToPrint = filteredRecords, customTitle = null) => {
+  const generatePdfDoc = (data = null, customItem = null) => {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-    const isAll = !selectedVehicle || selectedVehicle.value === 'ALL'
-    const vehLabel = isAll ? 'ALL FLEET VEHICLES' : selectedVehicle.value
+
+    let recordsToPrint = []
+    let voucherNumber = `MG-VCH-${Date.now().toString().slice(-6)}`
+    let statementPeriod = fromDate || 'ALL DATES'
+    let isAll = !selectedVehicle || selectedVehicle.value === 'ALL'
+    let vehLabel = isAll ? 'ALL FLEET VEHICLES' : (selectedVehicle.label || selectedVehicle.value)
+    let cubesTotal = totalCubes
+    let grossTotal = totalGrossRate
+    let expenseTotal = totalDailyExpense
+    let netTotal = totalNetPayable
+
+    if (customItem) {
+      recordsToPrint = [customItem]
+      vehLabel = customItem.vehicleNumber
+      cubesTotal = Number(customItem.cube) || 0
+      grossTotal = Number(customItem.transportRate) || 0
+      expenseTotal = Number(customItem.dailyExpense) || 0
+      netTotal = Number(customItem.payableAmount) || 0
+    } else if (data) {
+      if (Array.isArray(data)) {
+        recordsToPrint = data
+      } else {
+        recordsToPrint = data.items || data.trips || data.records || data.routes || data.dailyRoutes || data.details || []
+        voucherNumber = data.receiptNumber || data.voucherNumber || data.voucherNo || data.receiptNo || voucherNumber
+        statementPeriod = data.date || data.statementDate || data.period || statementPeriod
+        if (data.vehicleNumber) {
+          vehLabel = `${data.vehicleNumber}${data.driverName ? ` (Driver: ${data.driverName})` : ''}`
+        }
+        if (data.totalCubes !== undefined) cubesTotal = Number(data.totalCubes) || 0
+        else cubesTotal = recordsToPrint.reduce((sum, r) => sum + (Number(r.cube || r.cubes) || 0), 0)
+
+        if (data.totalGrossRate !== undefined) grossTotal = Number(data.totalGrossRate) || 0
+        else if (data.grossAmount !== undefined) grossTotal = Number(data.grossAmount) || 0
+        else grossTotal = recordsToPrint.reduce((sum, r) => sum + (Number(r.transportRate || r.rate || r.amount) || 0), 0)
+
+        if (data.totalDailyExpense !== undefined) expenseTotal = Number(data.totalDailyExpense) || 0
+        else if (data.totalExpenses !== undefined) expenseTotal = Number(data.totalExpenses) || 0
+        else expenseTotal = recordsToPrint.reduce((sum, r) => sum + (Number(r.dailyExpense || r.expense) || 0), 0)
+
+        if (data.totalNetPayable !== undefined) netTotal = Number(data.totalNetPayable) || 0
+        else if (data.netPayable !== undefined) netTotal = Number(data.netPayable) || 0
+        else netTotal = grossTotal - expenseTotal
+      }
+    } else {
+      recordsToPrint = filteredRecords
+    }
 
     // Header Background Accent Bar
     doc.setFillColor(15, 23, 42) // Slate 900
@@ -178,7 +247,7 @@ const Receipts = () => {
     // Document Meta (Top Right)
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(7.5)
-    doc.text(`VOUCHER: MG-VCH-${Date.now().toString().slice(-6)}`, 196, 12, { align: 'right' })
+    doc.text(`VOUCHER: ${voucherNumber}`, 196, 12, { align: 'right' })
     doc.text(`ISSUED: ${new Date().toLocaleDateString('en-GB')}`, 196, 19, { align: 'right' })
 
     // Voucher Info Grid Box
@@ -195,9 +264,9 @@ const Receipts = () => {
 
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(15, 23, 42)
-    doc.text(`${fromDate || 'ALL DATES'}`, 18, 49)
+    doc.text(`${statementPeriod}`, 18, 49)
     doc.text(`${vehLabel}`, 78, 49)
-    doc.text(`${recordsToPrint.length} Trips (${totalCubes.toFixed(1)} Cubes)`, 140, 49)
+    doc.text(`${recordsToPrint.length} Trips (${cubesTotal.toFixed(1)} Cubes)`, 140, 49)
 
     // Table Data preparation
     const tableHeaders = [
@@ -206,16 +275,16 @@ const Receipts = () => {
 
     const tableRows = recordsToPrint.map((item, idx) => [
       idx + 1,
-      item.date,
-      item.billNumber,
-      item.vehicleNumber,
-      item.land,
-      item.deliveryLocation,
-      item.cube > 0 ? item.cube : '-',
-      item.km > 0 ? `${item.km}` : '-',
-      formatLKR(item.transportRate),
-      item.dailyExpense > 0 ? formatLKR(item.dailyExpense) : '-',
-      formatLKR(item.payableAmount),
+      item.date || item.routeDate || '',
+      item.billNumber || item.billNo || item.invoiceNo || '-',
+      item.vehicleNumber || item.vehicleNo || '-',
+      item.land || item.landName || item.source || '-',
+      item.deliveryLocation || item.location || item.destination || '-',
+      (item.cube > 0 || item.cubes > 0) ? (item.cube || item.cubes) : '-',
+      (item.km > 0 || item.distance > 0) ? `${item.km || item.distance}` : '-',
+      formatLKR(item.transportRate ?? item.rate ?? item.amount ?? 0),
+      (item.dailyExpense > 0 || item.expense > 0) ? formatLKR(item.dailyExpense || item.expense) : '-',
+      formatLKR(item.payableAmount ?? item.netAmount ?? ((item.transportRate || 0) - (item.dailyExpense || 0))),
     ])
 
     // Generate Table with AutoTable
@@ -267,11 +336,11 @@ const Receipts = () => {
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(71, 85, 105)
     doc.text('Gross Transport Total:', 114, finalY + 7)
-    doc.text(`Rs. ${formatLKR(totalGrossRate)}`, 192, finalY + 7, { align: 'right' })
+    doc.text(`Rs. ${formatLKR(grossTotal)}`, 192, finalY + 7, { align: 'right' })
 
     doc.text('Total Expense Deductions:', 114, finalY + 14)
     doc.setTextColor(220, 38, 38)
-    doc.text(`- Rs. ${formatLKR(totalDailyExpense)}`, 192, finalY + 14, { align: 'right' })
+    doc.text(`- Rs. ${formatLKR(expenseTotal)}`, 192, finalY + 14, { align: 'right' })
 
     doc.setDrawColor(203, 213, 225)
     doc.line(114, finalY + 18, 192, finalY + 18)
@@ -281,7 +350,7 @@ const Receipts = () => {
     doc.setTextColor(15, 23, 42)
     doc.text('NET PAYABLE AMOUNT:', 114, finalY + 26)
     doc.setTextColor(217, 119, 6) // Amber 600
-    doc.text(`Rs. ${formatLKR(totalNetPayable)}`, 192, finalY + 26, { align: 'right' })
+    doc.text(`Rs. ${formatLKR(netTotal)}`, 192, finalY + 26, { align: 'right' })
 
     // Signatures section
     const signY = finalY + 48
@@ -307,44 +376,125 @@ const Receipts = () => {
     return doc
   }
 
-  // ─── Option 1: Preview PDF in Modal ───────────────────────────────────────
-  const handlePreviewPdf = (customItem = null) => {
-    const records = customItem ? [customItem] : filteredRecords
-    if (records.length === 0) {
-      alert('No matching records found to generate receipt preview. Please adjust your filters.')
+  // ─── Option 1: Preview PDF in Modal (Backend Connected) ────────────────────
+  const handlePreviewPdf = async (customItem = null) => {
+    if (customItem) {
+      const doc = generatePdfDoc(null, customItem)
+      const blob = doc.output('blob')
+      const blobUrl = URL.createObjectURL(blob)
+      setPreviewPdfUrl(blobUrl)
+      setPreviewMeta({
+        vehicle: customItem.vehicleNumber,
+        count: 1,
+        payable: customItem.payableAmount,
+      })
+      setPreviewModalVisible(true)
       return
     }
 
-    const doc = generatePdfDoc(records)
-    const blob = doc.output('blob')
-    const blobUrl = URL.createObjectURL(blob)
+    if (!fromDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Date Required',
+        text: 'Please select a date to preview the receipt.',
+        confirmButtonColor: '#f59e0b',
+      })
+      return
+    }
 
-    setPreviewPdfUrl(blobUrl)
-    setPreviewMeta({
-      vehicle: customItem ? customItem.vehicleNumber : (selectedVehicle?.label || 'All Vehicles'),
-      count: records.length,
-      payable: customItem ? customItem.payableAmount : totalNetPayable,
-    })
-    setPreviewModalVisible(true)
+    const vehNumber = selectedVehicle?.value || 'ALL'
+    setPreviewLoading(true)
+
+    try {
+      // 1. Query Spring Boot API: GET /api/material-grid/receipts/preview?date=...&vehicleNumber=...
+      const receiptData = await receiptService.getReceiptPreview(fromDate, vehNumber)
+
+      const items = receiptData?.items || receiptData?.trips || receiptData?.records || receiptData?.routes || (Array.isArray(receiptData) ? receiptData : [])
+
+      const doc = generatePdfDoc(receiptData)
+      const blob = doc.output('blob')
+      const blobUrl = URL.createObjectURL(blob)
+
+      setPreviewPdfUrl(blobUrl)
+      setPreviewMeta({
+        vehicle: receiptData?.vehicleNumber || selectedVehicle?.label || vehNumber,
+        count: items.length || 1,
+        payable: receiptData?.totalNetPayable ?? receiptData?.netPayable ?? totalNetPayable,
+      })
+      setPreviewModalVisible(true)
+    } catch (err) {
+      console.warn('Backend receipt preview call returned error, checking local records:', err.message)
+      // If server error or offline in development, fallback gracefully to current filtered records
+      if (filteredRecords.length > 0) {
+        const doc = generatePdfDoc(filteredRecords)
+        const blob = doc.output('blob')
+        const blobUrl = URL.createObjectURL(blob)
+        setPreviewPdfUrl(blobUrl)
+        setPreviewMeta({
+          vehicle: selectedVehicle?.label || 'All Vehicles',
+          count: filteredRecords.length,
+          payable: totalNetPayable,
+        })
+        setPreviewModalVisible(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Preview Failed',
+          text: err.message || 'Unable to retrieve receipt preview data from server.',
+          confirmButtonColor: '#dc2626',
+        })
+      }
+    } finally {
+      setPreviewLoading(false)
+    }
   }
 
   // ─── Option 2: Download PDF Receipt ───────────────────────────────────────
-  const handleDownloadPdf = (customItem = null) => {
-    const records = customItem ? [customItem] : filteredRecords
-    if (records.length === 0) {
-      alert('No matching records found to download receipt. Please adjust your filters.')
+  const handleDownloadPdf = async (customItem = null) => {
+    if (customItem) {
+      const doc = generatePdfDoc(null, customItem)
+      const fileName = `Material_Grid_Receipt_${customItem.vehicleNumber}_${customItem.date || fromDate}.pdf`
+      doc.save(fileName)
       return
     }
 
-    const doc = generatePdfDoc(records)
-    const vehName = customItem
-      ? customItem.vehicleNumber
-      : selectedVehicle?.value !== 'ALL'
-        ? selectedVehicle.value
-        : 'All_Vehicles'
+    if (!fromDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Date Required',
+        text: 'Please select a date to download the receipt.',
+        confirmButtonColor: '#f59e0b',
+      })
+      return
+    }
 
-    const fileName = `Material_Grid_Receipt_${vehName}_${fromDate}.pdf`
-    doc.save(fileName)
+    const vehNumber = selectedVehicle?.value || 'ALL'
+    setDownloadLoading(true)
+
+    try {
+      const receiptData = await receiptService.getReceiptPreview(fromDate, vehNumber)
+      const doc = generatePdfDoc(receiptData)
+      const vehName = receiptData?.vehicleNumber || (selectedVehicle?.value !== 'ALL' ? selectedVehicle.value : 'All_Vehicles')
+      const fileName = `Material_Grid_Receipt_${vehName}_${fromDate}.pdf`
+      doc.save(fileName)
+    } catch (err) {
+      console.warn('Backend download call returned error, checking local records:', err.message)
+      if (filteredRecords.length > 0) {
+        const doc = generatePdfDoc(filteredRecords)
+        const vehName = selectedVehicle?.value !== 'ALL' ? selectedVehicle.value : 'All_Vehicles'
+        const fileName = `Material_Grid_Receipt_${vehName}_${fromDate}.pdf`
+        doc.save(fileName)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text: err.message || 'Unable to download receipt.',
+          confirmButtonColor: '#dc2626',
+        })
+      }
+    } finally {
+      setDownloadLoading(false)
+    }
   }
 
   return (
@@ -376,7 +526,7 @@ const Receipts = () => {
               className="rc-btn-reset"
               onClick={() => {
                 setFromDate('2026-08-07')
-                setSelectedVehicle(VEHICLE_OPTIONS[0])
+                setSelectedVehicle(DEFAULT_VEHICLE_OPTION)
                 setTableSearch('')
               }}
             >
@@ -407,13 +557,20 @@ const Receipts = () => {
                 <CIcon icon={cilTruck} size="sm" className="text-warning" />
                 Vehicle Number (Searchable)
               </CFormLabel>
-              <Select
-                options={VEHICLE_OPTIONS}
+              <AsyncSelect
+                cacheOptions
+                defaultOptions
+                loadOptions={loadVehicleOptions}
                 value={selectedVehicle}
                 onChange={setSelectedVehicle}
-                placeholder="Search vehicle number or driver…"
+                placeholder="Search vehicle number (e.g. LC-4838) or driver…"
                 isClearable={false}
+                styles={selectStyles}
                 classNamePrefix="mg-select"
+                noOptionsMessage={({ inputValue }) =>
+                  inputValue ? `No vehicles matching "${inputValue}"` : 'Type to search vehicles…'
+                }
+                loadingMessage={() => 'Searching vehicles…'}
               />
             </CCol>
           </CRow>
@@ -424,13 +581,21 @@ const Receipts = () => {
 
             <div className="d-flex align-items-center gap-2">
               {/* Option 1: Preview PDF Receipt */}
-              <button className="rc-btn-preview" onClick={() => handlePreviewPdf()}>
-                <CIcon icon={cilFindInPage} /> Preview PDF Receipt
+              <button
+                className="rc-btn-preview"
+                onClick={() => handlePreviewPdf()}
+                disabled={previewLoading || downloadLoading}
+              >
+                <CIcon icon={cilFindInPage} /> {previewLoading ? 'Loading Preview…' : 'Preview PDF Receipt'}
               </button>
 
               {/* Option 2: Download PDF Receipt */}
-              <button className="rc-btn-download" onClick={() => handleDownloadPdf()}>
-                <CIcon icon={cilCloudDownload} /> Download PDF Receipt
+              <button
+                className="rc-btn-download"
+                onClick={() => handleDownloadPdf()}
+                disabled={previewLoading || downloadLoading}
+              >
+                <CIcon icon={cilCloudDownload} /> {downloadLoading ? 'Downloading…' : 'Download PDF Receipt'}
               </button>
             </div>
           </div>
