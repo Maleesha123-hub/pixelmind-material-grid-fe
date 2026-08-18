@@ -133,10 +133,16 @@ const _nav = [
     to: '/receipts',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
-  // {
-  //   component: CNavTitle,
-  //   name: 'MASTER DATA',
-  // },
+  {
+    component: CNavTitle,
+    name: 'MASTER DATA',
+  },
+    {
+    component: CNavItem,
+    name: 'Vehicles',
+    to: '/vehicles',
+    icon: <CIcon icon={cilCarAlt} customClassName="nav-icon" />,
+  },
   // {
   //   component: CNavGroup,
   //   name: 'Persons',

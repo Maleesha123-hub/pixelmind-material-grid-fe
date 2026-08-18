@@ -27,17 +27,11 @@ import {
 import './BulkUpload.css'
 import Swal from 'sweetalert2'
 
-
-
 import bulkUploadService from '../../../service/bulkUploadService'
 
-const REQUIRED_TRIP_COLUMNS = [
-  'Date', 'LAND', 'Vehial Number', 'Bil Number', 'Cube', 'KM', 'Transport Per Rate', 'Dilivery Location', 'Daily Expence', 'Paybel Amount'
-]
+const REQUIRED_TRIP_COLUMNS = ['Date', 'Vehicle Number', 'Check By', 'Bil Number', 'Route Code']
 
-const REQUIRED_EXPENSE_COLUMNS = [
-  'Date', 'Category', 'Vehicle/Ref', 'Voucher No', 'Paid To', 'Payment Method', 'Amount (LKR)', 'Site Allocation', 'Remarks'
-]
+const REQUIRED_EXPENSE_COLUMNS = ['Date', 'Vehicle Number', 'Amount (LKR)', 'Remarks']
 
 const BulkUpload = () => {
   const [activeTab, setActiveTab] = useState('trips') // 'trips' | 'expenses'
@@ -63,7 +57,10 @@ const BulkUpload = () => {
   // ─── Format Currency ──────────────────────────────────────────────────────
   const formatLKR = (num) => {
     if (isNaN(num) || num === null || num === undefined) return '0.00'
-    return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    return Number(num).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
   }
 
   // ─── Upload & Parse Material Trip Sheet (Backend API Connected) ───────────
@@ -86,33 +83,46 @@ const BulkUpload = () => {
           const worksheet = workbook.Sheets[sheetName]
           const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
-          const formatted = json.map((row) => {
-            const rawDate = row['Date'] || row['date'] || ''
-            const rawLand = row['LAND'] || row['Land'] || row['land'] || '-'
-            const rawVeh = row['Vehial Number'] || row['Vehicle Number'] || row['vehicle'] || row['Vehical'] || ''
-            const rawBill = row['Bil Number'] || row['Bill Number'] || row['bill'] || ''
-            const rawCube = parseFloat(row['Cube'] || row['cube'] || 0) || 0
-            const rawKm = parseFloat(row['KM'] || row['km'] || 0) || 0
-            const rawRate = parseFloat(row['Transport Per Rate'] || row['Transport Rate'] || row['transport'] || 0) || 0
-            const rawLoc = row['Dilivery Location'] || row['Delivery Location'] || row['location'] || '-'
-            const rawExpense = parseFloat(row['Daily Expence'] || row['Daily Expense'] || row['expense'] || 0) || 0
-            const rawPayable = row['Paybel Amount'] !== undefined && row['Paybel Amount'] !== ''
-              ? parseFloat(row['Paybel Amount'])
-              : (rawRate - rawExpense)
+          const formatted = json
+            .map((row) => {
+              const rawDate = row['Date'] || row['date'] || ''
+              const rawLand = row['LAND'] || row['Land'] || row['land'] || '-'
+              const rawVeh =
+                row['Vehial Number'] ||
+                row['Vehicle Number'] ||
+                row['vehicle'] ||
+                row['Vehical'] ||
+                ''
+              const rawBill = row['Bil Number'] || row['Bill Number'] || row['bill'] || ''
+              const rawCube = parseFloat(row['Cube'] || row['cube'] || 0) || 0
+              const rawKm = parseFloat(row['KM'] || row['km'] || 0) || 0
+              const rawRate =
+                parseFloat(
+                  row['Transport Per Rate'] || row['Transport Rate'] || row['transport'] || 0,
+                ) || 0
+              const rawLoc =
+                row['Dilivery Location'] || row['Delivery Location'] || row['location'] || '-'
+              const rawExpense =
+                parseFloat(row['Daily Expence'] || row['Daily Expense'] || row['expense'] || 0) || 0
+              const rawPayable =
+                row['Paybel Amount'] !== undefined && row['Paybel Amount'] !== ''
+                  ? parseFloat(row['Paybel Amount'])
+                  : rawRate - rawExpense
 
-            return {
-              date: rawDate,
-              land: rawLand,
-              vehicleNumber: rawVeh,
-              billNumber: rawBill,
-              cube: rawCube,
-              km: rawKm,
-              transportRate: rawRate,
-              deliveryLocation: rawLoc,
-              dailyExpense: rawExpense,
-              payableAmount: rawPayable,
-            }
-          }).filter(item => item.vehicleNumber || item.billNumber || item.date)
+              return {
+                date: rawDate,
+                land: rawLand,
+                vehicleNumber: rawVeh,
+                billNumber: rawBill,
+                cube: rawCube,
+                km: rawKm,
+                transportRate: rawRate,
+                deliveryLocation: rawLoc,
+                dailyExpense: rawExpense,
+                payableAmount: rawPayable,
+              }
+            })
+            .filter((item) => item.vehicleNumber || item.billNumber || item.date)
 
           setTripsData(formatted)
         } catch (parseErr) {
@@ -164,17 +174,20 @@ const BulkUpload = () => {
           const worksheet = workbook.Sheets[sheetName]
           const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
-          const formatted = json.map((row) => ({
-            date: row['Date'] || row['date'] || '',
-            category: row['Category'] || row['Expense Category'] || row['category'] || 'General Expense',
-            refNo: row['Vehicle/Ref'] || row['Vehicle Number'] || row['ref'] || '-',
-            voucherNo: row['Voucher No'] || row['voucher'] || '-',
-            paidTo: row['Paid To'] || row['beneficiary'] || '-',
-            method: row['Payment Method'] || row['method'] || 'Cash',
-            amount: parseFloat(row['Amount (LKR)'] || row['Amount'] || row['amount'] || 0) || 0,
-            site: row['Site Allocation'] || row['Site'] || row['site'] || 'General Site',
-            remarks: row['Remarks'] || row['Notes'] || row['remarks'] || '',
-          })).filter(item => item.date || item.amount || item.category)
+          const formatted = json
+            .map((row) => ({
+              date: row['Date'] || row['date'] || '',
+              category:
+                row['Category'] || row['Expense Category'] || row['category'] || 'General Expense',
+              refNo: row['Vehicle/Ref'] || row['Vehicle Number'] || row['ref'] || '-',
+              voucherNo: row['Voucher No'] || row['voucher'] || '-',
+              paidTo: row['Paid To'] || row['beneficiary'] || '-',
+              method: row['Payment Method'] || row['method'] || 'Cash',
+              amount: parseFloat(row['Amount (LKR)'] || row['Amount'] || row['amount'] || 0) || 0,
+              site: row['Site Allocation'] || row['Site'] || row['site'] || 'General Site',
+              remarks: row['Remarks'] || row['Notes'] || row['remarks'] || '',
+            }))
+            .filter((item) => item.date || item.amount || item.category)
 
           setExpensesData(formatted)
         } catch (parseErr) {
@@ -209,7 +222,18 @@ const BulkUpload = () => {
   // ─── Download Sample Excel Templates ──────────────────────────────────────
   const downloadSampleTripsTemplate = () => {
     const wsData = [
-      ['Date', 'LAND', 'Vehial Number', 'Bil Number', 'Cube', 'KM', 'Transport Per Rate', 'Dilivery Location', 'Daily Expence', 'Paybel Amount'],
+      [
+        'Date',
+        'LAND',
+        'Vehial Number',
+        'Bil Number',
+        'Cube',
+        'KM',
+        'Transport Per Rate',
+        'Dilivery Location',
+        'Daily Expence',
+        'Paybel Amount',
+      ],
       ['8/7/2026', 'L', 'LC-4838', '7901', 3.7, 24, 10952.0, '28+580', 0, 10952.0],
       ['8/7/2026', 'L', 'LI-8902', '7902', 3.9, 24, 11544.0, '28+580', 0, 11544.0],
       ['8/7/2026', 'S', 'LK-5177', '7904', 3.0, 24, 8880.0, '28+580', 0, 8880.0],
@@ -223,10 +247,50 @@ const BulkUpload = () => {
 
   const downloadSampleExpensesTemplate = () => {
     const wsData = [
-      ['Date', 'Category', 'Vehicle/Ref', 'Voucher No', 'Paid To', 'Payment Method', 'Amount (LKR)', 'Site Allocation', 'Remarks'],
-      ['8/7/2026', 'Fuel / Diesel', 'WP-CAC-1234', 'EXP-1001', 'Ceypetco Fuel Station', 'Fuel Card', 45000.0, '28+580', '120L Diesel'],
-      ['8/7/2026', 'Driver Advance', 'DRV-001 (Kamal)', 'EXP-1002', 'Kamal Perera', 'Cash', 10000.0, '28+580', 'Trip Advance'],
-      ['8/7/2026', 'Machinery Hire', 'Excavator Kondaya', 'EXP-1003', 'Kondaya Plant Hire', 'Bank Transfer', 100000.0, 'Quarry Land L', '10-hour hire'],
+      [
+        'Date',
+        'Category',
+        'Vehicle/Ref',
+        'Voucher No',
+        'Paid To',
+        'Payment Method',
+        'Amount (LKR)',
+        'Site Allocation',
+        'Remarks',
+      ],
+      [
+        '8/7/2026',
+        'Fuel / Diesel',
+        'WP-CAC-1234',
+        'EXP-1001',
+        'Ceypetco Fuel Station',
+        'Fuel Card',
+        45000.0,
+        '28+580',
+        '120L Diesel',
+      ],
+      [
+        '8/7/2026',
+        'Driver Advance',
+        'DRV-001 (Kamal)',
+        'EXP-1002',
+        'Kamal Perera',
+        'Cash',
+        10000.0,
+        '28+580',
+        'Trip Advance',
+      ],
+      [
+        '8/7/2026',
+        'Machinery Hire',
+        'Excavator Kondaya',
+        'EXP-1003',
+        'Kondaya Plant Hire',
+        'Bank Transfer',
+        100000.0,
+        'Quarry Land L',
+        '10-hour hire',
+      ],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     const wb = XLSX.utils.book_new()
@@ -235,7 +299,7 @@ const BulkUpload = () => {
   }
 
   // ─── Trips Calculations ───────────────────────────────────────────────────
-  const filteredTrips = tripsData.filter(item => {
+  const filteredTrips = tripsData.filter((item) => {
     const q = tripsSearch.toLowerCase()
     return (
       (item.vehicleNumber || '').toLowerCase().includes(q) ||
@@ -248,12 +312,21 @@ const BulkUpload = () => {
 
   const totalTripsCount = tripsData.length
   const totalCubes = tripsData.reduce((sum, item) => sum + (Number(item.cube) || 0), 0)
-  const totalGrossTransport = tripsData.reduce((sum, item) => sum + (Number(item.transportRate) || 0), 0)
-  const totalDailyExpensesInTrips = tripsData.reduce((sum, item) => sum + (Number(item.dailyExpense) || 0), 0)
-  const totalNetPayable = tripsData.reduce((sum, item) => sum + (Number(item.payableAmount) || 0), 0)
+  const totalGrossTransport = tripsData.reduce(
+    (sum, item) => sum + (Number(item.transportRate) || 0),
+    0,
+  )
+  const totalDailyExpensesInTrips = tripsData.reduce(
+    (sum, item) => sum + (Number(item.dailyExpense) || 0),
+    0,
+  )
+  const totalNetPayable = tripsData.reduce(
+    (sum, item) => sum + (Number(item.payableAmount) || 0),
+    0,
+  )
 
   // ─── Expenses Calculations ────────────────────────────────────────────────
-  const filteredExpenses = expensesData.filter(item => {
+  const filteredExpenses = expensesData.filter((item) => {
     const q = expensesSearch.toLowerCase()
     return (
       (item.category || '').toLowerCase().includes(q) ||
@@ -264,9 +337,17 @@ const BulkUpload = () => {
   })
 
   const totalExpenseAmount = expensesData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
-  const fuelExpenses = expensesData.filter(i => (i.category || '').includes('Fuel')).reduce((sum, i) => sum + i.amount, 0)
-  const machineryExpenses = expensesData.filter(i => (i.category || '').includes('Machinery') || (i.refNo || '').includes('Excavator')).reduce((sum, i) => sum + i.amount, 0)
-  const driverAdvances = expensesData.filter(i => (i.category || '').includes('Advance') || (i.category || '').includes('Labour')).reduce((sum, i) => sum + i.amount, 0)
+  const fuelExpenses = expensesData
+    .filter((i) => (i.category || '').includes('Fuel'))
+    .reduce((sum, i) => sum + i.amount, 0)
+  const machineryExpenses = expensesData
+    .filter(
+      (i) => (i.category || '').includes('Machinery') || (i.refNo || '').includes('Excavator'),
+    )
+    .reduce((sum, i) => sum + i.amount, 0)
+  const driverAdvances = expensesData
+    .filter((i) => (i.category || '').includes('Advance') || (i.category || '').includes('Labour'))
+    .reduce((sum, i) => sum + i.amount, 0)
 
   return (
     <div className="bu-page">
@@ -356,13 +437,18 @@ const BulkUpload = () => {
                   }}
                 />
                 <div className="bu-dropzone-icon">
-                  {tripsLoading ? <CSpinner color="warning" /> : <CIcon icon={cilCloudUpload} size="xl" />}
+                  {tripsLoading ? (
+                    <CSpinner color="warning" />
+                  ) : (
+                    <CIcon icon={cilCloudUpload} size="xl" />
+                  )}
                 </div>
                 <div className="bu-dropzone-title">
                   {tripsFileName ? tripsFileName : 'Drop your Excel trip file here, or browse'}
                 </div>
                 <div className="bu-dropzone-desc">
-                  Supports .xlsx, .xls, .csv files. Expected columns: Date, LAND, Vehial Number, Bil Number, Cube, KM, Transport Rate, Delivery Location, Daily Expence, Payable Amount
+                  Supports .xlsx, .xls, .csv files. Expected columns: Date, LAND, Vehial Number, Bil
+                  Number, Cube, KM, Transport Rate, Delivery Location, Daily Expence, Payable Amount
                 </div>
                 <CButton color="warning" size="sm" className="text-white fw-bold">
                   Browse Files
@@ -395,7 +481,7 @@ const BulkUpload = () => {
             <CCardHeader className="bu-card-header">
               <div className="bu-card-title">
                 <CIcon icon={cilMoney} className="text-info" />
-                <span>Upload Daily Site & Fleet Expenses Sheet</span>
+                <span>Upload Daily Site & Expenses Sheet</span>
               </div>
               <div className="d-flex align-items-center gap-2">
                 <button className="bu-btn-download" onClick={downloadSampleExpensesTemplate}>
@@ -432,13 +518,20 @@ const BulkUpload = () => {
                   }}
                 />
                 <div className="bu-dropzone-icon">
-                  {expensesLoading ? <CSpinner color="info" /> : <CIcon icon={cilMoney} size="xl" />}
+                  {expensesLoading ? (
+                    <CSpinner color="info" />
+                  ) : (
+                    <CIcon icon={cilMoney} size="xl" />
+                  )}
                 </div>
                 <div className="bu-dropzone-title">
-                  {expensesFileName ? expensesFileName : 'Drop your Daily Expenses Excel file here, or browse'}
+                  {expensesFileName
+                    ? expensesFileName
+                    : 'Drop your Daily Expenses Excel file here, or browse'}
                 </div>
                 <div className="bu-dropzone-desc">
-                  Supports .xlsx, .xls, .csv files. Columns: Date, Category, Vehicle/Ref, Voucher No, Paid To, Payment Method, Amount, Site Allocation, Remarks
+                  Supports .xlsx, .xls, .csv files. Columns: Date, Category, Vehicle/Ref, Voucher
+                  No, Paid To, Payment Method, Amount, Site Allocation, Remarks
                 </div>
                 <CButton color="info" size="sm" className="text-white fw-bold">
                   Browse Files

@@ -555,7 +555,7 @@ const Receipts = () => {
             <CCol xs={12} md={6}>
               <CFormLabel className="rc-label">
                 <CIcon icon={cilTruck} size="sm" className="text-warning" />
-                Vehicle Number (Searchable)
+                Vehicle Number
               </CFormLabel>
               <AsyncSelect
                 cacheOptions
