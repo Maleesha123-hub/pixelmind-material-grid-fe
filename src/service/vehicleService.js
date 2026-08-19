@@ -164,8 +164,8 @@ export const vehicleService = {
   },
 
   /**
-   * POST /api/material-grid/vehicles/bulk-upload
-   * Upload vehicle Excel/CSV file to backend endpoint if supported.
+   * POST /api/v1/vehicles/upload
+   * Upload vehicle Excel/CSV file to backend endpoint (Vehicle Number | Capacity(cube)).
    *
    * @param {File} file
    * @param {AbortSignal} [signal]
@@ -175,29 +175,38 @@ export const vehicleService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${API_BASE}/bulk-upload`, {
+    const response = await fetch(`${API_BASE}/upload`, {
       method: 'POST',
       body: formData,
       signal,
     })
 
-    if (!response.ok) {
-      let errorMessage = `Server responded with status: ${response.status}`
+    const contentType = response.headers.get('content-type')
+    let result = null
+    if (contentType && contentType.includes('application/json')) {
       try {
-        const errorData = await response.json()
-        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData)
+        result = await response.json()
       } catch {
-        const errorText = await response.text().catch(() => '')
-        if (errorText) errorMessage = errorText
+        result = null
       }
-      throw new Error(errorMessage)
+    } else {
+      result = await response.text().catch(() => '')
     }
 
-    const contentType = response.headers.get('content-type')
-    if (contentType && contentType.includes('application/json')) {
-      return await response.json()
+    if (!response.ok || (result && typeof result === 'object' && result.success === false)) {
+      let errorMessage =
+        (typeof result === 'object' && result?.message)
+          ? result.message
+          : `Server responded with status: ${response.status}`
+
+      const err = new Error(errorMessage)
+      err.response = result
+      err.status = response.status
+      err.errors = result?.data?.errors || result?.errors || []
+      throw err
     }
-    return await response.text()
+
+    return result
   },
 
   /**
