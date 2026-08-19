@@ -1,12 +1,13 @@
 /**
  * Vehicle Management Page
  *
- * Connects to:
- *   GET  /api/material-grid/vehicles?search=&page=&size=  → paginated table
- *   GET  /api/material-grid/vehicles/search?query=        → (used by Receipts)
- *   POST /api/material-grid/vehicles                      → create
- *   PUT  /api/material-grid/vehicles/{id}                 → update
- *   PATCH /api/material-grid/vehicles/{id}/status?status= → toggle
+ * Design matches Receipts & BulkUpload pages exactly.
+ * API:
+ *   GET  /api/material-grid/vehicles?search=&page=&size=
+ *   POST /api/material-grid/vehicles          { vehicleNumber, capacity }
+ *   PUT  /api/material-grid/vehicles/{id}     { capacity }
+ *   PATCH /api/material-grid/vehicles/{id}/status?status=
+ *   DELETE /api/material-grid/vehicles/{id}   (handled client-side / via status)
  *
  * @module Vehicle
  */
@@ -15,12 +16,16 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Swal from 'sweetalert2'
 import CIcon from '@coreui/icons-react'
 import {
+  CRow,
+  CCol,
+  CCard,
+  CCardBody,
+  CCardHeader,
   CModal,
   CModalHeader,
   CModalTitle,
   CModalBody,
   CModalFooter,
-  CButton,
   CSpinner,
 } from '@coreui/react'
 import {
@@ -32,15 +37,19 @@ import {
   cilPlus,
   cilReload,
   cilTruck,
+  cilTrash,
   cilChevronLeft,
   cilChevronRight,
+  cilFilter,
+  cilCloudUpload,
 } from '@coreui/icons'
 import vehicleService from '../../service/vehicleService'
+import VehicleBulkUploadModal from './VehicleBulkUploadModal'
 import './Vehicle.css'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const PAGE_SIZE = 10
-const EMPTY_FORM = { vehicleNumber: '', capacity: '' }
+const PAGE_SIZE = 15
+const EMPTY_FORM = { vehicleNumber: '', capacity: '', status: 'ACTIVE' }
 
 // ─── Debounce hook ────────────────────────────────────────────────────────────
 function useDebounce(value, delay = 400) {
@@ -55,53 +64,46 @@ function useDebounce(value, delay = 400) {
 // ─── Component ────────────────────────────────────────────────────────────────
 const Vehicle = () => {
   // ── Table state ─────────────────────────────────────────────────────────────
-  const [vehicles, setVehicles]         = useState([])          // current page content
+  const [vehicles, setVehicles] = useState([])
   const [totalElements, setTotalElements] = useState(0)
-  const [totalPages, setTotalPages]     = useState(0)
-  const [currentPage, setCurrentPage]   = useState(0)          // 0-based
-  const [loading, setLoading]           = useState(false)
-  const [searchInput, setSearchInput]   = useState('')
+  const [totalPages, setTotalPages] = useState(0)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
   const [statusFilter, setStatusFilter] = useState('ALL')
 
   // ── Modal / form state ───────────────────────────────────────────────────────
   const [modalVisible, setModalVisible] = useState(false)
-  const [editMode, setEditMode]         = useState(false)
-  const [selectedId, setSelectedId]     = useState(null)
-  const [form, setForm]                 = useState(EMPTY_FORM)
-  const [errors, setErrors]             = useState({})
-  const [saving, setSaving]             = useState(false)
+  const [bulkModalVisible, setBulkModalVisible] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [selectedId, setSelectedId] = useState(null)
+  const [form, setForm] = useState(EMPTY_FORM)
+  const [errors, setErrors] = useState({})
+  const [saving, setSaving] = useState(false)
 
-  // ── Debounced search ─────────────────────────────────────────────────────────
   const debouncedSearch = useDebounce(searchInput, 400)
   const abortRef = useRef(null)
 
-  // ── Load vehicles (server-side, paginated) ───────────────────────────────────
+  // ── Load vehicles ────────────────────────────────────────────────────────────
   const loadVehicles = useCallback(async (page = 0, search = '', statusF = 'ALL') => {
     if (abortRef.current) abortRef.current.abort()
     abortRef.current = new AbortController()
-
     setLoading(true)
     try {
       const result = await vehicleService.getVehicles(
         { search, page, size: PAGE_SIZE, sort: 'id,asc' },
-        abortRef.current.signal
+        abortRef.current.signal,
       )
-
-      // result is PageResponse: { content, totalElements, totalPages, number, size }
       let content = result?.content ?? (Array.isArray(result) ? result : [])
-
-      // client-side status filter (if backend doesn't support it)
       if (statusF !== 'ALL') {
         content = content.filter((v) => v.status === statusF)
       }
-
       setVehicles(content)
       setTotalElements(result?.totalElements ?? content.length)
       setTotalPages(result?.totalPages ?? 1)
       setCurrentPage(result?.number ?? page)
     } catch (err) {
       if (err.name === 'AbortError') return
-      console.warn('Backend unavailable — check your API server:', err.message)
       setVehicles([])
       setTotalElements(0)
       setTotalPages(0)
@@ -110,7 +112,6 @@ const Vehicle = () => {
     }
   }, [])
 
-  // Re-fetch whenever search/filter/page changes
   useEffect(() => {
     loadVehicles(0, debouncedSearch, statusFilter)
     setCurrentPage(0)
@@ -130,9 +131,7 @@ const Vehicle = () => {
 
   const validate = () => {
     const e = {}
-    if (!form.vehicleNumber.trim()) {
-      e.vehicleNumber = 'Vehicle number is required'
-    }
+    if (!form.vehicleNumber.trim()) e.vehicleNumber = 'Vehicle number is required'
     const cap = Number(form.capacity)
     if (!form.capacity && form.capacity !== 0) {
       e.capacity = 'Capacity is required'
@@ -143,7 +142,7 @@ const Vehicle = () => {
     return Object.keys(e).length === 0
   }
 
-  // ── Open modals ──────────────────────────────────────────────────────────────
+  // ── Modals ───────────────────────────────────────────────────────────────────
   const openAdd = () => {
     setEditMode(false)
     setSelectedId(null)
@@ -157,42 +156,51 @@ const Vehicle = () => {
     setSelectedId(v.id)
     setForm({
       vehicleNumber: v.vehicleNumber || '',
-      capacity:      v.capacity != null ? String(v.capacity) : '',
+      capacity: v.capacity != null ? String(v.capacity) : '',
+      status: v.status || 'ACTIVE',
     })
     setErrors({})
     setModalVisible(true)
   }
 
-  // ── Save (create / update) ───────────────────────────────────────────────────
+  // ── Save ─────────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     if (!validate()) return
     setSaving(true)
-
-    // Only send the fields VehicleCreateRequest / VehicleUpdateRequest accept
+    // VehicleCreateRequest accepts only: vehicleNumber, capacity
     const payload = {
       vehicleNumber: form.vehicleNumber.trim().toUpperCase(),
-      capacity:      Number(form.capacity),
+      capacity: Number(form.capacity),
+      status: form.status === 'ACTIVE' ? true : false,
     }
-
     try {
       if (editMode) {
         await vehicleService.updateVehicle(selectedId, payload)
+        // Apply status change separately if changed
+        if (form.status) {
+          await vehicleService.toggleVehicleStatus(selectedId, form.status).catch(() => {})
+        }
         Swal.fire({
-          icon: 'success', title: 'Vehicle Updated',
-          text: `${payload.vehicleNumber} updated successfully.`,
-          confirmButtonColor: '#d97706', timer: 2200, timerProgressBar: true,
+          icon: 'success',
+          title: 'Vehicle Updated',
+          text: `${payload.vehicleNumber} has been updated.`,
+          confirmButtonColor: '#d97706',
+          timer: 2200,
+          timerProgressBar: true,
         })
       } else {
         await vehicleService.createVehicle(payload)
         Swal.fire({
-          icon: 'success', title: 'Vehicle Added',
+          icon: 'success',
+          title: 'Vehicle Added',
           text: `${payload.vehicleNumber} has been registered.`,
-          confirmButtonColor: '#d97706', timer: 2200, timerProgressBar: true,
+          confirmButtonColor: '#d97706',
+          timer: 2200,
+          timerProgressBar: true,
         })
       }
       setModalVisible(false)
-      // Refresh current page
-      loadVehicles(currentPage, debouncedSearch, statusFilter)
+      loadVehicles(editMode ? currentPage : 0, debouncedSearch, statusFilter)
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -207,14 +215,13 @@ const Vehicle = () => {
 
   // ── Toggle status ────────────────────────────────────────────────────────────
   const handleToggle = async (v) => {
-    const next  = v.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
+    const next = v.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
     const label = next === 'ACTIVE' ? 'Activate' : 'Deactivate'
     const color = next === 'ACTIVE' ? '#059669' : '#dc2626'
-
     const res = await Swal.fire({
       title: `${label} ${v.vehicleNumber}?`,
-      text:  `This vehicle will be marked as ${next}.`,
-      icon:  'question',
+      text: `Vehicle will be marked as ${next}.`,
+      icon: 'question',
       showCancelButton: true,
       confirmButtonText: label,
       cancelButtonText: 'Cancel',
@@ -223,236 +230,306 @@ const Vehicle = () => {
       reverseButtons: true,
     })
     if (!res.isConfirmed) return
-
     try {
       await vehicleService.toggleVehicleStatus(v.id, next)
       Swal.fire({
         icon: 'success',
         title: next === 'ACTIVE' ? 'Activated' : 'Deactivated',
         text: `${v.vehicleNumber} is now ${next}.`,
-        confirmButtonColor: '#d97706', timer: 1800, timerProgressBar: true,
+        confirmButtonColor: '#d97706',
+        timer: 1800,
+        timerProgressBar: true,
       })
       loadVehicles(currentPage, debouncedSearch, statusFilter)
     } catch (err) {
       Swal.fire({
-        icon: 'error', title: 'Failed',
-        text: err.message || 'Could not update status.',
+        icon: 'error',
+        title: 'Failed',
+        text: err.message,
         confirmButtonColor: '#dc2626',
       })
     }
   }
 
-  // ── Render ───────────────────────────────────────────────────────────────────
+  // ── Delete ───────────────────────────────────────────────────────────────────
+  const handleDelete = async (v) => {
+    const res = await Swal.fire({
+      title: `Delete ${v.vehicleNumber}?`,
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#64748b',
+      reverseButtons: true,
+    })
+    if (!res.isConfirmed) return
+    try {
+      await vehicleService.deleteVehicle(v.id)
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted',
+        text: `${v.vehicleNumber} has been removed.`,
+        confirmButtonColor: '#d97706',
+        timer: 1800,
+        timerProgressBar: true,
+      })
+      loadVehicles(currentPage, debouncedSearch, statusFilter)
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to delete',
+        text: err.message,
+        confirmButtonColor: '#d97706',
+        timer: 5000,
+        timerProgressBar: true,
+      })
+    }
+  }
+
+  // ── Counts ───────────────────────────────────────────────────────────────────
+  const activeCount = vehicles.filter((v) => v.status === 'ACTIVE').length
+  const inactiveCount = vehicles.filter((v) => v.status === 'INACTIVE').length
   const startItem = totalElements === 0 ? 0 : currentPage * PAGE_SIZE + 1
-  const endItem   = Math.min((currentPage + 1) * PAGE_SIZE, totalElements)
+  const endItem = Math.min((currentPage + 1) * PAGE_SIZE, totalElements)
 
   return (
-    <div className="vh-page">
-
-      {/* ── Header ── */}
-      <div className="vh-page-header">
-        <div className="vh-header-left">
-          <div className="vh-header-icon">
+    <div className="vm-page">
+      {/* ── Page Header ── */}
+      <div className="vm-page-header">
+        <div className="vm-header-left">
+          <div className="vm-header-icon">
             <CIcon icon={cilCarAlt} size="xl" />
           </div>
           <div>
-            <h1 className="vh-page-title">Vehicle Management</h1>
-            <p className="vh-page-subtitle">
-              Fleet registry — vehicle number &amp; cube capacity
-            </p>
+            <h1 className="vm-page-title">Vehicle Management</h1>
+            <p className="vm-page-subtitle">Vehicle number &amp; cube capacity</p>
           </div>
         </div>
-        <button className="vh-btn-add" onClick={openAdd} id="btn-add-vehicle">
-          <CIcon icon={cilPlus} />
-          Add Vehicle
-        </button>
-      </div>
-
-      {/* ── Search + Filter row ── */}
-      <div className="vh-search-bar">
-        {/* Search input — debounced, triggers server-side query */}
-        <div className="vh-search-wrap">
-          <span className="vh-search-icon-pos">
-            {loading
-              ? <CSpinner size="sm" style={{ color: '#d97706', width: 14, height: 14 }} />
-              : <CIcon icon={cilSearch} size="sm" />
-            }
-          </span>
-          <input
-            id="vehicle-search"
-            type="text"
-            className="vh-search-input"
-            placeholder="Search vehicle number…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            autoComplete="off"
-          />
+        <div className="vm-header-actions">
+          <button
+            type="button"
+            className="vm-btn-upload-excel"
+            onClick={() => setBulkModalVisible(true)}
+            id="btn-bulk-upload-vehicle"
+            title="Upload Vehicle Excel Sheet"
+          >
+            <CIcon icon={cilCloudUpload} />
+            Upload Excel
+          </button>
+          <button className="vm-btn-add" onClick={openAdd} id="btn-add-vehicle">
+            <CIcon icon={cilPlus} />
+            Add Vehicle
+          </button>
         </div>
-
-        {/* Status filter */}
-        <select
-          id="vehicle-status-filter"
-          className="vh-filter-select"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="ALL">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
-        </select>
-
-        {/* Clear */}
-        <button
-          className="vh-btn-cancel"
-          style={{ height: 42 }}
-          title="Clear filters"
-          onClick={() => { setSearchInput(''); setStatusFilter('ALL') }}
-        >
-          <CIcon icon={cilReload} size="sm" />
-        </button>
       </div>
 
-      {/* ── Table Card ── */}
-      <div className="vh-card">
-        {loading && vehicles.length === 0 ? (
-          <div className="vh-loading"><div className="vh-spinner" /></div>
-        ) : (
-          <>
-            <table className="vh-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 44 }}>#</th>
-                  <th>Vehicle Number</th>
-                  <th>Capacity</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'center' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vehicles.length === 0 ? (
+      {/* ── Filter Card ── */}
+      <CCard className="vm-card">
+        <CCardHeader className="vm-card-header">
+          <div className="vm-card-title">
+            <CIcon icon={cilFilter} className="text-warning" />
+            <span>Search &amp; Filter</span>
+          </div>
+          <button
+            className="vm-btn-reset"
+            onClick={() => {
+              setSearchInput('')
+              setStatusFilter('ALL')
+            }}
+          >
+            <CIcon icon={cilReload} size="sm" />
+            Reset Filters
+          </button>
+        </CCardHeader>
+        <CCardBody className="vm-card-body">
+          <CRow className="g-3">
+            {/* Search */}
+            <CCol xs={12} md={6}>
+              <label className="vm-label">
+                <CIcon icon={cilSearch} size="sm" className="text-warning" />
+                Search Vehicle Number
+              </label>
+              <div className="vm-search-wrap">
+                <span className="vm-search-icon">
+                  {loading ? (
+                    <CSpinner size="sm" style={{ color: '#d97706', width: 13, height: 13 }} />
+                  ) : (
+                    <CIcon icon={cilSearch} size="sm" />
+                  )}
+                </span>
+                <input
+                  id="vehicle-search"
+                  type="text"
+                  className="vm-search-input"
+                  placeholder="e.g. LC-4838"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  autoComplete="off"
+                  style={{ paddingLeft: '2.25rem' }}
+                />
+              </div>
+            </CCol>
+
+            {/* Status Filter */}
+            <CCol xs={12} md={6}>
+              <label className="vm-label">
+                <CIcon icon={cilFilter} size="sm" className="text-warning" />
+                Filter by Status
+              </label>
+              <select
+                id="vehicle-status-filter"
+                className="vm-select"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="ALL">All Status</option>
+                <option value="ACTIVE">Active Only</option>
+                <option value="INACTIVE">Inactive Only</option>
+              </select>
+            </CCol>
+          </CRow>
+        </CCardBody>
+      </CCard>
+
+      {/* ── Vehicle Table Card ── */}
+      <CCard className="vm-card">
+        <div className="vm-table-wrap">
+          {loading && vehicles.length === 0 ? (
+            <div className="vm-loading">
+              <div className="vm-spinner" />
+            </div>
+          ) : (
+            <>
+              <table className="vm-table">
+                <thead>
                   <tr>
-                    <td colSpan={5}>
-                      <div className="vh-empty">
-                        <div className="vh-empty-icon">
-                          <CIcon icon={cilTruck} size="xl" />
-                        </div>
-                        <h3>No vehicles found</h3>
-                        <p>
-                          {searchInput || statusFilter !== 'ALL'
-                            ? 'Try a different search or filter.'
-                            : 'Click "Add Vehicle" to register the first vehicle.'}
-                        </p>
-                      </div>
-                    </td>
+                    <th style={{ width: 42 }}>#</th>
+                    <th>Vehicle Number</th>
+                    <th>Capacity (cube)</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'center', width: 120 }}>Actions</th>
                   </tr>
-                ) : (
-                  vehicles.map((v, i) => (
-                    <tr key={v.id}>
-                      <td className="vh-td-num">{startItem + i}</td>
-                      <td>
-                        <span className="vh-reg-pill">
-                          <CIcon icon={cilTruck} size="sm" style={{ color: '#f59e0b' }} />
-                          {v.vehicleNumber}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="vh-capacity-val">
-                          {v.capacity ?? '—'}
-                          <span className="vh-capacity-unit">m³</span>
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`vh-badge ${v.status === 'ACTIVE' ? 'active' : 'inactive'}`}>
-                          <span className="vh-badge-dot" />
-                          {v.status === 'ACTIVE' ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="vh-actions">
-                          <button
-                            className="vh-icon-btn edit"
-                            title="Edit vehicle"
-                            onClick={() => openEdit(v)}
-                            id={`btn-edit-${v.id}`}
-                          >
-                            <CIcon icon={cilPencil} size="sm" />
-                          </button>
-                          {v.status === 'ACTIVE' ? (
-                            <button
-                              className="vh-icon-btn deactivate"
-                              title="Deactivate"
-                              onClick={() => handleToggle(v)}
-                              id={`btn-deactivate-${v.id}`}
-                            >
-                              <CIcon icon={cilBan} size="sm" />
-                            </button>
-                          ) : (
-                            <button
-                              className="vh-icon-btn activate"
-                              title="Activate"
-                              onClick={() => handleToggle(v)}
-                              id={`btn-activate-${v.id}`}
-                            >
-                              <CIcon icon={cilCheckCircle} size="sm" />
-                            </button>
-                          )}
+                </thead>
+                <tbody>
+                  {vehicles.length === 0 ? (
+                    <tr>
+                      <td colSpan={5}>
+                        <div className="vm-empty">
+                          <div className="vm-empty-icon">
+                            <CIcon icon={cilTruck} size="xl" />
+                          </div>
+                          <h3>No vehicles found</h3>
+                          <p>
+                            {searchInput || statusFilter !== 'ALL'
+                              ? 'Try a different search term or filter.'
+                              : 'Click "Add Vehicle" to register the first vehicle.'}
+                          </p>
                         </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    vehicles.map((v, i) => (
+                      <tr key={v.id}>
+                        <td className="vm-td-num">{startItem + i}</td>
+                        <td>
+                          <span className="vm-reg-pill">
+                            <CIcon icon={cilTruck} size="sm" style={{ color: '#f59e0b' }} />
+                            {v.vehicleNumber}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="vm-capacity-val">
+                            {v.capacity ?? '—'}
+                            <span className="vm-capacity-unit">cube</span>
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={`vm-badge ${v.status === 'ACTIVE' ? 'active' : 'inactive'}`}
+                          >
+                            <span className="vm-badge-dot" />
+                            {v.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="vm-actions">
+                            {/* Edit */}
+                            <button
+                              className="vm-icon-btn edit"
+                              title="Edit vehicle"
+                              onClick={() => openEdit(v)}
+                              id={`btn-edit-${v.id}`}
+                            >
+                              <CIcon icon={cilPencil} size="sm" />
+                            </button>
 
-            {/* ── Table Footer: count + pagination ── */}
-            {totalElements > 0 && (
-              <div className="vh-table-footer">
-                <span>
-                  {startItem}–{endItem} of{' '}
-                  <span className="vh-count-badge">{totalElements}</span> vehicles
-                </span>
+                            {/* Delete */}
+                            <button
+                              className="vm-icon-btn delete"
+                              title="Delete vehicle"
+                              onClick={() => handleDelete(v)}
+                              id={`btn-delete-${v.id}`}
+                            >
+                              <CIcon icon={cilTrash} size="sm" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="vh-pagination">
-                    <button
-                      className="vh-page-btn"
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 0 || loading}
-                      title="Previous page"
-                    >
-                      <CIcon icon={cilChevronLeft} size="sm" />
-                    </button>
+              {/* Footer: count + pagination */}
+              {totalElements > 0 && (
+                <div className="vm-table-footer">
+                  <span>
+                    {startItem}–{endItem} of <span className="vm-count-chip">{totalElements}</span>{' '}
+                    vehicles
+                  </span>
 
-                    {/* Page numbers */}
-                    {Array.from({ length: totalPages }, (_, i) => i)
-                      .filter((p) => Math.abs(p - currentPage) <= 2)
-                      .map((p) => (
-                        <button
-                          key={p}
-                          className={`vh-page-btn ${p === currentPage ? 'active' : ''}`}
-                          onClick={() => goToPage(p)}
-                          disabled={loading}
-                        >
-                          {p + 1}
-                        </button>
-                      ))}
+                  {totalPages > 1 && (
+                    <div className="vm-pagination">
+                      <button
+                        className="vm-page-btn"
+                        onClick={() => goToPage(currentPage - 1)}
+                        disabled={currentPage === 0 || loading}
+                        title="Previous"
+                      >
+                        <CIcon icon={cilChevronLeft} size="sm" />
+                      </button>
 
-                    <button
-                      className="vh-page-btn"
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage >= totalPages - 1 || loading}
-                      title="Next page"
-                    >
-                      <CIcon icon={cilChevronRight} size="sm" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                      {Array.from({ length: totalPages }, (_, i) => i)
+                        .filter((p) => Math.abs(p - currentPage) <= 2)
+                        .map((p) => (
+                          <button
+                            key={p}
+                            className={`vm-page-btn ${p === currentPage ? 'active' : ''}`}
+                            onClick={() => goToPage(p)}
+                            disabled={loading}
+                          >
+                            {p + 1}
+                          </button>
+                        ))}
+
+                      <button
+                        className="vm-page-btn"
+                        onClick={() => goToPage(currentPage + 1)}
+                        disabled={currentPage >= totalPages - 1 || loading}
+                        title="Next"
+                      >
+                        <CIcon icon={cilChevronRight} size="sm" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </CCard>
 
       {/* ══════════ MODAL — ADD / EDIT ══════════ */}
       <CModal
@@ -462,66 +539,85 @@ const Vehicle = () => {
         backdrop="static"
         id="vehicle-modal"
       >
-        <CModalHeader className="vh-modal-header">
-          <CModalTitle className="vh-modal-title">
+        <CModalHeader className="vm-modal-header">
+          <CModalTitle className="vm-modal-title">
             <CIcon icon={editMode ? cilPencil : cilPlus} style={{ color: '#f59e0b' }} />
             {editMode ? 'Edit Vehicle' : 'Add Vehicle'}
           </CModalTitle>
         </CModalHeader>
 
-        <CModalBody className="vh-modal-body">
+        <CModalBody className="vm-modal-body">
+          <CRow className="g-3">
+            {/* Vehicle Number */}
+            <CCol xs={12}>
+              <label className="vm-label" htmlFor="field-veh-num">
+                Vehicle Number <span className="req">*</span>
+              </label>
+              <input
+                id="field-veh-num"
+                type="text"
+                className={`vm-input ${errors.vehicleNumber ? 'error' : ''}`}
+                placeholder="e.g. LC-4838"
+                value={form.vehicleNumber}
+                onChange={(e) => setField('vehicleNumber', e.target.value)}
+                // disabled={editMode}
+                // style={
+                //   editMode ? { background: '#f9fafb', cursor: 'not-allowed', color: '#6b7280' } : {}
+                // }
+                autoFocus={!editMode}
+              />
+              {errors.vehicleNumber ? (
+                <div className="vm-input-error">⚠ {errors.vehicleNumber}</div>
+              ) : null}
+            </CCol>
 
-          {/* Vehicle Number */}
-          <div className="vh-form-group">
-            <label className="vh-label" htmlFor="field-veh-num">
-              Vehicle Number <span className="req">*</span>
-            </label>
-            <input
-              id="field-veh-num"
-              type="text"
-              className={`vh-input ${errors.vehicleNumber ? 'error' : ''}`}
-              placeholder="e.g. LC-4838"
-              value={form.vehicleNumber}
-              onChange={(e) => setField('vehicleNumber', e.target.value)}
-              disabled={editMode}
-              style={editMode ? { background: '#f9fafb', cursor: 'not-allowed', color: '#6b7280' } : {}}
-              autoFocus={!editMode}
-            />
-            {errors.vehicleNumber
-              ? <div className="vh-input-error">⚠ {errors.vehicleNumber}</div>
-              : editMode
-                ? <div className="vh-input-hint">Vehicle number cannot be changed after creation</div>
-                : null
-            }
-          </div>
+            {/* Capacity */}
+            <CCol xs={12}>
+              <label className="vm-label" htmlFor="field-capacity">
+                Capacity (cube) <span className="req">*</span>
+              </label>
+              <input
+                id="field-capacity"
+                type="number"
+                step="0.1"
+                min="0.1"
+                className={`vm-input ${errors.capacity ? 'error' : ''}`}
+                placeholder="e.g. 4.5"
+                value={form.capacity}
+                onChange={(e) => setField('capacity', e.target.value)}
+                autoFocus={editMode}
+              />
+              {errors.capacity ? (
+                <div className="vm-input-error">⚠ {errors.capacity}</div>
+              ) : (
+                <div className="vm-input-hint">Load capacity in cubic meters</div>
+              )}
+            </CCol>
 
-          {/* Capacity in Cube */}
-          <div className="vh-form-group">
-            <label className="vh-label" htmlFor="field-capacity">
-              Capacity (Cubes — m³) <span className="req">*</span>
-            </label>
-            <input
-              id="field-capacity"
-              type="number"
-              step="0.1"
-              min="0.1"
-              className={`vh-input ${errors.capacity ? 'error' : ''}`}
-              placeholder="e.g. 4.5"
-              value={form.capacity}
-              onChange={(e) => setField('capacity', e.target.value)}
-              autoFocus={editMode}
-            />
-            {errors.capacity
-              ? <div className="vh-input-error">⚠ {errors.capacity}</div>
-              : <div className="vh-input-hint">Vehicle load capacity in cubic meters</div>
-            }
-          </div>
-
+            {/* Status — only shown in edit mode */}
+            {editMode && (
+              <CCol xs={12}>
+                <label className="vm-label" htmlFor="field-status">
+                  Status
+                </label>
+                <select
+                  id="field-status"
+                  className="vm-select"
+                  value={form.status}
+                  onChange={(e) => setField('status', e.target.value)}
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+                <div className="vm-input-hint">Change vehicle status</div>
+              </CCol>
+            )}
+          </CRow>
         </CModalBody>
 
-        <CModalFooter className="vh-modal-footer">
+        <CModalFooter className="vm-modal-footer">
           <button
-            className="vh-btn-cancel"
+            className="vm-btn-cancel"
             onClick={() => setModalVisible(false)}
             disabled={saving}
             id="btn-modal-cancel"
@@ -529,18 +625,31 @@ const Vehicle = () => {
             Cancel
           </button>
           <button
-            className="vh-btn-save"
+            className="vm-btn-save"
             onClick={handleSave}
             disabled={saving}
             id="btn-modal-save"
           >
-            {saving
-              ? <><CSpinner size="sm" /> Saving…</>
-              : <><CIcon icon={editMode ? cilPencil : cilPlus} /> {editMode ? 'Save Changes' : 'Add Vehicle'}</>
-            }
+            {saving ? (
+              <>
+                <CSpinner size="sm" style={{ marginRight: 4 }} /> Saving…
+              </>
+            ) : (
+              <>
+                <CIcon icon={editMode ? cilPencil : cilPlus} />{' '}
+                {editMode ? 'Save Changes' : 'Add Vehicle'}
+              </>
+            )}
           </button>
         </CModalFooter>
       </CModal>
+
+      {/* ══════════ MODAL — BULK EXCEL UPLOAD ══════════ */}
+      <VehicleBulkUploadModal
+        visible={bulkModalVisible}
+        onClose={() => setBulkModalVisible(false)}
+        onSuccess={() => loadVehicles(0, debouncedSearch, statusFilter)}
+      />
     </div>
   )
 }

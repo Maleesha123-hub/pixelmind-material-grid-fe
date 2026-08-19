@@ -506,7 +506,7 @@ const Receipts = () => {
             <CIcon icon={cilDescription} size="xl" />
           </div>
           <div>
-            <h1 className="rc-page-title">Receipts & Payment Vouchers</h1>
+            <h1 className="rc-page-title">Receipts</h1>
             <p className="rc-page-subtitle">
               Select date ranges and vehicle numbers to preview and download official transport receipts
             </p>

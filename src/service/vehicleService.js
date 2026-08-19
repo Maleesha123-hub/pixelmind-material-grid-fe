@@ -11,7 +11,7 @@
  *   PATCH /{id}/status?status=   → ApiResponse<VehicleResponse>
  */
 
-const API_BASE = `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/material-grid'}/vehicles`
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1/vehicles`
 
 // ─── Response unwrapper ──────────────────────────────────────────────────────
 // Handles: ApiResponse<T>  → { success, message, data }
@@ -26,8 +26,11 @@ const unwrap = (result) => {
 
 // ─── Shared fetch helper ─────────────────────────────────────────────────────
 const apiFetch = async (url, options = {}) => {
+  
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' }
+
   const response = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers,
     ...options,
   })
 
@@ -142,11 +145,100 @@ export const vehicleService = {
    * @returns {Promise<VehicleResponse>}
    */
   toggleVehicleStatus: async (id, status) => {
-    const result = await apiFetch(
-      `${API_BASE}/${id}/status?status=${encodeURIComponent(status)}`,
-      { method: 'PATCH' }
-    )
+    const result = await apiFetch(`${API_BASE}/${id}/status?status=${encodeURIComponent(status)}`, {
+      method: 'PATCH',
+    })
     return unwrap(result)
+  },
+
+  /**
+   * DELETE /api/material-grid/vehicles/{id}
+   * Permanently delete a vehicle.
+   *
+   * @param {number|string} id
+   * @returns {Promise<void>}
+   */
+  deleteVehicle: async (id) => {
+    const result = await apiFetch(`${API_BASE}/${id}`, { method: 'DELETE' })
+    return unwrap(result)
+  },
+
+  /**
+   * POST /api/material-grid/vehicles/bulk-upload
+   * Upload vehicle Excel/CSV file to backend endpoint if supported.
+   *
+   * @param {File} file
+   * @param {AbortSignal} [signal]
+   * @returns {Promise<any>}
+   */
+  bulkUploadVehiclesFile: async (file, signal) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await fetch(`${API_BASE}/bulk-upload`, {
+      method: 'POST',
+      body: formData,
+      signal,
+    })
+
+    if (!response.ok) {
+      let errorMessage = `Server responded with status: ${response.status}`
+      try {
+        const errorData = await response.json()
+        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData)
+      } catch {
+        const errorText = await response.text().catch(() => '')
+        if (errorText) errorMessage = errorText
+      }
+      throw new Error(errorMessage)
+    }
+
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json()
+    }
+    return await response.text()
+  },
+
+  /**
+   * Bulk create vehicles with batching and progress tracking.
+   * Concurrently processes chunks to maintain fast, reliable ingestion.
+   *
+   * @param {Array<{vehicleNumber: string, capacity: number, status?: string}>} vehiclesList
+   * @param {Function} [onProgress] - Callback (current, total, percentage)
+   * @returns {Promise<{successful: Array, failed: Array}>}
+   */
+  bulkCreateVehicles: async (vehiclesList = [], onProgress) => {
+    const total = vehiclesList.length
+    if (total === 0) return { successful: [], failed: [] }
+
+    const successful = []
+    const failed = []
+    const CHUNK_SIZE = 5
+
+    for (let i = 0; i < total; i += CHUNK_SIZE) {
+      const chunk = vehiclesList.slice(i, i + CHUNK_SIZE)
+      const promises = chunk.map(async (v) => {
+        try {
+          const res = await vehicleService.createVehicle({
+            vehicleNumber: v.vehicleNumber.trim().toUpperCase(),
+            capacity: Number(v.capacity),
+          })
+          successful.push({ ...v, result: res })
+        } catch (err) {
+          failed.push({ ...v, error: err.message || 'Failed to create' })
+        }
+      })
+
+      await Promise.all(promises)
+
+      const processed = Math.min(i + CHUNK_SIZE, total)
+      if (typeof onProgress === 'function') {
+        onProgress(processed, total, Math.round((processed / total) * 100))
+      }
+    }
+
+    return { successful, failed }
   },
 }
 

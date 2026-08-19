@@ -28,15 +28,7 @@ export default defineConfig(() => {
     },
     server: {
       port: 3000,
-      allowedHosts: [
-        'crepe-disgrace-girdle.ngrok-free.dev',
-        'my-nice-unlikely-sincerely.ngrok-free.dev',
-        'tiny-dearly-spotted-jumpsuit.ngrok-free.dev',
-        'crawling-catfish-silly.loca.lt',
-        'silly-weasel-truly.loca.lt',
-        'muffled-quail-nearly.ngrok-free.dev',
-        'friendly-squirrel-nearly.loca.lt'
-      ],
+      allowedHosts: ['*'],
       proxy: {
         // https://vitejs.dev/config/server-options.html
       },
