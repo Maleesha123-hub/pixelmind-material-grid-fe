@@ -30,6 +30,7 @@ import {
   cilBarcode,
   cilBalanceScale,
   cilMap,
+  cilLocationPin,
   cilUserPlus,
   cilShieldAlt,
   cilLockLocked,
@@ -137,11 +138,17 @@ const _nav = [
     component: CNavTitle,
     name: 'MASTER DATA',
   },
-    {
+  {
     component: CNavItem,
     name: 'Vehicles',
     to: '/vehicles',
     icon: <CIcon icon={cilCarAlt} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Routes',
+    to: '/routes',
+    icon: <CIcon icon={cilLocationPin} customClassName="nav-icon" />,
   },
   // {
   //   component: CNavGroup,

@@ -33,6 +33,9 @@ const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
 // Vehicles
 const Vehicle = React.lazy(() => import('./components/vehicles/Vehicle.jsx'))
 
+// Master Data — Routes
+const RoutesPage = React.lazy(() => import('./components/routes/Routes.jsx'))
+
 /**
  * Array of route configuration objects
  *
@@ -59,6 +62,7 @@ export const routes = [
   { path: '/logistics/bulk-upload', name: 'Bulk Upload', element: BulkUpload },
   { path: '/receipts', name: 'Receipts', element: Receipts },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
+  { path: '/routes', name: 'Routes', element: RoutesPage },
 ]
 
 export default routes
