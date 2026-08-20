@@ -1,0 +1,656 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Vehicle License Management — VehicleLicense.css
+   Matches the design system of Vehicle.css & Routes.css exactly.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Page Root ─────────────────────────────────────────────────────────── */
+.vlm-page {
+  padding: 1.25rem;
+  max-width: 1360px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Page Header ─────────────────────────────────────────────────────────── */
+.vlm-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.vlm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.vlm-header-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
+  flex-shrink: 0;
+}
+
+.vlm-page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.vlm-page-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.vlm-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.vlm-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+  transition: all 0.2s ease;
+}
+
+.vlm-btn-add:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45);
+  transform: translateY(-1px);
+}
+
+.vlm-btn-add:active {
+  transform: translateY(0);
+}
+
+
+
+/* ── Card (matches vm-card / rc-card) ──────────────────────────────────── */
+.vlm-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.vlm-card-header {
+  background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.vlm-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.vlm-card-body {
+  padding: 1.25rem;
+}
+
+/* ── Form Controls ──────────────────────────────────────────────────────── */
+.vlm-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vlm-label .req {
+  color: #dc2626;
+}
+
+.vlm-input,
+.vlm-select {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.vlm-input:focus,
+.vlm-select:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.vlm-input.error,
+.vlm-select.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.vlm-input-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.vlm-input-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.3rem;
+}
+
+/* ── Input with Currency Prepend ────────────────────────────────────────── */
+.vlm-input-currency-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vlm-currency-prefix {
+  position: absolute;
+  left: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.vlm-input.with-prefix {
+  padding-left: 3rem;
+}
+
+/* ── Search Wrap ────────────────────────────────────────────────────────── */
+.vlm-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vlm-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.vlm-search-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem 0.6rem 2.25rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vlm-search-input:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+/* ── Reset Button ───────────────────────────────────────────────────────── */
+.vlm-btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vlm-btn-reset:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* ── Table Styling ──────────────────────────────────────────────────────── */
+.vlm-table-wrap {
+  overflow-x: auto;
+  min-height: 280px;
+  position: relative;
+}
+
+.vlm-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.vlm-table thead {
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.vlm-table th {
+  padding: 0.85rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.vlm-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.vlm-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.vlm-table td {
+  padding: 0.85rem 1rem;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.vlm-td-num {
+  font-weight: 600;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  width: 44px;
+}
+
+/* ── Badges and Pills ───────────────────────────────────────────────────── */
+.vlm-code-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.vlm-date-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.vlm-date-cell .vlm-date-icon {
+  color: #94a3b8;
+}
+
+.vlm-duration-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.vlm-duration-pill.active {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.vlm-duration-pill.expired {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.vlm-price-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 6px;
+  font-weight: 700;
+  color: #92400e;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
+.vlm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.vlm-badge.active {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.vlm-badge.inactive {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.vlm-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.vlm-badge.active .vlm-badge-dot {
+  background-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.vlm-badge.inactive .vlm-badge-dot {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* ── Actions ────────────────────────────────────────────────────────────── */
+.vlm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.vlm-icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vlm-icon-btn.edit {
+  color: #d97706;
+  background: #fffbeb;
+  border-color: #fef3c7;
+}
+
+.vlm-icon-btn.edit:hover {
+  background: #fde68a;
+  color: #b45309;
+}
+
+.vlm-icon-btn.delete {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+
+.vlm-icon-btn.delete:hover {
+  background: #fecaca;
+  color: #b91c1c;
+}
+
+/* ── Table Footer & Pagination ──────────────────────────────────────────── */
+.vlm-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+  color: #64748b;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.vlm-count-chip {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.vlm-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vlm-page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vlm-page-btn:hover:not(:disabled) {
+  border-color: #f59e0b;
+  color: #d97706;
+  background: #fffbeb;
+}
+
+.vlm-page-btn.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+}
+
+.vlm-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Empty & Loading States ─────────────────────────────────────────────── */
+.vlm-loading,
+.vlm-empty {
+  padding: 3.5rem 1rem;
+  text-align: center;
+}
+
+.vlm-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #fde68a;
+  border-top-color: #d97706;
+  border-radius: 50%;
+  animation: vlm-spin 0.75s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes vlm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vlm-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.vlm-empty h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.4rem;
+}
+
+.vlm-empty p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ── Modal Styling ──────────────────────────────────────────────────────── */
+.vlm-modal-header {
+  background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.25rem;
+}
+
+.vlm-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vlm-modal-body {
+  padding: 1.25rem;
+}
+
+.vlm-modal-footer {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.vlm-btn-cancel {
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vlm-btn-cancel:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.vlm-btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+  transition: all 0.15s ease;
+}
+
+.vlm-btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+}
+
+.vlm-btn-save:disabled,
+.vlm-btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive adjustments ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .vlm-page {
+    padding: 0.75rem;
+  }
+
+  .vlm-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .vlm-header-actions {
+    width: 100%;
+  }
+
+  .vlm-btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -32,6 +32,7 @@ const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
 
 // Vehicles
 const Vehicle = React.lazy(() => import('./components/vehicles/Vehicle.jsx'))
+const VehicleLicense = React.lazy(() => import('./components/vehicles/VehicleLicense.jsx'))
 
 // Master Data — Routes
 const RoutesPage = React.lazy(() => import('./components/routes/Routes.jsx'))
