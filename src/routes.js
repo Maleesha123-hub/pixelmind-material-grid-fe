@@ -61,7 +61,8 @@ export const routes = [
   { path: '/transport-trips/trip-history', name: 'Trip History', element: tripHistory },
   { path: '/logistics/bulk-upload', name: 'Bulk Upload', element: BulkUpload },
   { path: '/receipts', name: 'Receipts', element: Receipts },
-  { path: '/vehicles', name: 'Vehicles', element: Vehicle },
+  { path: '/vehicles/vehicle', name: 'Vehicles', element: Vehicle },
+  { path: '/vehicles/vehicle-license', name: 'Vehicle License', element: VehicleLicense },
   { path: '/routes', name: 'Routes', element: RoutesPage },
 ]
 
