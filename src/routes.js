@@ -37,6 +37,9 @@ const VehicleLicense = React.lazy(() => import('./components/vehicles/VehicleLic
 // Master Data — Routes
 const RoutesPage = React.lazy(() => import('./components/routes/Routes.jsx'))
 
+// Master Data — Price Rates
+const PriceRate = React.lazy(() => import('./components/priceRates/PriceRate.jsx'))
+
 /**
  * Array of route configuration objects
  *
@@ -65,6 +68,7 @@ export const routes = [
   { path: '/vehicles/vehicle', name: 'Vehicles', element: Vehicle },
   { path: '/vehicles/vehicle-license', name: 'Vehicle License', element: VehicleLicense },
   { path: '/routes', name: 'Routes', element: RoutesPage },
+  { path: '/price-rates', name: 'Price Rates', element: PriceRate },
 ]
 
 export default routes
