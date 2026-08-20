@@ -116,13 +116,7 @@ const VehicleLicense = () => {
 
   // ── Load Licenses ───────────────────────────────────────────────────────────
   const loadLicenses = useCallback(
-    async (
-      page = 0,
-      search = '',
-      startD = '',
-      endD = '',
-      statusF = 'ALL'
-    ) => {
+    async (page = 0, search = '', startD = '', endD = '', statusF = 'ALL') => {
       if (abortRef.current) abortRef.current.abort()
       abortRef.current = new AbortController()
       setLoading(true)
@@ -136,40 +130,15 @@ const VehicleLicense = () => {
             size: PAGE_SIZE,
             sort: 'id,desc',
           },
-          abortRef.current.signal
+          abortRef.current.signal,
         )
 
         let content = result?.content ?? (Array.isArray(result) ? result : [])
 
-        // Filter by date range (ensure active overlap with selected range)
-        if (startD) {
-          content = content.filter((item) => {
-            const itemEnd = item.endDate || item.startDate
-            return !itemEnd || itemEnd >= startD
-          })
-        }
-        if (endD) {
-          content = content.filter((item) => {
-            const itemStart = item.startDate || item.endDate
-            return !itemStart || itemStart <= endD
-          })
-        }
-
-        // Apply client search if search query entered
-        if (search.trim()) {
-          const q = search.trim().toLowerCase()
-          content = content.filter(
-            (item) =>
-              (item.licenseCode && item.licenseCode.toLowerCase().includes(q)) ||
-              (item.price != null && String(item.price).includes(q))
-          )
-        }
-
         // Apply status filter if active/inactive
         if (statusF !== 'ALL') {
           content = content.filter((item) => {
-            const isActive = item.active !== false && item.status !== false && item.status !== 'INACTIVE'
-            return statusF === 'ACTIVE' ? isActive : !isActive
+            return statusF === item.status
           })
         }
 
@@ -186,7 +155,7 @@ const VehicleLicense = () => {
         setLoading(false)
       }
     },
-    []
+    [],
   )
 
   useEffect(() => {
@@ -242,7 +211,8 @@ const VehicleLicense = () => {
   const openEdit = (license) => {
     setEditMode(true)
     setSelectedId(license.id)
-    const isAct = license.active !== false && license.status !== false && license.status !== 'INACTIVE'
+    const isAct =
+      license.active !== false && license.status !== false && license.status !== 'INACTIVE'
     setForm({
       startDate: license.startDate || '',
       endDate: license.endDate || '',
@@ -290,7 +260,13 @@ const VehicleLicense = () => {
         })
       }
       setModalVisible(false)
-      loadLicenses(editMode ? currentPage : 0, debouncedSearch, startDateFilter, endDateFilter, statusFilter)
+      loadLicenses(
+        editMode ? currentPage : 0,
+        debouncedSearch,
+        startDateFilter,
+        endDateFilter,
+        statusFilter,
+      )
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -302,8 +278,6 @@ const VehicleLicense = () => {
       setSaving(false)
     }
   }
-
-
 
   // ── Delete Handler ───────────────────────────────────────────────────────────
   const handleDelete = async (license) => {
@@ -336,7 +310,8 @@ const VehicleLicense = () => {
       Swal.fire({
         icon: 'error',
         title: 'Cannot Delete License',
-        text: err.message || 'Failed to delete license. It might be referenced by vehicle assignments.',
+        text:
+          err.message || 'Failed to delete license. It might be referenced by vehicle assignments.',
         confirmButtonColor: '#d97706',
       })
     }
@@ -509,7 +484,10 @@ const VehicleLicense = () => {
                           </div>
                           <h3>No vehicle licenses found</h3>
                           <p>
-                            {searchInput || startDateFilter || endDateFilter || statusFilter !== 'ALL'
+                            {searchInput ||
+                            startDateFilter ||
+                            endDateFilter ||
+                            statusFilter !== 'ALL'
                               ? 'Try adjusting your date range or filter criteria.'
                               : 'Click "Add License" to create the first vehicle license.'}
                           </p>
@@ -551,9 +529,7 @@ const VehicleLicense = () => {
                             </span>
                           </td>
                           <td>
-                            <span className="vlm-price-pill">
-                              Rs. {formatCurrency(lic.price)}
-                            </span>
+                            <span className="vlm-price-pill">Rs. {formatCurrency(lic.price)}</span>
                           </td>
                           <td>
                             <span className={`vlm-badge ${isAct ? 'active' : 'inactive'}`}>
@@ -595,8 +571,8 @@ const VehicleLicense = () => {
               {totalElements > 0 && (
                 <div className="vlm-table-footer">
                   <span>
-                    {startItem}–{endItem} of{' '}
-                    <span className="vlm-count-chip">{totalElements}</span> licenses
+                    {startItem}–{endItem} of <span className="vlm-count-chip">{totalElements}</span>{' '}
+                    licenses
                   </span>
 
                   {totalPages > 1 && (

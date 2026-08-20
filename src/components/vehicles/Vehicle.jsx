@@ -405,7 +405,7 @@ const Vehicle = () => {
               <table className="vm-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 42 }}>#</th>
+                    <th style={{ width: 44 }}>#</th>
                     <th>Vehicle Number</th>
                     <th>Capacity (cube)</th>
                     <th>Status</th>

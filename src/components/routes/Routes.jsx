@@ -380,7 +380,7 @@ const Routes = () => {
               <table className="rt-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 42 }}>#</th>
+                    <th style={{ width: 44 }}>#</th>
                     <th>Route (Start → End)</th>
                     <th>Start Location</th>
                     <th>End Location</th>
