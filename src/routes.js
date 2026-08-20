@@ -19,10 +19,13 @@ import React from 'react'
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
 // Transport Trips
-const processTrip = React.lazy(() => import('./components/transportTrip/processTrip/ProcessTrip.jsx'))
-const tripHistory = React.lazy(() => import('./components/transportTrip/tripHistory/TripHistory.jsx'))
+const processTrip = React.lazy(
+  () => import('./components/transportTrip/processTrip/ProcessTrip.jsx'),
+)
+const tripHistory = React.lazy(
+  () => import('./components/transportTrip/tripHistory/TripHistory.jsx'),
+)
 const Route = React.lazy(() => import('./components/transportTrip/route/Route.jsx'))
-
 
 // Logistics
 const BulkUpload = React.lazy(() => import('./components/logistics/bulkUpload/BulkUpload.jsx'))
@@ -31,8 +34,8 @@ const BulkUpload = React.lazy(() => import('./components/logistics/bulkUpload/Bu
 const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
 
 // Vehicles
-const Vehicle = React.lazy(() => import('./components/vehicles/Vehicle.jsx'))
-const VehicleLicense = React.lazy(() => import('./components/vehicles/VehicleLicense.jsx'))
+const Vehicle = React.lazy(() => import('./components/vehicles/vehicle/Vehicle.jsx'))
+const VehicleLicense = React.lazy(() => import('./components/vehicles/license/VehicleLicense.jsx'))
 
 // Master Data — Routes
 const RoutesPage = React.lazy(() => import('./components/routes/Routes.jsx'))

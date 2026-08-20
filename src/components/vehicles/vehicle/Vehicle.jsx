@@ -43,7 +43,7 @@ import {
   cilFilter,
   cilCloudUpload,
 } from '@coreui/icons'
-import vehicleService from '../../service/vehicleService'
+import vehicleService from '../../../service/vehicleService'
 import VehicleBulkUploadModal from './VehicleBulkUploadModal'
 import './Vehicle.css'
 

@@ -20,7 +20,7 @@ import {
   cilWarning,
   cilBan,
 } from '@coreui/icons'
-import vehicleService from '../../service/vehicleService'
+import vehicleService from '../../../service/vehicleService'
 
 /**
  * Format bytes to readable size
@@ -91,9 +91,7 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
     if (!selectedFile) return
 
     const validExtensions = ['.xlsx', '.xls', '.csv']
-    const hasValidExt = validExtensions.some((ext) =>
-      selectedFile.name.toLowerCase().endsWith(ext)
-    )
+    const hasValidExt = validExtensions.some((ext) => selectedFile.name.toLowerCase().endsWith(ext))
 
     if (!hasValidExt) {
       Swal.fire({
@@ -158,11 +156,13 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
 
     try {
       const response = await vehicleService.bulkUploadVehiclesFile(file)
-      
+
       const successMessage =
         response?.message ||
         response?.data?.message ||
-        (typeof response === 'string' ? response : `Vehicles from "${file.name}" have been uploaded successfully.`)
+        (typeof response === 'string'
+          ? response
+          : `Vehicles from "${file.name}" have been uploaded successfully.`)
 
       Swal.fire({
         icon: 'success',
@@ -179,11 +179,7 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
       console.error('Bulk upload error:', err)
 
       // Extract error details from backend response
-      const rawErrors =
-        err.errors ||
-        err.response?.data?.errors ||
-        err.response?.errors ||
-        []
+      const rawErrors = err.errors || err.response?.data?.errors || err.response?.errors || []
 
       const summaryData = err.response?.data || null
 
@@ -201,7 +197,8 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
         Swal.fire({
           icon: 'error',
           title: 'Upload Failed',
-          text: err.message || 'Could not upload vehicles. Please check your Excel file and try again.',
+          text:
+            err.message || 'Could not upload vehicles. Please check your Excel file and try again.',
           confirmButtonColor: '#dc2626',
         })
       }
@@ -245,7 +242,8 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
             <div>
               <div className="vm-bulk-template-title">Need the Excel template format?</div>
               <div className="vm-bulk-template-desc">
-                Download the standardized template with vehicle columns (Vehicle Number, Capacity (cube)).
+                Download the standardized template with vehicle columns (Vehicle Number, Capacity
+                (cube)).
               </div>
             </div>
           </div>
@@ -281,9 +279,7 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
             <div className="vm-bulk-drop-icon">
               <CIcon icon={cilCloudUpload} size="xxl" />
             </div>
-            <h4 className="vm-bulk-drop-heading">
-              Drag &amp; drop your vehicle Excel file here
-            </h4>
+            <h4 className="vm-bulk-drop-heading">Drag &amp; drop your vehicle Excel file here</h4>
             <p className="vm-bulk-drop-subheading">
               or <span className="vm-bulk-browse-link">browse from your computer</span>
             </p>
@@ -344,7 +340,9 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
               {uploadSummary?.totalRows != null && (
                 <div className="vm-bulk-val-summary-text">
                   Total Rows: <strong>{uploadSummary.totalRows}</strong> | Errors:{' '}
-                  <strong className="text-danger">{uploadSummary.errorCount ?? backendErrors.length}</strong>
+                  <strong className="text-danger">
+                    {uploadSummary.errorCount ?? backendErrors.length}
+                  </strong>
                 </div>
               )}
             </div>
@@ -363,23 +361,28 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
                   {backendErrors.map((err, idx) => (
                     <tr key={idx}>
                       <td>
-                        <span className="vm-bulk-val-row-pill">
-                          Row {err.rowNumber ?? idx + 1}
-                        </span>
+                        <span className="vm-bulk-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
                       </td>
                       <td>
                         <span className="vm-bulk-val-field">{err.field || '—'}</span>
                       </td>
                       <td>
                         <code className="vm-bulk-val-value">
-                          {err.value !== undefined && err.value !== null && String(err.value).trim() !== ''
+                          {err.value !== undefined &&
+                          err.value !== null &&
+                          String(err.value).trim() !== ''
                             ? String(err.value)
                             : '[Empty]'}
                         </code>
                       </td>
                       <td>
                         <div className="vm-bulk-val-msg">
-                          <CIcon icon={cilBan} size="sm" className="text-danger" style={{ flexShrink: 0 }} />
+                          <CIcon
+                            icon={cilBan}
+                            size="sm"
+                            className="text-danger"
+                            style={{ flexShrink: 0 }}
+                          />
                           <span>{err.message || 'Validation error'}</span>
                         </div>
                       </td>
@@ -390,7 +393,8 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
             </div>
             <br></br>
             <div className="vm-bulk-val-footer-hint">
-              💡 Please fix these rows in your Excel file or remove duplicate vehicles, then re-upload.
+              💡 Please fix these rows in your Excel file or remove duplicate vehicles, then
+              re-upload.
             </div>
           </div>
         )}

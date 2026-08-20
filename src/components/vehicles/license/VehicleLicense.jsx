@@ -41,7 +41,7 @@ import {
   cilFilter,
   cilCalendar,
 } from '@coreui/icons'
-import licenseService from '../../service/licenseService'
+import licenseService from '../../../service/licenseService'
 import './VehicleLicense.css'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
