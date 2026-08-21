@@ -1,58 +1,39 @@
 /**
  * Receipt Service
- * Handles receipt preview data retrieval and PDF generation support
+ * Delegates to DailyRouteController endpoints for live data binding,
+ * preview summary DTOs, and backend PDF streaming & downloads.
  */
 
-const API_BASE = `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api/material-grid'}/receipts`
+import dailyRouteService from './dailyRouteService'
 
 export const receiptService = {
   /**
-   * Fetch receipt preview data for given date and vehicle number
-   * Endpoint: GET /api/material-grid/receipts/preview?date=YYYY-MM-DD&vehicleNumber=...
-   * @param {string} date - Date in YYYY-MM-DD format
-   * @param {string} vehicleNumber - Vehicle number (e.g. LC-4838 or ALL)
-   * @param {AbortSignal} [signal] - Optional abort signal
-   * @returns {Promise<any>}
+   * Fetch receipt preview data / summary DTO for given date and vehicle number
+   * Endpoint: GET /api/v1/daily-routes/receipt/preview?date=YYYY-MM-DD&vehicleNumber=...
    */
-  getReceiptPreview: async (date, vehicleNumber, signal) => {
-    if (!date) {
-      throw new Error('Please select a date to preview the receipt.')
-    }
-    if (!vehicleNumber) {
-      throw new Error('Please select a vehicle number to preview the receipt.')
-    }
+  getReceiptPreview: async (date, vehicleNumber = 'ALL', signal) => {
+    return dailyRouteService.getReceiptPreviewData(date, vehicleNumber, signal)
+  },
 
-    const params = new URLSearchParams({
-      date,
-      vehicleNumber,
-    })
+  /**
+   * Fetch daily routes list
+   */
+  getDailyRoutes: async (params, signal) => {
+    return dailyRouteService.getDailyRoutes(params, signal)
+  },
 
-    const response = await fetch(`${API_BASE}/preview?${params.toString()}`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      signal,
-    })
+  /**
+   * Fetch backend-generated PDF Blob
+   */
+  getReceiptPdfBlob: async (params, signal) => {
+    return dailyRouteService.getReceiptPdfBlob(params, signal)
+  },
 
-    if (!response.ok) {
-      let errorMessage = `Server responded with status: ${response.status}`
-      try {
-        const errorData = await response.json()
-        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData)
-      } catch {
-        const errorText = await response.text().catch(() => '')
-        if (errorText) errorMessage = errorText
-      }
-      throw new Error(errorMessage)
-    }
-
-    const result = await response.json()
-    // Handle ApiResponse<ReceiptSummaryDTO> { success, message, data: {...} }
-    if (result && result.data !== undefined) {
-      return result.data
-    }
-    return result
+  /**
+   * Download backend-generated PDF
+   */
+  downloadReceiptPdf: async (params, signal) => {
+    return dailyRouteService.downloadReceiptPdf(params, signal)
   },
 }
 
