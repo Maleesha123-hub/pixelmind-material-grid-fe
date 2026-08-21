@@ -2,7 +2,7 @@
  * Receipts & Settlement Management
  *
  * Connected directly to DailyRouteController backend APIs for:
- *   - Fetching live daily route / trips transactions and summary totals
+ *   - Fetching live daily route / trips transactions and summary totals by vehicleId
  *   - Previewing official backend-generated PDF receipts in an embedded viewer
  *   - Downloading official backend-generated PDF files directly to browser
  *
@@ -38,7 +38,6 @@ import {
   cilTruck,
   cilFindInPage,
   cilCloudDownload,
-  cilSearch,
   cilCheckCircle,
   cilUser,
   cilMoney,
@@ -56,6 +55,8 @@ import './Receipts.css'
 // ─── Default Consolidated Option ────────────────────────────────────────────
 const DEFAULT_VEHICLE_OPTION = {
   value: 'ALL',
+  id: 'ALL',
+  vehicleId: 'ALL',
   label: 'All Vehicles (Consolidated Receipt)',
   vehicleNumber: 'ALL',
   vehicleType: 'Complete Active Fleet',
@@ -63,11 +64,335 @@ const DEFAULT_VEHICLE_OPTION = {
   isConsolidated: true,
 }
 
-// ─── Master Fleet Vehicles Reference ────────────────────────────────────────
-const MASTER_FLEET_VEHICLES = []
+// ─── Master Fleet Vehicles Reference (With IDs) ─────────────────────────────
+const MASTER_FLEET_VEHICLES = [
+  {
+    id: 1,
+    vehicleNumber: 'LC-4838',
+    vehicleType: 'Tipper (4.5 Cube)',
+    driverName: 'Kamal Perera',
+    status: 'ACTIVE',
+  },
+  {
+    id: 2,
+    vehicleNumber: 'LI-8902',
+    vehicleType: 'Dump Truck (4.0 Cube)',
+    driverName: 'Sunil Silva',
+    status: 'ACTIVE',
+  },
+  {
+    id: 3,
+    vehicleNumber: 'LM-4535',
+    vehicleType: 'Heavy Tipper (5.0 Cube)',
+    driverName: 'Ranjith Fernando',
+    status: 'ACTIVE',
+  },
+  {
+    id: 4,
+    vehicleNumber: 'LK-5177',
+    vehicleType: 'Tipper (3.5 Cube)',
+    driverName: 'Nimal Jayasinghe',
+    status: 'ACTIVE',
+  },
+  {
+    id: 5,
+    vehicleNumber: 'LM-6460',
+    vehicleType: 'Dump Truck (4.5 Cube)',
+    driverName: 'Anura Kumara',
+    status: 'ACTIVE',
+  },
+  {
+    id: 6,
+    vehicleNumber: 'LM-4687',
+    vehicleType: 'Tipper (4.0 Cube)',
+    driverName: 'Bandara M.',
+    status: 'ACTIVE',
+  },
+  {
+    id: 7,
+    vehicleNumber: 'LJ-0993',
+    vehicleType: 'Heavy Tipper (4.2 Cube)',
+    driverName: 'Sarath Fonseka',
+    status: 'ACTIVE',
+  },
+  {
+    id: 8,
+    vehicleNumber: 'LI-9587',
+    vehicleType: 'Tipper (3.8 Cube)',
+    driverName: 'Pradeep Kumara',
+    status: 'ACTIVE',
+  },
+  {
+    id: 9,
+    vehicleNumber: 'LI-5827',
+    vehicleType: 'Dump Truck (4.0 Cube)',
+    driverName: 'Chaminda V.',
+    status: 'ACTIVE',
+  },
+  {
+    id: 10,
+    vehicleNumber: 'LM-4565',
+    vehicleType: 'Heavy Tipper (5.0 Cube)',
+    driverName: 'Gamini D.',
+    status: 'ACTIVE',
+  },
+  {
+    id: 11,
+    vehicleNumber: 'LN-5891',
+    vehicleType: 'Tipper (4.2 Cube)',
+    driverName: 'Asela P.',
+    status: 'ACTIVE',
+  },
+  {
+    id: 12,
+    vehicleNumber: 'LO-4415',
+    vehicleType: 'Dump Truck (4.5 Cube)',
+    driverName: 'Thushara K.',
+    status: 'ACTIVE',
+  },
+  {
+    id: 13,
+    vehicleNumber: 'LM-9680',
+    vehicleType: 'Tipper (3.6 Cube)',
+    driverName: 'Chandana S.',
+    status: 'ACTIVE',
+  },
+  {
+    id: 14,
+    vehicleNumber: 'LF-3769',
+    vehicleType: 'Dump Truck (3.5 Cube)',
+    driverName: 'Mahinda R.',
+    status: 'ACTIVE',
+  },
+]
 
 // ─── Fallback Sample Dataset (Used only when backend is unreachable) ────────
-const FALLBACK_RECEIPT_ITEMS = []
+const FALLBACK_RECEIPT_ITEMS = [
+  {
+    id: 'RCP-7901',
+    vehicleId: 1,
+    date: '2026-08-07',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LC-4838',
+    driver: 'Kamal Perera',
+    billNumber: '7901',
+    cube: 3.7,
+    km: 24,
+    transportRate: 10952.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 10952.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7902',
+    vehicleId: 2,
+    date: '2026-08-07',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LI-8902',
+    driver: 'Sunil Silva',
+    billNumber: '7902',
+    cube: 3.9,
+    km: 24,
+    transportRate: 11544.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11544.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7903',
+    vehicleId: 3,
+    date: '2026-08-07',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LM-4535',
+    driver: 'Ranjith Fernando',
+    billNumber: '7903',
+    cube: 4.0,
+    km: 24,
+    transportRate: 11840.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11840.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7904',
+    vehicleId: 4,
+    date: '2026-08-07',
+    land: 'S (Sand Quarry)',
+    vehicleNumber: 'LK-5177',
+    driver: 'Nimal Jayasinghe',
+    billNumber: '7904',
+    cube: 3.0,
+    km: 24,
+    transportRate: 8880.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 8880.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7905',
+    vehicleId: 5,
+    date: '2026-08-07',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LM-6460',
+    driver: 'Anura Kumara',
+    billNumber: '7905',
+    cube: 4.3,
+    km: 24,
+    transportRate: 12728.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 12728.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7906',
+    vehicleId: 6,
+    date: '2026-08-07',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LM-4687',
+    driver: 'Bandara M.',
+    billNumber: '7906',
+    cube: 3.8,
+    km: 24,
+    transportRate: 11248.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11248.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7907',
+    vehicleId: 7,
+    date: '2026-08-07',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LJ-0993',
+    driver: 'Sarath Fonseka',
+    billNumber: '7907',
+    cube: 3.8,
+    km: 24,
+    transportRate: 11248.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11248.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7908',
+    vehicleId: 8,
+    date: '2026-08-08',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LI-9587',
+    driver: 'Pradeep Kumara',
+    billNumber: '7908',
+    cube: 3.7,
+    km: 24,
+    transportRate: 10952.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 10952.0,
+    status: 'Pending',
+  },
+  {
+    id: 'RCP-7909',
+    vehicleId: 9,
+    date: '2026-08-08',
+    land: 'S (Sand Quarry)',
+    vehicleNumber: 'LI-5827',
+    driver: 'Chaminda V.',
+    billNumber: '7909',
+    cube: 3.8,
+    km: 24,
+    transportRate: 11248.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11248.0,
+    status: 'Pending',
+  },
+  {
+    id: 'RCP-7911',
+    vehicleId: 10,
+    date: '2026-08-08',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LM-4565',
+    driver: 'Gamini D.',
+    billNumber: '7911',
+    cube: 4.0,
+    km: 24,
+    transportRate: 11840.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 10000.0,
+    payableAmount: 1840.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7912',
+    vehicleId: 11,
+    date: '2026-08-09',
+    land: 'B (Brick Works)',
+    vehicleNumber: 'LN-5891',
+    driver: 'Asela P.',
+    billNumber: '7912',
+    cube: 4.0,
+    km: 24,
+    transportRate: 11840.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11840.0,
+    status: 'Pending',
+  },
+  {
+    id: 'RCP-7913',
+    vehicleId: 12,
+    date: '2026-08-09',
+    land: 'B (Brick Works)',
+    vehicleNumber: 'LO-4415',
+    driver: 'Thushara K.',
+    billNumber: '7913',
+    cube: 4.0,
+    km: 24,
+    transportRate: 11840.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 0,
+    payableAmount: 11840.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7920',
+    vehicleId: 13,
+    date: '2026-08-10',
+    land: 'B (Brick Works)',
+    vehicleNumber: 'LM-9680',
+    driver: 'Chandana S.',
+    billNumber: '7920',
+    cube: 3.6,
+    km: 24,
+    transportRate: 10656.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 5000.0,
+    payableAmount: 5656.0,
+    status: 'Paid',
+  },
+  {
+    id: 'RCP-7921',
+    vehicleId: 14,
+    date: '2026-08-10',
+    land: 'L (Quarry East)',
+    vehicleNumber: 'LF-3769',
+    driver: 'Mahinda R.',
+    billNumber: '7921',
+    cube: 3.0,
+    km: 24,
+    transportRate: 8880.0,
+    deliveryLocation: 'Warakapola 28+580',
+    dailyExpense: 2000.0,
+    payableAmount: 6880.0,
+    status: 'Paid',
+  },
+]
 
 // ─── Format Currency ────────────────────────────────────────────────────────
 const formatLKR = (num) => {
@@ -154,7 +479,7 @@ const CustomVehicleOption = (props) => {
     >
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center gap-2">
-          <span className="rc-option-plate">{data.vehicleNumber || data.value}</span>
+          <span className="rc-option-plate">{data.vehicleNumber || data.label}</span>
           <div>
             <div className="rc-option-driver">
               <CIcon icon={cilUser} size="sm" className="me-1 text-muted" />
@@ -175,7 +500,6 @@ const Receipts = () => {
   // ─── Filter State ─────────────────────────────────────────────────────────
   const [selectedDate, setSelectedDate] = useState('2026-08-07')
   const [selectedVehicle, setSelectedVehicle] = useState(DEFAULT_VEHICLE_OPTION)
-  const [tableSearch, setTableSearch] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
 
   // ─── Backend Data State ───────────────────────────────────────────────────
@@ -192,10 +516,16 @@ const Receipts = () => {
   const [downloadLoading, setDownloadLoading] = useState(false)
   const [rowActionId, setRowActionId] = useState(null)
 
-  // ─── Format Vehicle Object into Standard Select Option ────────────────────
+  // ─── Format Vehicle Object into Standard Select Option with vehicleId ─────
   const formatVehicleOption = useCallback((v) => {
+    const rawId = v.id ?? v.vehicleId ?? null
     const num =
-      v.vehicleNumber || v.vehicleNo || v.registrationNumber || v.regNo || v.number || v.id || ''
+      v.vehicleNumber ||
+      v.vehicleNo ||
+      v.registrationNumber ||
+      v.regNo ||
+      v.number ||
+      (rawId ? `Vehicle #${rawId}` : '')
     const type = v.vehicleType || v.type || v.model || (v.capacity ? `${v.capacity} m³` : '')
     const driver = v.driverName || v.driver || ''
 
@@ -204,16 +534,18 @@ const Receipts = () => {
     if (type) label += ` — ${type}`
 
     return {
-      value: num,
-      label,
+      value: rawId ? String(rawId) : num || 'ALL',
+      id: rawId,
+      vehicleId: rawId,
       vehicleNumber: num,
+      label,
       vehicleType: type || 'Material Transport Vehicle',
       driverName: driver || 'Assigned Driver',
       data: v,
     }
   }, [])
 
-  // ─── Initial Master Fleet Options for Dropdown (At least 14 vehicles) ─────
+  // ─── Initial Master Fleet Options for Dropdown (With IDs) ─────────────────
   const initialFleetOptions = useMemo(() => {
     const fleetList = MASTER_FLEET_VEHICLES.map(formatVehicleOption)
     return [DEFAULT_VEHICLE_OPTION, ...fleetList]
@@ -230,27 +562,26 @@ const Receipts = () => {
         ? backendVehicles.map(formatVehicleOption)
         : []
 
-      // 2. Aggregate with master fleet and transaction vehicles to ensure rich dataset
+      // 2. Aggregate with master fleet
       const aggregatedMap = new Map()
 
-      // Insert backend vehicles first
       backendFormatted.forEach((item) => {
-        if (item.value && item.value !== 'ALL') {
-          aggregatedMap.set(item.value.toUpperCase(), item)
+        const key = item.vehicleId ? String(item.vehicleId) : item.vehicleNumber?.toUpperCase()
+        if (key && key !== 'ALL') {
+          aggregatedMap.set(key, item)
         }
       })
 
-      // Insert master fleet vehicles
       MASTER_FLEET_VEHICLES.forEach((item) => {
         const opt = formatVehicleOption(item)
-        if (!aggregatedMap.has(opt.value.toUpperCase())) {
-          aggregatedMap.set(opt.value.toUpperCase(), opt)
+        const key = opt.vehicleId ? String(opt.vehicleId) : opt.vehicleNumber?.toUpperCase()
+        if (!aggregatedMap.has(key)) {
+          aggregatedMap.set(key, opt)
         }
       })
 
       const allVehicles = Array.from(aggregatedMap.values())
 
-      // 3. Filter by search input (matching vehicle plate, driver, or type)
       let filtered = allVehicles
       if (cleanInput && !cleanInput.includes('all')) {
         filtered = allVehicles.filter((opt) => {
@@ -258,21 +589,19 @@ const Receipts = () => {
           const driverMatch = (opt.driverName || '').toLowerCase().includes(cleanInput)
           const typeMatch = (opt.vehicleType || '').toLowerCase().includes(cleanInput)
           const labelMatch = (opt.label || '').toLowerCase().includes(cleanInput)
-          return numMatch || driverMatch || typeMatch || labelMatch
+          const idMatch = opt.vehicleId ? String(opt.vehicleId).includes(cleanInput) : false
+          return numMatch || driverMatch || typeMatch || labelMatch || idMatch
         })
       }
 
-      // If user is searching 'all' or empty input, include the consolidated option
       if (!cleanInput || cleanInput.includes('all')) {
         return [DEFAULT_VEHICLE_OPTION, ...filtered]
       }
 
-      // If query has matches, return matching vehicles (always showing at least 5 if available in fleet)
       if (filtered.length > 0) {
         return filtered
       }
 
-      // Fallback: if no exact match found, provide top 5 closest fleet vehicles so user always has choices
       return allVehicles.slice(0, 5)
     } catch (err) {
       console.warn('Vehicle search API fallback to local fleet:', err.message)
@@ -286,21 +615,25 @@ const Receipts = () => {
     }
   }
 
-  // ─── Fetch Daily Routes / Receipts from DailyRouteController Backend ──────
+  // ─── Fetch Daily Routes / Receipts from DailyRouteController Backend (Using vehicleId) ──
   useEffect(() => {
     let ignore = false
     const controller = new AbortController()
 
     const fetchReceipts = async () => {
       setLoading(true)
-      const vehicleId = selectedVehicle?.data?.id || 'ALL'
+      // Extract vehicleId directly (not vehicle number)
+      const vehicleId =
+        selectedVehicle?.vehicleId ||
+        selectedVehicle?.id ||
+        (selectedVehicle?.value !== 'ALL' ? selectedVehicle?.value : '')
 
       try {
+        // Query DailyRouteController passing vehicleId
         const routesResponse = await dailyRouteService.getDailyRoutes(
           {
             date: selectedDate,
-            vehicleId: vehicleId,
-            search: tableSearch,
+            vehicleId: vehicleId || '',
             page: 0,
             size: 100,
           },
@@ -320,9 +653,15 @@ const Receipts = () => {
 
         const mapped = fetchedList.map((r, i) => ({
           id: r.id || r.routeId || r.tripId || `REC-${i + 1}`,
+          vehicleId: r.vehicleId || r.vehicle?.id || r.vehicle_id || null,
           date: r.date || r.routeDate || r.tripDate || selectedDate,
           billNumber: r.billNumber || r.billNo || r.invoiceNo || r.code || `B-${1000 + i}`,
-          vehicleNumber: r.vehicleNumber || r.vehicleNo || r.regNo || vehNumber,
+          vehicleNumber:
+            r.vehicleNumber ||
+            r.vehicleNo ||
+            r.vehicle?.vehicleNumber ||
+            r.regNo ||
+            'Assigned Fleet',
           driver: r.driver || r.driverName || r.driverContact || 'Assigned Driver',
           land: r.land || r.landName || r.source || r.startLocation || 'Quarry Source',
           deliveryLocation:
@@ -347,7 +686,7 @@ const Receipts = () => {
           if (selectedDate) {
             const summaryDto = await dailyRouteService.getReceiptPreviewData(
               selectedDate,
-              vehNumber,
+              vehicleId || 'ALL',
               controller.signal,
             )
             if (!ignore && summaryDto) {
@@ -363,10 +702,12 @@ const Receipts = () => {
 
         const fallbackFiltered = FALLBACK_RECEIPT_ITEMS.filter((item) => {
           if (selectedDate && item.date !== selectedDate) return false
-          if (vehNumber !== 'ALL') {
-            const itemVeh = (item.vehicleNumber || '').toLowerCase().replace(/[\s\-_]/g, '')
-            const selVeh = vehNumber.toLowerCase().replace(/[\s\-_]/g, '')
-            if (itemVeh !== selVeh) return false
+          if (vehicleId && vehicleId !== 'ALL') {
+            const matchId = String(item.vehicleId) === String(vehicleId)
+            const matchVeh =
+              String(item.vehicleNumber).toLowerCase() ===
+              String(selectedVehicle?.vehicleNumber || '').toLowerCase()
+            if (!matchId && !matchVeh) return false
           }
           return true
         })
@@ -384,23 +725,10 @@ const Receipts = () => {
       ignore = true
       controller.abort()
     }
-  }, [selectedDate, selectedVehicle, tableSearch, refreshKey])
+  }, [selectedDate, selectedVehicle, refreshKey])
 
-  // ─── Filtered Records (with search input) ─────────────────────────────────
-  const filteredRecords = useMemo(() => {
-    if (!tableSearch.trim()) return records
-
-    const q = tableSearch.toLowerCase().trim()
-    return records.filter((item) => {
-      const matchVeh = (item.vehicleNumber || '').toLowerCase().includes(q)
-      const matchBill = (item.billNumber || '').toString().toLowerCase().includes(q)
-      const matchDriver = (item.driver || '').toLowerCase().includes(q)
-      const matchLoc = (item.deliveryLocation || '').toLowerCase().includes(q)
-      const matchLand = (item.land || '').toLowerCase().includes(q)
-      const matchId = (item.id || '').toString().toLowerCase().includes(q)
-      return matchVeh || matchBill || matchDriver || matchLoc || matchLand || matchId
-    })
-  }, [records, tableSearch])
+  // ─── Filtered Records ─────────────────────────────────────────────────────
+  const filteredRecords = records
 
   // ─── Pagination ───────────────────────────────────────────────────────────
   const totalPages = Math.ceil(filteredRecords.length / PAGE_SIZE) || 1
@@ -426,7 +754,7 @@ const Receipts = () => {
     backendSummary?.netPayable ??
     totalGrossRate - totalDailyExpense
 
-  // ─── Action: Preview Backend PDF (Streamed from DailyRouteController) ─────
+  // ─── Action: Preview Backend PDF (Passing vehicleId to backend) ───────────
   const handlePreviewBackendPdf = async (customItem = null) => {
     if (!selectedDate && !customItem) {
       Swal.fire({
@@ -438,7 +766,12 @@ const Receipts = () => {
       return
     }
 
-    const vehNumber = customItem ? customItem.vehicleNumber : selectedVehicle?.value || 'ALL'
+    const vehicleId = customItem
+      ? customItem.vehicleId || customItem.raw?.vehicleId || customItem.raw?.vehicle?.id || ''
+      : selectedVehicle?.vehicleId ||
+        selectedVehicle?.id ||
+        (selectedVehicle?.value !== 'ALL' ? selectedVehicle?.value : 'ALL')
+
     const routeId = customItem ? customItem.id || customItem.raw?.id : null
 
     setPreviewLoading(true)
@@ -447,7 +780,7 @@ const Receipts = () => {
     try {
       const pdfBlob = await dailyRouteService.getReceiptPdfBlob({
         date: customItem ? customItem.date || selectedDate : selectedDate,
-        vehicleNumber: vehNumber,
+        vehicleId: vehicleId || 'ALL',
         routeId,
       })
 
@@ -455,12 +788,14 @@ const Receipts = () => {
 
       setPreviewPdfUrl(blobUrl)
       setPreviewMeta({
-        vehicle: customItem ? customItem.vehicleNumber : selectedVehicle?.label || vehNumber,
+        vehicle: customItem
+          ? customItem.vehicleNumber
+          : selectedVehicle?.label || `Vehicle #${vehicleId}`,
         date: customItem ? customItem.date : selectedDate,
         count: customItem ? 1 : totalTrips,
         payable: customItem ? customItem.payableAmount : totalNetPayable,
         routeId,
-        vehNumber,
+        vehicleId,
       })
       setPreviewModalVisible(true)
     } catch (err) {
@@ -479,7 +814,7 @@ const Receipts = () => {
     }
   }
 
-  // ─── Action: Download Backend PDF (Streamed from DailyRouteController) ────
+  // ─── Action: Download Backend PDF (Passing vehicleId to backend) ──────────
   const handleDownloadBackendPdf = async (customItem = null) => {
     if (!selectedDate && !customItem) {
       Swal.fire({
@@ -491,13 +826,18 @@ const Receipts = () => {
       return
     }
 
-    const vehNumber = customItem ? customItem.vehicleNumber : selectedVehicle?.value || 'ALL'
+    const vehicleId = customItem
+      ? customItem.vehicleId || customItem.raw?.vehicleId || customItem.raw?.vehicle?.id || ''
+      : selectedVehicle?.vehicleId ||
+        selectedVehicle?.id ||
+        (selectedVehicle?.value !== 'ALL' ? selectedVehicle?.value : 'ALL')
+
     const routeId = customItem ? customItem.id || customItem.raw?.id : null
     const dateVal = customItem ? customItem.date || selectedDate : selectedDate
 
     const fileName = customItem
-      ? `Material_Grid_Receipt_${customItem.vehicleNumber}_Bill_${customItem.billNumber || customItem.id}.pdf`
-      : `Material_Grid_Receipt_${vehNumber !== 'ALL' ? vehNumber : 'All_Vehicles'}_${dateVal}.pdf`
+      ? `Material_Grid_Receipt_${customItem.vehicleNumber || `Vehicle_${vehicleId}`}_Bill_${customItem.billNumber || customItem.id}.pdf`
+      : `Material_Grid_Receipt_${vehicleId && vehicleId !== 'ALL' ? `Vehicle_${vehicleId}` : 'All_Vehicles'}_${dateVal}.pdf`
 
     setDownloadLoading(true)
     if (customItem) setRowActionId(customItem.id)
@@ -505,7 +845,7 @@ const Receipts = () => {
     try {
       await dailyRouteService.downloadReceiptPdf({
         date: dateVal,
-        vehicleNumber: vehNumber,
+        vehicleId: vehicleId || 'ALL',
         routeId,
         fileName,
       })
@@ -574,11 +914,6 @@ const Receipts = () => {
     setCurrentPage(1)
   }
 
-  const handleSearchChange = (val) => {
-    setTableSearch(val)
-    setCurrentPage(1)
-  }
-
   return (
     <div className="rc-page">
       {/* ── Page Header ── */}
@@ -591,7 +926,7 @@ const Receipts = () => {
             <div className="d-flex align-items-center gap-2 flex-wrap">
               <h1 className="rc-page-title">Receipts & Settlement</h1>
               <span className="rc-backend-tag">
-                <CIcon icon={cilCheckCircle} size="sm" /> DailyRoute Connected
+                <CIcon icon={cilCheckCircle} size="sm" /> DailyRoute Backend Connected
               </span>
             </div>
             <p className="rc-page-subtitle">
@@ -627,7 +962,6 @@ const Receipts = () => {
               onClick={() => {
                 setSelectedDate('2026-08-07')
                 setSelectedVehicle(DEFAULT_VEHICLE_OPTION)
-                setTableSearch('')
                 setCurrentPage(1)
               }}
             >
@@ -639,7 +973,7 @@ const Receipts = () => {
         <CCardBody className="rc-card-body">
           <CRow className="g-3">
             {/* Date Input with Quick Selectors */}
-            <CCol xs={12} md={6} lg={4}>
+            <CCol xs={12} md={6}>
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <CFormLabel className="rc-label mb-0">
                   <CIcon icon={cilCalendar} size="sm" className="text-warning" />
@@ -649,6 +983,13 @@ const Receipts = () => {
                   <button
                     type="button"
                     className={`rc-quick-btn ${selectedDate === '2026-08-07' ? 'active' : ''}`}
+                    onClick={() => setQuickDate('sample')}
+                  >
+                    Aug 7
+                  </button>
+                  <button
+                    type="button"
+                    className="rc-quick-btn"
                     onClick={() => setQuickDate('today')}
                   >
                     Today
@@ -677,8 +1018,8 @@ const Receipts = () => {
               />
             </CCol>
 
-            {/* Searchable Vehicle Dropdown (Shows at least 5+ vehicles when typing) */}
-            <CCol xs={12} md={6} lg={4}>
+            {/* Searchable Vehicle Dropdown */}
+            <CCol xs={12} md={6}>
               <CFormLabel className="rc-label">
                 <CIcon icon={cilTruck} size="sm" className="text-warning" />
                 Assigned Vehicle Number
@@ -705,33 +1046,6 @@ const Receipts = () => {
                 loadingMessage={() => 'Searching fleet vehicles…'}
               />
             </CCol>
-
-            {/* Table Quick Search Filter */}
-            {/* <CCol xs={12} md={12} lg={4}>
-              <CFormLabel className="rc-label">
-                <CIcon icon={cilSearch} size="sm" className="text-warning" />
-                Quick Search Within Records
-              </CFormLabel>
-              <div className="rc-search-input-wrapper">
-                <CIcon icon={cilSearch} className="rc-search-icon" />
-                <CFormInput
-                  type="text"
-                  className="rc-input rc-input-search"
-                  placeholder="Filter by bill #, driver, location, land…"
-                  value={tableSearch}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                />
-                {tableSearch && (
-                  <button
-                    type="button"
-                    className="rc-search-clear"
-                    onClick={() => handleSearchChange('')}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            </CCol> */}
           </CRow>
 
           {/* Action Bar with Backend PDF Preview & Download */}
@@ -742,7 +1056,7 @@ const Receipts = () => {
                 <strong>
                   {selectedVehicle?.value === 'ALL'
                     ? 'All Vehicles (Consolidated)'
-                    : selectedVehicle?.value}
+                    : selectedVehicle?.label || selectedVehicle?.vehicleNumber}
                 </strong>
                 {selectedDate ? ` • ${selectedDate}` : ' • All Dates'}
               </span>
@@ -909,7 +1223,6 @@ const Receipts = () => {
                 onClick={() => {
                   setSelectedDate('')
                   setSelectedVehicle(DEFAULT_VEHICLE_OPTION)
-                  setTableSearch('')
                   setCurrentPage(1)
                 }}
               >
@@ -1179,7 +1492,7 @@ const Receipts = () => {
                   previewMeta?.routeId
                     ? {
                         id: previewMeta.routeId,
-                        vehicleNumber: previewMeta.vehNumber,
+                        vehicleId: previewMeta.vehicleId,
                         date: previewMeta.date,
                       }
                     : null,

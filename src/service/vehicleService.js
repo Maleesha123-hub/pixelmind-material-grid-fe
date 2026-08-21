@@ -69,34 +69,9 @@ export const vehicleService = {
    */
   searchVehicles: async (query = '', signal) => {
     const qs = query.trim() ? `?query=${encodeURIComponent(query.trim())}` : ''
-    const endpoints = [
-      `${API_BASE}/search${qs}`,
-      `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/material-grid/vehicles/search${qs}`,
-      `${API_BASE}?search=${encodeURIComponent(query.trim())}&size=50`,
-      `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/material-grid/vehicles?search=${encodeURIComponent(query.trim())}&size=50`,
-    ]
-
-    for (let i = 0; i < endpoints.length; i++) {
-      try {
-        const result = await apiFetch(endpoints[i], { signal })
-        const data = unwrap(result)
-        let list = []
-        if (Array.isArray(data)) {
-          list = data
-        } else if (data?.content && Array.isArray(data.content)) {
-          list = data.content
-        } else if (data?.items && Array.isArray(data.items)) {
-          list = data.items
-        }
-        if (list.length > 0) return list
-      } catch (err) {
-        if (signal?.aborted) throw err
-        if (i === endpoints.length - 1) {
-          console.warn('Vehicle search fallback exhausted:', err.message)
-        }
-      }
-    }
-    return []
+    const result = await apiFetch(`${API_BASE}/search${qs}`, { signal })
+    const data = unwrap(result)
+    return Array.isArray(data) ? data : []
   },
 
   /**

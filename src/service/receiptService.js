@@ -8,11 +8,11 @@ import dailyRouteService from './dailyRouteService'
 
 export const receiptService = {
   /**
-   * Fetch receipt preview data / summary DTO for given date and vehicle number
-   * Endpoint: GET /api/v1/daily-routes/receipt/preview?date=YYYY-MM-DD&vehicleNumber=...
+   * Fetch receipt preview data / summary DTO for given date and vehicleId
+   * Endpoint: GET /api/v1/daily-routes/receipt/preview?date=YYYY-MM-DD&vehicleId=...
    */
-  getReceiptPreview: async (date, vehicleNumber = 'ALL', signal) => {
-    return dailyRouteService.getReceiptPreviewData(date, vehicleNumber, signal)
+  getReceiptPreview: async (date, vehicleId = 'ALL', signal) => {
+    return dailyRouteService.getReceiptPreviewData(date, vehicleId, signal)
   },
 
   /**
