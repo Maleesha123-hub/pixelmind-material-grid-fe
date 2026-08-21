@@ -65,10 +65,18 @@ export const routeService = {
    * @returns {Promise<Array>}
    */
   searchRoutes: async (query = '', signal) => {
-    const qs = query.trim() ? `?query=${encodeURIComponent(query.trim())}` : ''
-    const result = await apiFetch(`${API_BASE}/search${qs}`, { signal })
+    const qs = buildQuery({
+      search: query.trim(),
+      page: 0,
+      size: 50,
+      sort: 'id,asc',
+    })
+    const result = await apiFetch(`${API_BASE}?${qs}`, { signal })
     const data = unwrap(result)
-    return Array.isArray(data) ? data : []
+    if (Array.isArray(data)) return data
+    if (data?.content && Array.isArray(data.content)) return data.content
+    if (data?.items && Array.isArray(data.items)) return data.items
+    return []
   },
 
   /**
@@ -91,7 +99,10 @@ export const routeService = {
    * @param {AbortSignal} [signal]
    * @returns {Promise<Object>}
    */
-  getRoutes: async ({ search = '', status = '', page = 0, size = 15, sort = 'id,asc' } = {}, signal) => {
+  getRoutes: async (
+    { search = '', status = '', page = 0, size = 15, sort = 'id,asc' } = {},
+    signal,
+  ) => {
     const qs = buildQuery({ search, status: status === 'ALL' ? '' : status, page, size, sort })
     const result = await apiFetch(`${API_BASE}?${qs}`, { signal })
     return unwrap(result)
@@ -144,7 +155,7 @@ export const routeService = {
     const statusParam = typeof status === 'boolean' ? (status ? 'ACTIVE' : 'INACTIVE') : status
     const result = await apiFetch(
       `${API_BASE}/${id}/status?status=${encodeURIComponent(statusParam)}`,
-      { method: 'PATCH' }
+      { method: 'PATCH' },
     )
     return unwrap(result)
   },

@@ -59,8 +59,8 @@ const buildQuery = (params) => {
 
 export const vehicleService = {
   /**
-   * GET /api/material-grid/vehicles/search?query=
-   * Auto-complete / dropdown search — returns active vehicles only.
+   * GET /api/v1/vehicles?search=&size=50
+   * Auto-complete / dropdown search — returns vehicles matching query.
    * Used by: Receipts page async select dropdown.
    *
    * @param {string} [query] - Search term (vehicle number)
@@ -68,10 +68,18 @@ export const vehicleService = {
    * @returns {Promise<Array<VehicleResponse>>}
    */
   searchVehicles: async (query = '', signal) => {
-    const qs = query.trim() ? `?query=${encodeURIComponent(query.trim())}` : ''
-    const result = await apiFetch(`${API_BASE}/search${qs}`, { signal })
+    const qs = buildQuery({
+      search: query.trim(),
+      page: 0,
+      size: 50,
+      sort: 'id,asc',
+    })
+    const result = await apiFetch(`${API_BASE}?${qs}`, { signal })
     const data = unwrap(result)
-    return Array.isArray(data) ? data : []
+    if (Array.isArray(data)) return data
+    if (data?.content && Array.isArray(data.content)) return data.content
+    if (data?.items && Array.isArray(data.items)) return data.items
+    return []
   },
 
   /**
