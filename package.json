@@ -6,6 +6,10 @@
   "bugs": {
     "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
   },
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
