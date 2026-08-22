@@ -257,13 +257,13 @@ const Receipts = () => {
     }
   }
 
-  // ─── Fetch Receipt Summary DTO from DailyRouteController Backend ──────────
+  // ─── Fetch Receipt Summary DTO from DailyRouteReportController Backend ───
   useEffect(() => {
     let ignore = false
     const controller = new AbortController()
 
     const fetchReceiptSummary = async () => {
-      if (!selectedDate) {
+      if (!selectedDate || selectedVehicle?.vehicleId == 'ALL') {
         setBackendSummary(null)
         return
       }
@@ -275,9 +275,9 @@ const Receipts = () => {
         (selectedVehicle?.value !== 'ALL' ? selectedVehicle?.value : '')
 
       try {
-        const summaryDto = await dailyRouteService.getReceiptPreviewData(
+        const summaryDto = await dailyRouteService.getSummary(
           selectedDate,
-          vehicleId || 'ALL',
+          vehicleId,
           controller.signal,
         )
 
@@ -286,7 +286,7 @@ const Receipts = () => {
         }
       } catch (err) {
         if (ignore || err.name === 'AbortError') return
-        console.error('Backend receipt summary fetch failed:', err.message)
+        console.error('DailyRouteReportController.getSummary() fetch failed:', err.message)
         setBackendSummary(null)
       } finally {
         if (!ignore) setLoading(false)
@@ -301,23 +301,24 @@ const Receipts = () => {
     }
   }, [selectedDate, selectedVehicle, refreshKey])
 
-  // ─── Summary Totals from Backend DTO ──────────────────────────────────────
-  const totalTrips = backendSummary?.totalTrips ?? backendSummary?.tripCount ?? 0
-  const totalCubes = backendSummary?.totalCubes ?? backendSummary?.cubeCount ?? 0
-  const totalGrossRate = backendSummary?.totalGrossRate ?? backendSummary?.grossAmount ?? 0
-  const totalDailyExpense = backendSummary?.totalDailyExpense ?? backendSummary?.totalExpenses ?? 0
-  const totalNetPayable =
-    backendSummary?.totalNetPayable ??
-    backendSummary?.netPayable ??
-    totalGrossRate - totalDailyExpense
+  // ─── Summary Totals from Backend DTO (DailyRouteReportController.getSummary) ───
+  const totalDispatches = backendSummary?.totalDispatches ?? 0
+
+  const totalCubes = backendSummary?.totalVolumes ?? 0
+
+  const totalGrossRate = backendSummary?.dailyGrossTransportRate ?? 0
+
+  const totalDailyExpense = backendSummary?.dailyDeduction ?? 0
+
+  const totalNetPayable = backendSummary?.payable ?? 0
 
   // ─── Action: Preview Backend PDF (Streamed from Backend) ──────────────────
   const handlePreviewBackendPdf = async () => {
-    if (!selectedDate) {
+    if (!selectedDate || selectedVehicle?.value == 'ALL') {
       Swal.fire({
         icon: 'warning',
         title: 'Date Required',
-        text: 'Please select a date to preview the official backend PDF receipt.',
+        text: 'Please select a date and vehicle to preview the receipt',
         confirmButtonColor: '#f59e0b',
       })
       return
@@ -344,7 +345,7 @@ const Receipts = () => {
           selectedVehicle?.label ||
           (vehicleId !== 'ALL' ? `Vehicle #${vehicleId}` : 'All Fleet Vehicles'),
         date: selectedDate,
-        count: totalTrips,
+        count: totalDispatches,
         payable: totalNetPayable,
         vehicleId,
       })
@@ -587,7 +588,7 @@ const Receipts = () => {
                 {selectedDate ? ` • ${selectedDate}` : ' • All Dates'}
               </span>
               <span className="text-muted ms-2" style={{ fontSize: '0.8rem' }}>
-                ({totalTrips} recorded dispatches)
+                ({totalDispatches} recorded dispatches)
               </span>
             </div>
 
@@ -637,7 +638,7 @@ const Receipts = () => {
           <div className="d-flex justify-content-between align-items-start">
             <div>
               <div className="rc-kpi-label">Total Dispatches</div>
-              <div className="rc-kpi-value">{totalTrips}</div>
+              <div className="rc-kpi-value">{totalDispatches}</div>
               <div className="rc-kpi-sub">Trips recorded</div>
             </div>
             <div className="rc-kpi-icon-pill rc-kpi-icon-pill--blue">
