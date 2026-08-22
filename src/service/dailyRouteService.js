@@ -1,19 +1,16 @@
 /**
  * Daily Route & Receipts Service
- * Handles direct communication with Spring Boot DailyRouteController & DailyRouteReportController
+ * Handles direct communication with Spring Boot DailyRouteReportController & DailyRouteController
  *
  * Endpoints:
- *   GET  /api/v1/daily-route-reports/summary?date=...&vehicleId=... → CommonResponseDTO (Receipt Summary)
- *   GET  /api/v1/daily-routes                                       → ApiResponse<PageResponse<DailyRouteResponse>>
- *   GET  /api/v1/daily-routes/receipt/pdf?date=...&vehicleId=...    → Binary PDF Stream (application/pdf)
- *   GET  /api/v1/daily-routes/{id}/pdf                              → Binary PDF Stream for single trip
+ *   GET  /api/v1/daily-routes/report/summary?date=...&vehicleId=... → CommonResponseDTO (Receipt Summary)
+ *   GET  /api/v1/daily-routes/report/preview?date=...&vehicleId=... → Binary PDF Stream (application/pdf)
+ *   GET  /api/v1/daily-routes/report/download?date=...&vehicleId=... → Binary PDF Stream (application/pdf)
  *
  * @module dailyRouteService
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-const DAILY_ROUTE_API = `${BASE_URL}/api/v1/daily-routes`
-const DAILY_ROUTE_REPORT_API = `${BASE_URL}/api/v1/daily-routes/report`
 
 // ─── Response unwrapper ──────────────────────────────────────────────────────
 const unwrap = (result) => {
@@ -98,10 +95,10 @@ const apiFetchBlob = async (url, options = {}) => {
 export const dailyRouteService = {
   /**
    * Fetch receipt summary from DailyRouteReportController.getSummary(date, vehicleId)
-   * GET /api/v1/daily-route-reports/summary?date=YYYY-MM-DD&vehicleId=...
+   * GET /api/v1/daily-routes/report/summary?date=YYYY-MM-DD&vehicleId=...
    *
    * @param {string} date - Date in YYYY-MM-DD format
-   * @param {string|number} [vehicleId] - Numeric vehicle ID or 'ALL'
+   * @param {string|number} [vehicleId] - Numeric vehicle ID
    * @param {AbortSignal} [signal]
    * @returns {Promise<any>}
    */
@@ -113,15 +110,19 @@ export const dailyRouteService = {
     const vehIdParam = vehicleId === 'ALL' ? '' : vehicleId
     const qs = buildQuery({ date, vehicleId: vehIdParam })
 
-    const endpoint = `${DAILY_ROUTE_REPORT_API}/summary?${qs}`
+    const endpoints = [
+      `${BASE_URL}/api/v1/daily-routes/report/summary?${qs}`,
+    ]
 
     let lastError = null
-    try {
-      const result = await apiFetch(endpoint, { method: 'GET', signal })
-      return unwrap(result)
-    } catch (err) {
-      if (signal?.aborted) throw err
-      lastError = err
+    for (let i = 0; i < endpoints.length; i++) {
+      try {
+        const result = await apiFetch(endpoints[i], { method: 'GET', signal })
+        return unwrap(result)
+      } catch (err) {
+        if (signal?.aborted) throw err
+        lastError = err
+      }
     }
 
     throw lastError || new Error('Failed to load receipt summary from backend')
@@ -135,71 +136,78 @@ export const dailyRouteService = {
   },
 
   /**
-   * Fetch daily routes / trips list from DailyRouteController
-   * GET /api/v1/daily-routes?date=...&vehicleId=...&page=...&size=...&search=...
-   */
-  getDailyRoutes: async (
-    { date = '', vehicleId = '', search = '', page = 0, size = 20, sort = 'id,desc' } = {},
-    signal,
-  ) => {
-    const qs = buildQuery({
-      date,
-      vehicleId: vehicleId === 'ALL' ? '' : vehicleId,
-      search,
-      page,
-      size,
-      sort,
-    })
-
-    const result = await apiFetch(`${DAILY_ROUTE_API}${qs ? `?${qs}` : ''}`, {
-      method: 'GET',
-      signal,
-    })
-    return unwrap(result)
-  },
-
-  /**
    * Fetch backend-generated PDF receipt stream as a Blob (application/pdf)
-   * GET /api/v1/daily-routes/receipt/pdf?date=...&vehicleId=...
-   * or for single trip: GET /api/v1/daily-routes/{routeId}/pdf
+   * Calls DailyRouteReportController.preview(date, vehicleId)
+   * GET /api/v1/daily-routes/report/preview?date=YYYY-MM-DD&vehicleId=...
    *
    * @param {Object} params
-   * @param {string} [params.date] - Date in YYYY-MM-DD format
-   * @param {string|number} [params.vehicleId] - Vehicle ID or ALL
-   * @param {string|number} [params.routeId] - Optional specific route/trip ID
+   * @param {string} params.date - Date in YYYY-MM-DD format
+   * @param {string|number} [params.vehicleId] - Vehicle ID
    * @param {AbortSignal} [params.signal]
    * @returns {Promise<Blob>}
    */
-  getReceiptPdfBlob: async ({ date, vehicleId = 'ALL', routeId = null } = {}, signal) => {
-    if (routeId) {
-      return await apiFetchBlob(`${DAILY_ROUTE_REPORT_API}/preview/${date}/${vehicleId}`, {
-        method: 'GET',
-        signal,
-      })
+  getReceiptPdfBlob: async ({ date, vehicleId = 'ALL' } = {}, signal) => {
+    if (!date) {
+      throw new Error('Please select a date to preview the PDF receipt.')
     }
+
+    const vehIdParam = vehicleId === 'ALL' ? '' : vehicleId
+    const qs = buildQuery({ date, vehicleId: vehIdParam })
+
+    const endpoints = [
+      `${BASE_URL}/api/v1/daily-routes/report/preview?${qs}`,
+    ]
+
+    let lastError = null
+    for (let i = 0; i < endpoints.length; i++) {
+      try {
+        return await apiFetchBlob(endpoints[i], { method: 'GET', signal })
+      } catch (err) {
+        if (signal?.aborted) throw err
+        lastError = err
+      }
+    }
+
+    throw lastError || new Error('Failed to retrieve PDF receipt from backend')
   },
 
   /**
    * Directly download the backend-generated PDF receipt to the client
+   * Calls DailyRouteReportController.download(date, vehicleId) or preview with attachment
    *
    * @param {Object} params
-   * @param {string} [params.date]
+   * @param {string} params.date
    * @param {string|number} [params.vehicleId]
-   * @param {string|number} [params.routeId]
    * @param {string} [params.fileName]
    * @param {AbortSignal} [params.signal]
    */
-  downloadReceiptPdf: async (
-    { date, vehicleId = 'ALL', routeId = null, fileName = '' } = {},
-    signal,
-  ) => {
-    const blob = await dailyRouteService.getReceiptPdfBlob({ date, vehicleId, routeId }, signal)
+  downloadReceiptPdf: async ({ date, vehicleId = 'ALL', fileName = '' } = {}, signal) => {
+    const vehIdParam = vehicleId === 'ALL' ? '' : vehicleId
+    const qs = buildQuery({ date, vehicleId: vehIdParam })
+
+    const downloadEndpoints = [
+      `${BASE_URL}/api/v1/daily-routes/report/download?${qs}`,
+    ]
+
+    let blob = null
+    let lastError = null
+    for (let i = 0; i < downloadEndpoints.length; i++) {
+      try {
+        blob = await apiFetchBlob(downloadEndpoints[i], { method: 'GET', signal })
+        if (blob) break
+      } catch (err) {
+        if (signal?.aborted) throw err
+        lastError = err
+      }
+    }
+
+    if (!blob) {
+      throw lastError || new Error('Failed to download PDF receipt from backend')
+    }
 
     const resolvedFileName =
       fileName ||
-      (routeId
-        ? `Material_Grid_Trip_Receipt_${routeId}.pdf`
-        : `Material_Grid_Receipt_${vehicleId !== 'ALL' ? `Vehicle_${vehicleId}` : 'All_Vehicles'}_${date || 'export'}.pdf`)
+      `Material_Grid_Receipt_${vehicleId !== 'ALL' ? `Vehicle_${vehicleId}` : 'All_Vehicles'}_${date || 'export'}.pdf`
 
     const blobUrl = URL.createObjectURL(blob)
     const link = document.createElement('a')

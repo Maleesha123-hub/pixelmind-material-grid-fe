@@ -314,36 +314,31 @@ const Receipts = () => {
 
   // ─── Action: Preview Backend PDF (Streamed from Backend) ──────────────────
   const handlePreviewBackendPdf = async () => {
-    if (!selectedDate || selectedVehicle?.value == 'ALL') {
+    if (!selectedDate || !selectedVehicle || selectedVehicle?.value === 'ALL') {
       Swal.fire({
         icon: 'warning',
-        title: 'Date Required',
-        text: 'Please select a date and vehicle to preview the receipt',
+        title: 'Vehicle & Date Required',
+        text: 'Please select both a date and an assigned vehicle to preview the receipt.',
         confirmButtonColor: '#f59e0b',
       })
       return
     }
 
-    const vehicleId =
-      selectedVehicle?.vehicleId ||
-      selectedVehicle?.id ||
-      (selectedVehicle?.value !== 'ALL' ? selectedVehicle?.value : 'ALL')
+    const vehicleId = selectedVehicle?.id || selectedVehicle?.vehicleId || selectedVehicle?.value
 
     setPreviewLoading(true)
 
     try {
       const pdfBlob = await dailyRouteService.getReceiptPdfBlob({
         date: selectedDate,
-        vehicleId: vehicleId || 'ALL',
+        vehicleId,
       })
 
       const blobUrl = URL.createObjectURL(pdfBlob)
 
       setPreviewPdfUrl(blobUrl)
       setPreviewMeta({
-        vehicle:
-          selectedVehicle?.label ||
-          (vehicleId !== 'ALL' ? `Vehicle #${vehicleId}` : 'All Fleet Vehicles'),
+        vehicle: selectedVehicle?.label || `Vehicle #${vehicleId}`,
         date: selectedDate,
         count: totalDispatches,
         payable: totalNetPayable,
@@ -357,7 +352,7 @@ const Receipts = () => {
         title: 'Backend PDF Preview Failed',
         text:
           err.message ||
-          'Unable to retrieve PDF receipt from backend DailyRoute controller. Please verify that the backend service is running.',
+          'Unable to retrieve PDF receipt from backend DailyRouteReportController. Please check server logs.',
         confirmButtonColor: '#dc2626',
       })
     } finally {
@@ -367,30 +362,26 @@ const Receipts = () => {
 
   // ─── Action: Download Backend PDF (Streamed from Backend) ─────────────────
   const handleDownloadBackendPdf = async () => {
-    if (!selectedDate) {
+    if (!selectedDate || !selectedVehicle || selectedVehicle?.value === 'ALL') {
       Swal.fire({
         icon: 'warning',
-        title: 'Date Required',
-        text: 'Please select a date to download the official backend PDF receipt.',
+        title: 'Vehicle & Date Required',
+        text: 'Please select both a date and an assigned vehicle to download the official receipt.',
         confirmButtonColor: '#f59e0b',
       })
       return
     }
 
-    const vehicleId =
-      selectedVehicle?.vehicleId ||
-      selectedVehicle?.id ||
-      (selectedVehicle?.value !== 'ALL' ? selectedVehicle?.value : 'ALL')
-
+    const vehicleId = selectedVehicle?.id || selectedVehicle?.vehicleId || selectedVehicle?.value
     const dateVal = selectedDate
-    const fileName = `Material_Grid_Receipt_${vehicleId && vehicleId !== 'ALL' ? `Vehicle_${vehicleId}` : 'All_Vehicles'}_${dateVal}.pdf`
+    const fileName = `Material_Grid_Receipt_${selectedVehicle?.vehicleNumber || `Vehicle_${vehicleId}`}_${dateVal}.pdf`
 
     setDownloadLoading(true)
 
     try {
       await dailyRouteService.downloadReceiptPdf({
         date: dateVal,
-        vehicleId: vehicleId || 'ALL',
+        vehicleId,
         fileName,
       })
 
@@ -412,7 +403,7 @@ const Receipts = () => {
         title: 'Download Failed',
         text:
           err.message ||
-          'Unable to download receipt PDF from backend DailyRoute controller. Please check server logs.',
+          'Unable to download receipt PDF from backend DailyRouteReportController. Please check server logs.',
         confirmButtonColor: '#dc2626',
       })
     } finally {
