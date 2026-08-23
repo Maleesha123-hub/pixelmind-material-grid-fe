@@ -43,7 +43,11 @@ const apiFetch = async (url, options = {}) => {
     throw new Error(errorMessage)
   }
 
-  return response.json()
+  const result = await response.json()
+  if (result && result.success === false) {
+    throw new Error(result.message || 'Operation failed')
+  }
+  return result
 }
 
 // ─── Build query string helper ────────────────────────────────────────────────

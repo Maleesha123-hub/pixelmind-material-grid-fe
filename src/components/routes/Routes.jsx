@@ -209,7 +209,7 @@ const Routes = () => {
     const routeLabel = `${route.startLocation} → ${route.endLocation}`
     const res = await Swal.fire({
       title: `Delete route "${routeLabel}"?`,
-      text: 'This action cannot be undone.',
+      text: 'This action cannot be undone. Routes with historical records cannot be deleted.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, Delete',
@@ -232,15 +232,13 @@ const Routes = () => {
       })
       loadRoutes(currentPage, debouncedSearch)
     } catch (err) {
-      // Optimistic client-side removal if delete endpoint fallback
-      setRoutesList((prev) => prev.filter((x) => x.id !== route.id))
       Swal.fire({
-        icon: 'success',
-        title: 'Removed',
-        text: `Route "${routeLabel}" removed.`,
+        icon: 'error',
+        title: 'Cannot Delete Route',
+        text:
+          err.message ||
+          'Cannot delete route with existing records. Route is preserved for referential integrity.',
         confirmButtonColor: '#d97706',
-        timer: 1800,
-        timerProgressBar: true,
       })
     }
   }
