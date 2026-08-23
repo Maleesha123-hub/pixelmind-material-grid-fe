@@ -45,7 +45,6 @@ const EMPTY_FORM = {
   startLocation: '',
   endLocation: '',
   km: '',
-  status: 'ACTIVE',
 }
 
 // ─── Debounce hook ────────────────────────────────────────────────────────────
@@ -66,7 +65,6 @@ const Routes = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
-  const [statusFilter, setStatusFilter] = useState('ALL')
 
   // ── Modal / form state ───────────────────────────────────────────────────────
   const [modalVisible, setModalVisible] = useState(false)
@@ -80,36 +78,16 @@ const Routes = () => {
   const abortRef = useRef(null)
 
   // ── Load routes ─────────────────────────────────────────────────────────────
-  const loadRoutes = useCallback(async (page = 0, search = '', statusF = 'ALL') => {
+  const loadRoutes = useCallback(async (page = 0, search = '') => {
     if (abortRef.current) abortRef.current.abort()
     abortRef.current = new AbortController()
     setLoading(true)
     try {
       const result = await routeService.getRoutes(
-        { search, status: statusF, page, size: PAGE_SIZE, sort: 'id,asc' },
+        { search, page, size: PAGE_SIZE, sort: 'id,asc' },
         abortRef.current.signal,
       )
-      let content = result?.content ?? (Array.isArray(result) ? result : [])
-
-      if (statusF !== 'ALL') {
-        content = content.filter((r) => r.status === statusF)
-      }
-
-      // Client-side fallback filtering if API returns raw array
-      // if (Array.isArray(result)) {
-      //   if (search.trim()) {
-      //     const q = search.trim().toLowerCase()
-      //     content = content.filter((r) => {
-      //       const combined = `${r.startLocation || ''} - ${r.endLocation || ''}`.toLowerCase()
-      //       const start = (r.startLocation || '').toLowerCase()
-      //       const end = (r.endLocation || '').toLowerCase()
-      //       return combined.includes(q) || start.includes(q) || end.includes(q)
-      //     })
-      //   }
-      //   if (statusF !== 'ALL') {
-      //     content = content.filter((r) => r.status === statusF)
-      //   }
-      // }
+      const content = result?.content ?? (Array.isArray(result) ? result : [])
 
       setRoutesList(content)
       setTotalElements(result?.totalElements ?? content.length)
@@ -126,13 +104,13 @@ const Routes = () => {
   }, [])
 
   useEffect(() => {
-    loadRoutes(0, debouncedSearch, statusFilter)
+    loadRoutes(0, debouncedSearch)
     setCurrentPage(0)
-  }, [debouncedSearch, statusFilter, loadRoutes])
+  }, [debouncedSearch, loadRoutes])
 
   const goToPage = (page) => {
     if (page < 0 || page >= totalPages) return
-    loadRoutes(page, debouncedSearch, statusFilter)
+    loadRoutes(page, debouncedSearch)
     setCurrentPage(page)
   }
 
@@ -170,12 +148,10 @@ const Routes = () => {
   const openEdit = (route) => {
     setEditMode(true)
     setSelectedId(route.id)
-    const isAct = route.status === true || route.status === 'ACTIVE' || route.status == null
     setForm({
       startLocation: route.startLocation || '',
       endLocation: route.endLocation || '',
       km: route.km != null ? String(route.km) : '',
-      status: isAct ? 'ACTIVE' : 'INACTIVE',
     })
     setErrors({})
     setModalVisible(true)
@@ -190,7 +166,6 @@ const Routes = () => {
       startLocation: form.startLocation.trim(),
       endLocation: form.endLocation.trim(),
       km: Number(form.km),
-      status: form.status === 'ACTIVE',
     }
 
     try {
@@ -216,7 +191,7 @@ const Routes = () => {
         })
       }
       setModalVisible(false)
-      loadRoutes(editMode ? currentPage : 0, debouncedSearch, statusFilter)
+      loadRoutes(editMode ? currentPage : 0, debouncedSearch)
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -255,7 +230,7 @@ const Routes = () => {
         timer: 1800,
         timerProgressBar: true,
       })
-      loadRoutes(currentPage, debouncedSearch, statusFilter)
+      loadRoutes(currentPage, debouncedSearch)
     } catch (err) {
       // Optimistic client-side removal if delete endpoint fallback
       setRoutesList((prev) => prev.filter((x) => x.id !== route.id))
@@ -271,12 +246,6 @@ const Routes = () => {
   }
 
   // ── Counts ───────────────────────────────────────────────────────────────────
-  const activeCount = routesList.filter(
-    (r) => r.status === true || r.status === 'ACTIVE' || r.status == null,
-  ).length
-  const inactiveCount = routesList.filter(
-    (r) => r.status === false || r.status === 'INACTIVE',
-  ).length
   const startItem = totalElements === 0 ? 0 : currentPage * PAGE_SIZE + 1
   const endItem = Math.min((currentPage + 1) * PAGE_SIZE, totalElements)
 
@@ -312,17 +281,16 @@ const Routes = () => {
             className="rt-btn-reset"
             onClick={() => {
               setSearchInput('')
-              setStatusFilter('ALL')
             }}
           >
             <CIcon icon={cilReload} size="sm" />
-            Reset Filters
+            Reset Filter
           </button>
         </CCardHeader>
         <CCardBody className="rt-card-body">
           <CRow className="g-3">
             {/* Search Route (start location - end location) */}
-            <CCol xs={12} md={6}>
+            <CCol xs={12} sm={8} md={5} lg={4}>
               <label className="rt-label">
                 <CIcon icon={cilSearch} size="sm" className="text-warning" />
                 Search Route (Start / End Location)
@@ -346,24 +314,6 @@ const Routes = () => {
                 />
               </div>
             </CCol>
-
-            {/* Status Filter */}
-            <CCol xs={12} md={6}>
-              <label className="rt-label">
-                <CIcon icon={cilFilter} size="sm" className="text-warning" />
-                Filter by Status
-              </label>
-              <select
-                id="route-status-filter"
-                className="rt-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="INACTIVE">Inactive Only</option>
-              </select>
-            </CCol>
           </CRow>
         </CCardBody>
       </CCard>
@@ -385,86 +335,75 @@ const Routes = () => {
                     <th>Start Location</th>
                     <th>End Location</th>
                     <th>Distance (km)</th>
-                    <th>Status</th>
                     <th style={{ textAlign: 'center', width: 120 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {routesList.length === 0 ? (
                     <tr>
-                      <td colSpan={7}>
+                      <td colSpan={6}>
                         <div className="rt-empty">
                           <div className="rt-empty-icon">
                             <CIcon icon={cilLocationPin} size="xl" />
                           </div>
                           <h3>No routes found</h3>
                           <p>
-                            {searchInput || statusFilter !== 'ALL'
-                              ? 'Try a different search term or filter.'
+                            {searchInput
+                              ? 'Try a different search term.'
                               : 'Click "Add Route" to register the first route.'}
                           </p>
                         </div>
                       </td>
                     </tr>
                   ) : (
-                    routesList.map((r, i) => {
-                      const isActive =
-                        r.status === true || r.status === 'ACTIVE' || r.status == null
-                      return (
-                        <tr key={r.id || i}>
-                          <td className="rt-td-num">{startItem + i}</td>
-                          <td>
-                            <span className="rt-route-pill">
-                              <CIcon icon={cilLocationPin} size="sm" style={{ color: '#f59e0b' }} />
-                              <span>{r.startLocation}</span>
-                              <span className="rt-route-arrow">→</span>
-                              <span>{r.endLocation}</span>
-                            </span>
-                          </td>
-                          <td>
-                            <span className="rt-loc-badge">{r.startLocation}</span>
-                          </td>
-                          <td>
-                            <span className="rt-loc-badge">{r.endLocation}</span>
-                          </td>
-                          <td>
-                            <span className="rt-km-val">
-                              {r.km ?? '—'}
-                              <span className="rt-km-unit">km</span>
-                            </span>
-                          </td>
-                          <td>
-                            <span className={`rt-badge ${isActive ? 'active' : 'inactive'}`}>
-                              <span className="rt-badge-dot" />
-                              {isActive ? 'Active' : 'Inactive'}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="rt-actions">
-                              {/* Edit */}
-                              <button
-                                className="rt-icon-btn edit"
-                                title="Edit route"
-                                onClick={() => openEdit(r)}
-                                id={`btn-edit-route-${r.id || i}`}
-                              >
-                                <CIcon icon={cilPencil} size="sm" />
-                              </button>
+                    routesList.map((r, i) => (
+                      <tr key={r.id || i}>
+                        <td className="rt-td-num">{startItem + i}</td>
+                        <td>
+                          <span className="rt-route-pill">
+                            <CIcon icon={cilLocationPin} size="sm" style={{ color: '#f59e0b' }} />
+                            <span>{r.startLocation}</span>
+                            <span className="rt-route-arrow">→</span>
+                            <span>{r.endLocation}</span>
+                          </span>
+                        </td>
+                        <td>
+                          <span className="rt-loc-badge">{r.startLocation}</span>
+                        </td>
+                        <td>
+                          <span className="rt-loc-badge">{r.endLocation}</span>
+                        </td>
+                        <td>
+                          <span className="rt-km-val">
+                            {r.km ?? '—'}
+                            <span className="rt-km-unit">km</span>
+                          </span>
+                        </td>
+                        <td>
+                          <div className="rt-actions">
+                            {/* Edit */}
+                            <button
+                              className="rt-icon-btn edit"
+                              title="Edit route"
+                              onClick={() => openEdit(r)}
+                              id={`btn-edit-route-${r.id || i}`}
+                            >
+                              <CIcon icon={cilPencil} size="sm" />
+                            </button>
 
-                              {/* Delete */}
-                              <button
-                                className="rt-icon-btn delete"
-                                title="Delete route"
-                                onClick={() => handleDelete(r)}
-                                id={`btn-delete-route-${r.id || i}`}
-                              >
-                                <CIcon icon={cilTrash} size="sm" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })
+                            {/* Delete */}
+                            <button
+                              className="rt-icon-btn delete"
+                              title="Delete route"
+                              onClick={() => handleDelete(r)}
+                              id={`btn-delete-route-${r.id || i}`}
+                            >
+                              <CIcon icon={cilTrash} size="sm" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
               </table>
@@ -571,7 +510,7 @@ const Routes = () => {
             </CCol>
 
             {/* Distance (km) */}
-            <CCol xs={12} md={6}>
+            <CCol xs={12}>
               <label className="rt-label" htmlFor="field-km">
                 Distance (km) <span className="req">*</span>
               </label>
@@ -591,25 +530,6 @@ const Routes = () => {
                 <div className="rt-input-hint">Distance in kilometers</div>
               )}
             </CCol>
-
-            {/* Status — only shown in edit mode */}
-            {editMode && (
-              <CCol xs={12} md={6}>
-                <label className="rt-label" htmlFor="field-status">
-                  Status
-                </label>
-                <select
-                  id="field-status"
-                  className="rt-select"
-                  value={form.status}
-                  onChange={(e) => setField('status', e.target.value)}
-                >
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                </select>
-                <div className="rt-input-hint">Change route status</div>
-              </CCol>
-            )}
           </CRow>
         </CModalBody>
 
