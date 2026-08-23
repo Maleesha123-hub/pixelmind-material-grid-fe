@@ -77,6 +77,7 @@ const BulkUpload = () => {
   const [tripsSearch, setTripsSearch] = useState('')
   const [tripsPage, setTripsPage] = useState(0)
   const [tripsErrors, setTripsErrors] = useState([])
+  const [tripsSummary, setTripsSummary] = useState(null)
   const [tripsDragOver, setTripsDragOver] = useState(false)
   const tripFileInputRef = useRef(null)
 
@@ -93,39 +94,23 @@ const BulkUpload = () => {
   // ─── Sample Template Downloads ──────────────────────────────────────────────
   const downloadTripsTemplate = () => {
     const wsData = [
-      [
-        'Date',
-        'LAND',
-        'Vehial Number',
-        'Bil Number',
-        'Cube',
-        'KM',
-        'Transport Per Rate',
-        'Dilivery Location',
-        'Daily Expence',
-        'Paybel Amount',
-      ],
-      ['8/7/2026', 'L', 'LC-4838', '7901', 3.7, 24, 10952.0, '28+580', 0, 10952.0],
-      ['8/7/2026', 'L', 'LI-8902', '7902', 3.9, 24, 11544.0, '28+580', 0, 11544.0],
-      ['8/7/2026', 'S', 'LK-5177', '7904', 3.0, 24, 8880.0, '28+580', 0, 8880.0],
-      ['8/7/2026', 'L', 'LM-4565', '7911', 4.0, 24, 11840.0, '28+580', 10000.0, 1840.0],
+      ['Date', 'Vehicle Number', 'Bil Number', 'Route Code', 'Check By'],
+      ['8/7/2026', 'LC-4838', '7901', 'RT000001', 'Loku akka'],
+      ['8/7/2026', 'LI-8902', '7902', 'RT000001', 'Loku akka'],
+      ['8/7/2026', 'LM-4535', '7903', 'RT000001', 'Loku akka'],
+      ['8/7/2026', 'LK-5177', '7904', 'RT000001', 'surendra'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     ws['!cols'] = [
-      { wch: 12 },
-      { wch: 8 },
+      { wch: 14 },
+      { wch: 18 },
       { wch: 16 },
-      { wch: 14 },
-      { wch: 10 },
-      { wch: 10 },
+      { wch: 16 },
       { wch: 18 },
-      { wch: 18 },
-      { wch: 14 },
-      { wch: 14 },
     ]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Daily Routes')
-    XLSX.writeFile(wb, 'Material_Routes_Template.xlsx')
+    XLSX.writeFile(wb, 'Daily_Routes_Template.xlsx')
   }
 
   const downloadExpensesTemplate = () => {
@@ -193,37 +178,49 @@ const BulkUpload = () => {
         const formatted = json
           .map((row) => {
             const rawDate = row['Date'] || row['date'] || ''
-            const rawLand = row['LAND'] || row['Land'] || row['land'] || '-'
             const rawVeh =
-              row['Vehial Number'] || row['Vehicle Number'] || row['vehicle'] || row['Vehical'] || ''
-            const rawBill = row['Bil Number'] || row['Bill Number'] || row['bill'] || ''
-            const rawCube = parseFloat(row['Cube'] || row['cube'] || 0) || 0
-            const rawKm = parseFloat(row['KM'] || row['km'] || 0) || 0
-            const rawRate =
-              parseFloat(row['Transport Per Rate'] || row['Transport Rate'] || row['transport'] || 0) || 0
-            const rawLoc =
-              row['Dilivery Location'] || row['Delivery Location'] || row['location'] || '-'
-            const rawExpense =
-              parseFloat(row['Daily Expence'] || row['Daily Expense'] || row['expense'] || 0) || 0
-            const rawPayable =
-              row['Paybel Amount'] !== undefined && row['Paybel Amount'] !== ''
-                ? parseFloat(row['Paybel Amount'])
-                : rawRate - rawExpense
+              row['Vehicle Number'] ||
+              row['vehicleNumber'] ||
+              row['Vehicle'] ||
+              row['vehicle'] ||
+              row['Vehial Number'] ||
+              row['Vehical'] ||
+              ''
+            const rawBill =
+              row['Bil Number'] ||
+              row['Bill Number'] ||
+              row['bilNumber'] ||
+              row['billNumber'] ||
+              row['Bill'] ||
+              row['bill'] ||
+              ''
+            const rawRouteCode =
+              row['Route Code'] ||
+              row['routeCode'] ||
+              row['RouteCode'] ||
+              row['Route'] ||
+              row['route'] ||
+              ''
+            const rawCheckBy =
+              row['Check By'] ||
+              row['Checked By'] ||
+              row['checkBy'] ||
+              row['checkedBy'] ||
+              row['Check by'] ||
+              row['Checked by'] ||
+              ''
 
             return {
               date: rawDate,
-              land: rawLand,
-              vehicleNumber: rawVeh,
-              billNumber: rawBill,
-              cube: rawCube,
-              km: rawKm,
-              transportRate: rawRate,
-              deliveryLocation: rawLoc,
-              dailyExpense: rawExpense,
-              payableAmount: rawPayable,
+              vehicleNumber: String(rawVeh).trim(),
+              billNumber: String(rawBill).trim(),
+              routeCode: String(rawRouteCode).trim(),
+              checkBy: String(rawCheckBy).trim(),
             }
           })
-          .filter((item) => item.vehicleNumber || item.billNumber || item.date)
+          .filter(
+            (item) => item.vehicleNumber || item.billNumber || item.routeCode || item.date || item.checkBy,
+          )
 
         setTripsData(formatted)
         setTripsPage(0)
@@ -273,6 +270,7 @@ const BulkUpload = () => {
     if (!validateFile(file)) return
     setTripsFile(file)
     setTripsErrors([])
+    setTripsSummary(null)
     parseTripsLocal(file)
   }
 
@@ -288,6 +286,7 @@ const BulkUpload = () => {
     if (!tripsFile) return
     setTripsLoading(true)
     setTripsErrors([])
+    setTripsSummary(null)
 
     try {
       const response = await bulkUploadService.uploadTripsSheet(tripsFile)
@@ -308,16 +307,30 @@ const BulkUpload = () => {
       })
     } catch (err) {
       console.error('Trip upload error:', err)
-      const rawErrors = err.errors || err.response?.data?.errors || []
+      const rawErrors =
+        err.errors ||
+        err.response?.data?.errors ||
+        err.response?.errors ||
+        []
+      const summaryData = err.response?.data || null
+
       if (rawErrors.length > 0) {
         setTripsErrors(rawErrors)
+        setTripsSummary(summaryData)
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Failed',
+          text: err.message || 'Please check the validation errors listed below.',
+          confirmButtonColor: '#dc2626',
+        })
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: err.message || 'Unable to upload trips sheet. Please check your data format.',
+          confirmButtonColor: '#dc2626',
+        })
       }
-      Swal.fire({
-        icon: 'error',
-        title: 'Upload Failed',
-        text: err.message || 'Unable to upload trips sheet. Please check your data format.',
-        confirmButtonColor: '#dc2626',
-      })
     } finally {
       setTripsLoading(false)
     }
@@ -367,6 +380,7 @@ const BulkUpload = () => {
     setTripsFile(null)
     setTripsData([])
     setTripsErrors([])
+    setTripsSummary(null)
     setTripsSearch('')
     setTripsPage(0)
     if (tripFileInputRef.current) tripFileInputRef.current.value = ''
@@ -388,23 +402,22 @@ const BulkUpload = () => {
     return tripsData.filter(
       (item) =>
         (item.vehicleNumber || '').toLowerCase().includes(q) ||
-        (item.billNumber || '').toString().includes(q) ||
-        (item.deliveryLocation || '').toLowerCase().includes(q) ||
-        (item.land || '').toLowerCase().includes(q) ||
-        (item.date || '').includes(q)
+        (item.billNumber || '').toString().toLowerCase().includes(q) ||
+        (item.routeCode || '').toLowerCase().includes(q) ||
+        (item.checkBy || '').toLowerCase().includes(q) ||
+        (item.date || '').includes(q),
     )
   }, [tripsData, tripsSearch])
 
   const totalTripsCount = tripsData.length
-  const totalCubes = tripsData.reduce((sum, item) => sum + (Number(item.cube) || 0), 0)
-  const totalGrossTransport = tripsData.reduce((sum, item) => sum + (Number(item.transportRate) || 0), 0)
-  const totalDailyExpensesInTrips = tripsData.reduce((sum, item) => sum + (Number(item.dailyExpense) || 0), 0)
-  const totalNetPayable = tripsData.reduce((sum, item) => sum + (Number(item.payableAmount) || 0), 0)
+  const uniqueVehiclesCount = new Set(tripsData.map((item) => item.vehicleNumber).filter(Boolean)).size
+  const uniqueRoutesCount = new Set(tripsData.map((item) => item.routeCode).filter(Boolean)).size
+  const uniqueInspectorsCount = new Set(tripsData.map((item) => item.checkBy).filter(Boolean)).size
 
   const tripsTotalPages = Math.ceil(filteredTrips.length / PREVIEW_PAGE_SIZE) || 1
   const paginatedTrips = filteredTrips.slice(
     tripsPage * PREVIEW_PAGE_SIZE,
-    (tripsPage + 1) * PREVIEW_PAGE_SIZE
+    (tripsPage + 1) * PREVIEW_PAGE_SIZE,
   )
 
   // ─── Expenses Filter & Metrics ───────────────────────────────────────────────
@@ -416,7 +429,7 @@ const BulkUpload = () => {
         (item.category || '').toLowerCase().includes(q) ||
         (item.refNo || '').toLowerCase().includes(q) ||
         (item.paidTo || '').toLowerCase().includes(q) ||
-        (item.voucherNo || '').toLowerCase().includes(q)
+        (item.voucherNo || '').toLowerCase().includes(q),
     )
   }, [expensesData, expensesSearch])
 
@@ -434,7 +447,7 @@ const BulkUpload = () => {
   const expensesTotalPages = Math.ceil(filteredExpenses.length / PREVIEW_PAGE_SIZE) || 1
   const paginatedExpenses = filteredExpenses.slice(
     expensesPage * PREVIEW_PAGE_SIZE,
-    (expensesPage + 1) * PREVIEW_PAGE_SIZE
+    (expensesPage + 1) * PREVIEW_PAGE_SIZE,
   )
 
   return (
@@ -592,33 +605,69 @@ const BulkUpload = () => {
 
               {/* Validation Errors Display */}
               {tripsErrors.length > 0 && (
-                <div className="bu-val-box">
+                <div className="bu-val-box" id="routes-upload-validation-errors">
                   <div className="bu-val-header">
-                    <span className="bu-val-title">
-                      <CIcon icon={cilBan} /> {tripsErrors.length} Validation Errors Found
-                    </span>
+                    <div className="bu-val-title">
+                      <CIcon icon={cilWarning} className="text-danger" />
+                      <span>Upload Validation Errors</span>
+                      <span className="bu-val-count-badge">{tripsErrors.length} Failed</span>
+                    </div>
+                    {tripsSummary?.totalRows != null && (
+                      <div className="bu-val-summary-text">
+                        Total Rows: <strong>{tripsSummary.totalRows}</strong> | Errors:{' '}
+                        <strong className="text-danger">
+                          {tripsSummary.errorCount ?? tripsErrors.length}
+                        </strong>
+                      </div>
+                    )}
                   </div>
+
                   <div className="bu-val-table-wrap">
                     <table className="bu-val-table">
                       <thead>
                         <tr>
-                          <th style={{ width: 80 }}>Row</th>
-                          <th>Field</th>
-                          <th>Value</th>
-                          <th>Message</th>
+                          <th style={{ width: 70 }}>Row</th>
+                          <th style={{ width: 140 }}>Field</th>
+                          <th style={{ width: 150 }}>Entered Value</th>
+                          <th>Validation Error</th>
                         </tr>
                       </thead>
                       <tbody>
                         {tripsErrors.map((err, idx) => (
                           <tr key={idx}>
-                            <td>Row {err.rowNumber ?? idx + 1}</td>
-                            <td>{err.field || '—'}</td>
-                            <td><code>{err.value || '[Empty]'}</code></td>
-                            <td style={{ color: '#c53030' }}>{err.message || 'Validation error'}</td>
+                            <td>
+                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                            </td>
+                            <td>
+                              <span className="bu-val-field">{err.field || '—'}</span>
+                            </td>
+                            <td>
+                              <code className="bu-val-value">
+                                {err.value !== undefined &&
+                                err.value !== null &&
+                                String(err.value).trim() !== ''
+                                  ? String(err.value)
+                                  : '[Empty]'}
+                              </code>
+                            </td>
+                            <td>
+                              <div className="bu-val-msg">
+                                <CIcon
+                                  icon={cilBan}
+                                  size="sm"
+                                  className="text-danger"
+                                  style={{ flexShrink: 0 }}
+                                />
+                                <span>{err.message || 'Validation error'}</span>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                  <div className="bu-val-footer-hint mt-2">
+                    💡 Please fix these rows in your Excel file (e.g. ensure valid license dates exist or correct the dates), then re-upload.
                   </div>
                 </div>
               )}
@@ -639,26 +688,22 @@ const BulkUpload = () => {
                 {/* Metrics Summary Grid */}
                 <div className="bu-metrics-grid">
                   <div className="bu-metric-card">
-                    <span className="bu-metric-label">Total Trips</span>
+                    <span className="bu-metric-label">Total Routes</span>
                     <span className="bu-metric-value">{totalTripsCount}</span>
                   </div>
                   <div className="bu-metric-card">
-                    <span className="bu-metric-label">Total Volume</span>
-                    <span className="bu-metric-value highlight">{totalCubes.toFixed(1)} cubes</span>
+                    <span className="bu-metric-label">Active Vehicles</span>
+                    <span className="bu-metric-value highlight">{uniqueVehiclesCount} vehicles</span>
                   </div>
                   <div className="bu-metric-card">
-                    <span className="bu-metric-label">Gross Transport</span>
-                    <span className="bu-metric-value">Rs. {formatCurrency(totalGrossTransport)}</span>
-                  </div>
-                  <div className="bu-metric-card">
-                    <span className="bu-metric-label">Daily Expenses</span>
-                    <span className="bu-metric-value" style={{ color: '#dc2626' }}>
-                      Rs. {formatCurrency(totalDailyExpensesInTrips)}
+                    <span className="bu-metric-label">Route Codes</span>
+                    <span className="bu-metric-value" style={{ color: '#0284c7' }}>
+                      {uniqueRoutesCount} routes
                     </span>
                   </div>
                   <div className="bu-metric-card">
-                    <span className="bu-metric-label">Net Payable</span>
-                    <span className="bu-metric-value green">Rs. {formatCurrency(totalNetPayable)}</span>
+                    <span className="bu-metric-label">Checked By</span>
+                    <span className="bu-metric-value green">{uniqueInspectorsCount} persons</span>
                   </div>
                 </div>
 
@@ -669,7 +714,7 @@ const BulkUpload = () => {
                     <input
                       type="text"
                       className="bu-search-input"
-                      placeholder="Search by vehicle, bill number, location, or date..."
+                      placeholder="Search by vehicle, bil number, route code, check by, or date..."
                       value={tripsSearch}
                       onChange={(e) => {
                         setTripsSearch(e.target.value)
@@ -695,15 +740,10 @@ const BulkUpload = () => {
                       <tr>
                         <th style={{ width: 44 }}>#</th>
                         <th>Date</th>
-                        <th>Land</th>
-                        <th>Vehicle No</th>
-                        <th>Bill No</th>
-                        <th>Cube</th>
-                        <th>KM</th>
-                        <th>Transport Rate</th>
-                        <th>Delivery Location</th>
-                        <th>Daily Exp.</th>
-                        <th>Payable</th>
+                        <th>Vehicle Number</th>
+                        <th>Bil Number</th>
+                        <th>Route Code</th>
+                        <th>Check By</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -711,22 +751,19 @@ const BulkUpload = () => {
                         <tr key={idx}>
                           <td className="bu-td-num">{tripsPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
                           <td>{item.date || '—'}</td>
-                          <td>{item.land || '—'}</td>
                           <td>
                             <span className="bu-veh-pill">
                               <CIcon icon={cilTruck} size="sm" style={{ color: '#d97706' }} />
                               {item.vehicleNumber || '—'}
                             </span>
                           </td>
-                          <td><strong>{item.billNumber || '—'}</strong></td>
-                          <td>{item.cube}</td>
-                          <td>{item.km}</td>
-                          <td className="bu-currency-pill">Rs. {formatCurrency(item.transportRate)}</td>
-                          <td>{item.deliveryLocation || '—'}</td>
-                          <td style={{ color: item.dailyExpense > 0 ? '#dc2626' : '#64748b' }}>
-                            Rs. {formatCurrency(item.dailyExpense)}
+                          <td>
+                            <strong>{item.billNumber || '—'}</strong>
                           </td>
-                          <td className="bu-currency-pill net">Rs. {formatCurrency(item.payableAmount)}</td>
+                          <td>
+                            <span className="bu-code-badge">{item.routeCode || '—'}</span>
+                          </td>
+                          <td>{item.checkBy || '—'}</td>
                         </tr>
                       ))}
                     </tbody>
