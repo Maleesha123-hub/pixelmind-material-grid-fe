@@ -53,7 +53,7 @@ const DEFAULT_VEHICLE_OPTION = {
   value: 'ALL',
   id: 'ALL',
   vehicleId: 'ALL',
-  label: 'All Vehicles (Consolidated Receipt)',
+  label: 'Select a Vehicle',
   vehicleNumber: 'ALL',
   vehicleType: 'Complete Active Fleet',
   driverName: 'All Fleet Drivers',
@@ -550,7 +550,7 @@ const Receipts = () => {
                 Selected:{' '}
                 <strong>
                   {selectedVehicle?.value === 'ALL'
-                    ? 'All Vehicles (Consolidated)'
+                    ? 'Search Vehicles'
                     : selectedVehicle?.label || selectedVehicle?.vehicleNumber}
                 </strong>
                 {startDate && endDate
@@ -723,10 +723,10 @@ const Receipts = () => {
 
         <CModalFooter className="d-flex justify-content-between align-items-center">
           <div className="text-muted" style={{ fontSize: '0.85rem' }}>
-            Net Payable Settlement:{' '}
+            {/* Net Payable Settlement:{' '}
             <strong className="text-success" style={{ fontSize: '1rem' }}>
               Rs. {formatLKR(previewMeta?.payable)}
-            </strong>
+            </strong> */}
           </div>
 
           <div className="d-flex align-items-center gap-2">
