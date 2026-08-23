@@ -21,13 +21,26 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
-import avatar8 from './../../assets/images/avatars/8.jpg'
-
 const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
-        <CAvatar src={avatar8} size="md" />
+        <div
+          className="app-header-user-avatar d-flex align-items-center justify-content-center rounded-circle"
+          style={{
+            width: '38px',
+            height: '38px',
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+            border: '1.5px solid #334155',
+            color: '#f59e0b',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          title="User Profile"
+        >
+          <CIcon icon={cilUser} size="lg" />
+        </div>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Activity</CDropdownHeader>

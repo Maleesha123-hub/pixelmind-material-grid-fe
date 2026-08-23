@@ -9,7 +9,7 @@
  * Matches the Material Grid design system (Vehicle, Routes, BulkUpload).
  */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import AsyncSelect from 'react-select/async'
 import Swal from 'sweetalert2'
 import vehicleService from '../../service/vehicleService'
@@ -29,6 +29,7 @@ import {
   CModalBody,
   CModalFooter,
   CSpinner,
+  useColorModes,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
@@ -66,37 +67,52 @@ const formatLKR = (num) => {
   return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-// ─── Enhanced Select Component Styles ───────────────────────────────────────
-const selectStyles = {
+// ─── Enhanced Dynamic Select Component Styles ──────────────────────────────
+const getSelectStyles = (isDark) => ({
   control: (base, state) => ({
     ...base,
     minHeight: '42px',
     borderRadius: '8px',
-    borderColor: state.isFocused ? '#d97706' : '#cbd5e1',
-    boxShadow: state.isFocused ? '0 0 0 3px rgba(217,119,6,0.18)' : 'none',
+    borderColor: state.isFocused ? '#f59e0b' : isDark ? '#334155' : '#cbd5e1',
+    boxShadow: state.isFocused ? '0 0 0 3px rgba(245,158,11,0.22)' : 'none',
     fontSize: '0.875rem',
-    backgroundColor: '#ffffff',
+    backgroundColor: isDark ? '#131d31' : '#ffffff',
+    color: isDark ? '#f8fafc' : '#0f172a',
     cursor: 'pointer',
-    '&:hover': { borderColor: '#d97706' },
+    '&:hover': { borderColor: '#f59e0b' },
   }),
   menuPortal: (base) => ({ ...base, zIndex: 99999 }),
   menu: (base) => ({
     ...base,
     borderRadius: '10px',
     zIndex: 99999,
-    boxShadow: '0 12px 28px rgba(15, 23, 42, 0.16)',
-    border: '1px solid #cbd5e1',
+    boxShadow: isDark
+      ? '0 16px 36px rgba(0, 0, 0, 0.65)'
+      : '0 12px 28px rgba(15, 23, 42, 0.16)',
+    backgroundColor: isDark ? '#0f172a' : '#ffffff',
+    border: isDark ? '1px solid #334155' : '1px solid #cbd5e1',
     overflow: 'hidden',
   }),
   menuList: (base) => ({
     ...base,
     maxHeight: '260px',
     padding: '4px',
+    backgroundColor: isDark ? '#0f172a' : '#ffffff',
   }),
   option: (base, state) => ({
     ...base,
-    backgroundColor: state.isSelected ? '#d97706' : state.isFocused ? '#fef3c7' : 'transparent',
-    color: state.isSelected ? '#ffffff' : '#0f172a',
+    backgroundColor: state.isSelected
+      ? '#d97706'
+      : state.isFocused
+      ? isDark
+        ? '#1e293b'
+        : '#fef3c7'
+      : 'transparent',
+    color: state.isSelected
+      ? '#ffffff'
+      : isDark
+      ? '#f8fafc'
+      : '#0f172a',
     fontSize: '0.85rem',
     cursor: 'pointer',
     borderRadius: '6px',
@@ -104,9 +120,36 @@ const selectStyles = {
     marginBottom: '2px',
     transition: 'all 0.12s ease',
   }),
-  placeholder: (base) => ({ ...base, color: '#94a3b8', fontSize: '0.85rem' }),
-  singleValue: (base) => ({ ...base, color: '#0f172a', fontSize: '0.875rem', fontWeight: 600 }),
-}
+  input: (base) => ({
+    ...base,
+    color: isDark ? '#f8fafc' : '#0f172a',
+  }),
+  placeholder: (base) => ({
+    ...base,
+    color: isDark ? '#64748b' : '#94a3b8',
+    fontSize: '0.85rem',
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: isDark ? '#f8fafc' : '#0f172a',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+  }),
+  indicatorSeparator: (base) => ({
+    ...base,
+    backgroundColor: isDark ? '#334155' : '#e2e8f0',
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    color: isDark ? '#94a3b8' : '#64748b',
+    '&:hover': { color: '#f59e0b' },
+  }),
+  clearIndicator: (base) => ({
+    ...base,
+    color: isDark ? '#94a3b8' : '#64748b',
+    '&:hover': { color: '#ef4444' },
+  }),
+})
 
 // ─── Custom Option UI Component for Vehicle Select Dropdown ─────────────────
 const CustomVehicleOption = (props) => {
@@ -161,6 +204,10 @@ const CustomVehicleOption = (props) => {
 const getTodayStr = () => new Date().toISOString().split('T')[0]
 
 const Receipts = () => {
+  // ─── Color Mode (Dark / Light) ────────────────────────────────────────────
+  const { colorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const selectStyles = useMemo(() => getSelectStyles(colorMode === 'dark'), [colorMode])
+
   // ─── Filter State ─────────────────────────────────────────────────────────
   const [startDate, setStartDate] = useState(getTodayStr)
   const [endDate, setEndDate] = useState(getTodayStr)

@@ -593,15 +593,46 @@
     }
   }
 
-  .bu-btn-download {
+  .bu-btn-download,
+  .vm-btn-upload-excel {
     background: #131d31 !important;
     border: 1.5px solid #059669 !important;
     color: #34d399 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
 
     &:hover {
       background: rgba(5, 150, 105, 0.2) !important;
       border-color: #10b981 !important;
       color: #6ee7b7 !important;
+      transform: translateY(-1px);
+    }
+  }
+
+  // ─── Modal Cancel / Secondary Buttons ──────────────────────────────────────
+  .vlm-btn-cancel,
+  .vm-btn-cancel,
+  .rt-btn-cancel,
+  .pr-btn-cancel,
+  .pt-btn-cancel,
+  .modal-footer .btn-light,
+  .modal-footer .btn-secondary {
+    background: #131d31 !important;
+    border: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+
+    &:hover:not(:disabled) {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #ffffff !important;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      background: #0b1120 !important;
+      border-color: #1e293b !important;
+      color: #64748b !important;
+      opacity: 0.5;
     }
   }
 
@@ -660,6 +691,16 @@
     border-left: 5px solid #10b981 !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 
+    .pr-spotlight-icon {
+      background: rgba(16, 185, 129, 0.18) !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+      color: #34d399 !important;
+    }
+
+    .pr-spotlight-label {
+      color: #34d399 !important;
+    }
+
     .pr-spotlight-title {
       color: #f8fafc !important;
     }
@@ -672,8 +713,49 @@
       color: #34d399 !important;
     }
 
+    .pr-spotlight-unit {
+      color: #94a3b8 !important;
+    }
+
     .pr-spotlight-meta {
-      color: #64748b !important;
+      color: #94a3b8 !important;
+
+      strong {
+        color: #f8fafc !important;
+      }
+    }
+  }
+
+  // Price Rate Table User Pill & Status Badges
+  .pr-user-pill {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+
+    svg {
+      color: #94a3b8 !important;
+    }
+  }
+
+  .pr-date-cell {
+    color: #cbd5e1 !important;
+
+    .pr-date-icon {
+      color: #94a3b8 !important;
+    }
+  }
+
+  .pr-badge {
+    &.active {
+      background: rgba(16, 185, 129, 0.18) !important;
+      color: #34d399 !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    }
+
+    &.inactive {
+      background: #1e293b !important;
+      color: #94a3b8 !important;
+      border: 1px solid #334155 !important;
     }
   }
 
@@ -899,6 +981,20 @@
       color: #cbd5e1 !important;
     }
 
+    .pr-modal-notice {
+      background: rgba(2, 132, 199, 0.12) !important;
+      border: 1px solid rgba(2, 132, 199, 0.3) !important;
+      color: #38bdf8 !important;
+
+      strong {
+        color: #7dd3fc !important;
+      }
+
+      svg {
+        color: #38bdf8 !important;
+      }
+    }
+
     .modal-footer,
     .vm-modal-footer,
     .vlm-modal-footer,
@@ -918,6 +1014,76 @@
     background-color: #090d16 !important;
     border: 1px solid #1e293b !important;
     border-radius: 10px;
+  }
+
+  // ─── Vehicle React-Select Component in Dark Mode ───────────────────────────
+  .mg-vehicle-select__control {
+    background-color: #131d31 !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+  }
+
+  .mg-vehicle-select__menu {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65) !important;
+  }
+
+  .mg-vehicle-select__menu-list {
+    background-color: #0f172a !important;
+  }
+
+  .mg-vehicle-select__single-value {
+    color: #f8fafc !important;
+  }
+
+  .mg-vehicle-select__placeholder {
+    color: #64748b !important;
+  }
+
+  .mg-vehicle-select__input-container {
+    color: #f8fafc !important;
+  }
+
+  .mg-vehicle-select__indicator-separator {
+    background-color: #334155 !important;
+  }
+
+  .mg-vehicle-select__dropdown-indicator,
+  .mg-vehicle-select__clear-indicator {
+    color: #94a3b8 !important;
+  }
+
+  .rc-select-option {
+    &.is-focused {
+      background-color: #1e293b !important;
+    }
+
+    &.is-selected {
+      background-color: #d97706 !important;
+    }
+
+    .rc-option-driver {
+      color: #f8fafc !important;
+    }
+
+    .rc-option-title {
+      color: #f8fafc !important;
+    }
+
+    .rc-option-subtitle {
+      color: #94a3b8 !important;
+    }
+
+    .rc-option-type {
+      color: #94a3b8 !important;
+    }
+
+    .rc-option-plate {
+      background: #090d16 !important;
+      border: 1px solid #334155 !important;
+      color: #fbbf24 !important;
+    }
   }
 
   // ─── SweetAlert2 Dark Popups ───────────────────────────────────────────────
