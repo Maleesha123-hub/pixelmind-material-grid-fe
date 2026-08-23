@@ -89,7 +89,7 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink to="/transport-trips/process-trip" as={NavLink}>
+            <CNavLink to="/logistics/bulk-upload" as={NavLink}>
               Operations
             </CNavLink>
           </CNavItem>
