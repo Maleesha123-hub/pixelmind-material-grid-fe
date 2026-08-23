@@ -3,7 +3,7 @@
  *
  * Streamlined interface for uploading, validating, and previewing:
  *   1. Daily Routes / Material Transport Trips Sheet
- *   2. Daily Site & Fleet Expenses Sheet
+ *   2. Daily Fleet & Site Expenses Sheet
  *
  * Features:
  *   - Drag & Drop Excel/CSV upload with file details preview
@@ -88,6 +88,7 @@ const BulkUpload = () => {
   const [expensesSearch, setExpensesSearch] = useState('')
   const [expensesPage, setExpensesPage] = useState(0)
   const [expensesErrors, setExpensesErrors] = useState([])
+  const [expensesSummary, setExpensesSummary] = useState(null)
   const [expensesDragOver, setExpensesDragOver] = useState(false)
   const expenseFileInputRef = useRef(null)
 
@@ -115,32 +116,18 @@ const BulkUpload = () => {
 
   const downloadExpensesTemplate = () => {
     const wsData = [
-      [
-        'Date',
-        'Category',
-        'Vehicle/Ref',
-        'Voucher No',
-        'Paid To',
-        'Payment Method',
-        'Amount (LKR)',
-        'Site Allocation',
-        'Remarks',
-      ],
-      ['2026-08-07', 'Fuel / Diesel', 'WP-CAC-1234', 'EXP-1001', 'Ceypetco Station', 'Fuel Card', 45000.0, '28+580', '120L Diesel'],
-      ['2026-08-07', 'Driver Advance', 'DRV-001', 'EXP-1002', 'Kamal Perera', 'Cash', 10000.0, '28+580', 'Trip Advance'],
-      ['2026-08-07', 'Machinery Hire', 'Excavator #1', 'EXP-1003', 'Plant Hire Ltd', 'Bank Transfer', 100000.0, 'Quarry Land L', '10-hour hire'],
+      ['Date', 'Vehicle Number', 'Expense'],
+      ['2026-08-07', 'LM-4565', 10000],
+      ['2026-08-07', 'lf-3769', 5000],
+      ['2026-08-07', 'LJ-4472', 3000],
+      ['2026-08-07', 'LM-4687', 7000],
+      ['2026-08-07', 'LI-8790', 10000],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     ws['!cols'] = [
       { wch: 14 },
       { wch: 18 },
       { wch: 16 },
-      { wch: 14 },
-      { wch: 20 },
-      { wch: 16 },
-      { wch: 15 },
-      { wch: 16 },
-      { wch: 20 },
     ]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Daily Expenses')
@@ -250,29 +237,59 @@ const BulkUpload = () => {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result)
-        const workbook = XLSX.read(data, { type: 'array' })
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
         const formatted = json
-          .map((row) => ({
-            date: row['Date'] || row['date'] || '',
-            category: row['Category'] || row['Expense Category'] || row['category'] || 'General Expense',
-            refNo: row['Vehicle/Ref'] || row['Vehicle Number'] || row['ref'] || '-',
-            voucherNo: row['Voucher No'] || row['voucher'] || '-',
-            paidTo: row['Paid To'] || row['beneficiary'] || '-',
-            method: row['Payment Method'] || row['method'] || 'Cash',
-            amount: parseFloat(row['Amount (LKR)'] || row['Amount'] || row['amount'] || 0) || 0,
-            site: row['Site Allocation'] || row['Site'] || row['site'] || 'General Site',
-            remarks: row['Remarks'] || row['Notes'] || row['remarks'] || '',
-          }))
-          .filter((item) => item.date || item.amount || item.category)
+          .map((row) => {
+            let rawDate = row['Date'] || row['date'] || ''
+            if (rawDate instanceof Date) {
+              rawDate = rawDate.toISOString().split('T')[0]
+            } else if (typeof rawDate === 'string' && rawDate.trim()) {
+              const str = rawDate.trim()
+              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
+              if (mdy) {
+                const mm = mdy[1].padStart(2, '0')
+                const dd = mdy[2].padStart(2, '0')
+                const yyyy = mdy[3]
+                rawDate = `${yyyy}-${mm}-${dd}`
+              }
+            }
+
+            const rawVeh =
+              row['Vehicle Number'] ||
+              row['vehicleNumber'] ||
+              row['Vehicle/Ref'] ||
+              row['Vehicle'] ||
+              row['vehicle'] ||
+              row['Vehial Number'] ||
+              row['Vehical'] ||
+              ''
+            const rawExpense =
+              row['Expense'] !== undefined && row['Expense'] !== ''
+                ? Number(String(row['Expense']).replace(/,/g, '')) || 0
+                : row['Amount (LKR)'] !== undefined && row['Amount (LKR)'] !== ''
+                ? Number(String(row['Amount (LKR)']).replace(/,/g, '')) || 0
+                : row['Amount'] !== undefined && row['Amount'] !== ''
+                ? Number(String(row['Amount']).replace(/,/g, '')) || 0
+                : row['amount'] !== undefined && row['amount'] !== ''
+                ? Number(String(row['amount']).replace(/,/g, '')) || 0
+                : 0
+
+            return {
+              date: String(rawDate).trim(),
+              vehicleNumber: String(rawVeh).trim(),
+              expense: rawExpense,
+            }
+          })
+          .filter((item) => item.vehicleNumber || item.expense > 0 || item.date)
 
         setExpensesData(formatted)
         setExpensesPage(0)
       } catch (err) {
-        console.warn('Local preview parse error:', err)
+        console.warn('Local preview parse error (expenses):', err)
       }
     }
     reader.readAsArrayBuffer(file)
@@ -291,6 +308,7 @@ const BulkUpload = () => {
     if (!validateFile(file)) return
     setExpensesFile(file)
     setExpensesErrors([])
+    setExpensesSummary(null)
     parseExpensesLocal(file)
   }
 
@@ -353,6 +371,7 @@ const BulkUpload = () => {
     if (!expensesFile) return
     setExpensesLoading(true)
     setExpensesErrors([])
+    setExpensesSummary(null)
 
     try {
       const response = await bulkUploadService.uploadDailyExpenses(expensesFile)
@@ -373,16 +392,30 @@ const BulkUpload = () => {
       })
     } catch (err) {
       console.error('Expense upload error:', err)
-      const rawErrors = err.errors || err.response?.data?.errors || []
+      const rawErrors =
+        err.errors ||
+        err.response?.data?.errors ||
+        err.response?.errors ||
+        []
+      const summaryData = err.response?.data || null
+
       if (rawErrors.length > 0) {
         setExpensesErrors(rawErrors)
+        setExpensesSummary(summaryData)
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Failed',
+          text: err.message || 'Please check the validation errors listed below.',
+          confirmButtonColor: '#dc2626',
+        })
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: err.message || 'Unable to upload expenses sheet. Please check your data format.',
+          confirmButtonColor: '#dc2626',
+        })
       }
-      Swal.fire({
-        icon: 'error',
-        title: 'Upload Failed',
-        text: err.message || 'Unable to upload expenses sheet. Please check your data format.',
-        confirmButtonColor: '#dc2626',
-      })
     } finally {
       setExpensesLoading(false)
     }
@@ -403,6 +436,7 @@ const BulkUpload = () => {
     setExpensesFile(null)
     setExpensesData([])
     setExpensesErrors([])
+    setExpensesSummary(null)
     setExpensesSearch('')
     setExpensesPage(0)
     if (expenseFileInputRef.current) expenseFileInputRef.current.value = ''
@@ -439,23 +473,17 @@ const BulkUpload = () => {
     const q = expensesSearch.toLowerCase()
     return expensesData.filter(
       (item) =>
-        (item.category || '').toLowerCase().includes(q) ||
-        (item.refNo || '').toLowerCase().includes(q) ||
-        (item.paidTo || '').toLowerCase().includes(q) ||
-        (item.voucherNo || '').toLowerCase().includes(q),
+        (item.vehicleNumber || '').toLowerCase().includes(q) ||
+        (item.expense || '').toString().toLowerCase().includes(q) ||
+        (item.date || '').includes(q),
     )
   }, [expensesData, expensesSearch])
 
-  const totalExpenseAmount = expensesData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
-  const fuelExpenses = expensesData
-    .filter((i) => (i.category || '').includes('Fuel'))
-    .reduce((sum, i) => sum + (Number(i.amount) || 0), 0)
-  const machineryExpenses = expensesData
-    .filter((i) => (i.category || '').includes('Machinery') || (i.refNo || '').includes('Excavator'))
-    .reduce((sum, i) => sum + (Number(i.amount) || 0), 0)
-  const driverAdvances = expensesData
-    .filter((i) => (i.category || '').includes('Advance') || (i.category || '').includes('Labour'))
-    .reduce((sum, i) => sum + (Number(i.amount) || 0), 0)
+  const totalExpenseCount = expensesData.length
+  const totalExpenseAmount = expensesData.reduce((sum, item) => sum + (Number(item.expense) || 0), 0)
+  const uniqueExpenseVehiclesCount = new Set(
+    expensesData.map((item) => item.vehicleNumber).filter(Boolean),
+  ).size
 
   const expensesTotalPages = Math.ceil(filteredExpenses.length / PREVIEW_PAGE_SIZE) || 1
   const paginatedExpenses = filteredExpenses.slice(
@@ -836,7 +864,7 @@ const BulkUpload = () => {
             <CCardHeader className="bu-card-header">
               <div className="bu-card-title">
                 <CIcon icon={cilMoney} className="text-success" />
-                <span>Upload Daily Fleet &amp; Site Expenses Sheet</span>
+                <span>Upload Vehicle Daily Expenses Sheet</span>
               </div>
             </CCardHeader>
 
@@ -930,33 +958,69 @@ const BulkUpload = () => {
 
               {/* Validation Errors Display */}
               {expensesErrors.length > 0 && (
-                <div className="bu-val-box">
+                <div className="bu-val-box" id="expenses-upload-validation-errors">
                   <div className="bu-val-header">
-                    <span className="bu-val-title">
-                      <CIcon icon={cilBan} /> {expensesErrors.length} Validation Errors Found
-                    </span>
+                    <div className="bu-val-title">
+                      <CIcon icon={cilWarning} className="text-danger" />
+                      <span>Upload Validation Errors</span>
+                      <span className="bu-val-count-badge">{expensesErrors.length} Failed</span>
+                    </div>
+                    {expensesSummary?.totalRows != null && (
+                      <div className="bu-val-summary-text">
+                        Total Rows: <strong>{expensesSummary.totalRows}</strong> | Errors:{' '}
+                        <strong className="text-danger">
+                          {expensesSummary.errorCount ?? expensesErrors.length}
+                        </strong>
+                      </div>
+                    )}
                   </div>
+
                   <div className="bu-val-table-wrap">
                     <table className="bu-val-table">
                       <thead>
                         <tr>
-                          <th style={{ width: 80 }}>Row</th>
-                          <th>Field</th>
-                          <th>Value</th>
-                          <th>Message</th>
+                          <th style={{ width: 70 }}>Row</th>
+                          <th style={{ width: 140 }}>Field</th>
+                          <th style={{ width: 150 }}>Entered Value</th>
+                          <th>Validation Error</th>
                         </tr>
                       </thead>
                       <tbody>
                         {expensesErrors.map((err, idx) => (
                           <tr key={idx}>
-                            <td>Row {err.rowNumber ?? idx + 1}</td>
-                            <td>{err.field || '—'}</td>
-                            <td><code>{err.value || '[Empty]'}</code></td>
-                            <td style={{ color: '#c53030' }}>{err.message || 'Validation error'}</td>
+                            <td>
+                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                            </td>
+                            <td>
+                              <span className="bu-val-field">{err.field || '—'}</span>
+                            </td>
+                            <td>
+                              <code className="bu-val-value">
+                                {err.value !== undefined &&
+                                err.value !== null &&
+                                String(err.value).trim() !== ''
+                                  ? String(err.value)
+                                  : '[Empty]'}
+                              </code>
+                            </td>
+                            <td>
+                              <div className="bu-val-msg">
+                                <CIcon
+                                  icon={cilBan}
+                                  size="sm"
+                                  className="text-danger"
+                                  style={{ flexShrink: 0 }}
+                                />
+                                <span>{err.message || 'Validation error'}</span>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                  <div className="bu-val-footer-hint mt-2">
+                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers, expense amounts, or dates), then re-upload.
                   </div>
                 </div>
               )}
@@ -978,23 +1042,15 @@ const BulkUpload = () => {
                 <div className="bu-metrics-grid">
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Total Records</span>
-                    <span className="bu-metric-value">{expensesData.length}</span>
+                    <span className="bu-metric-value">{totalExpenseCount}</span>
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Total Expense</span>
                     <span className="bu-metric-value highlight">Rs. {formatCurrency(totalExpenseAmount)}</span>
                   </div>
                   <div className="bu-metric-card">
-                    <span className="bu-metric-label">Fuel / Diesel</span>
-                    <span className="bu-metric-value">Rs. {formatCurrency(fuelExpenses)}</span>
-                  </div>
-                  <div className="bu-metric-card">
-                    <span className="bu-metric-label">Machinery Hire</span>
-                    <span className="bu-metric-value">Rs. {formatCurrency(machineryExpenses)}</span>
-                  </div>
-                  <div className="bu-metric-card">
-                    <span className="bu-metric-label">Driver Advances</span>
-                    <span className="bu-metric-value">Rs. {formatCurrency(driverAdvances)}</span>
+                    <span className="bu-metric-label">Active Vehicles</span>
+                    <span className="bu-metric-value green">{uniqueExpenseVehiclesCount} vehicles</span>
                   </div>
                 </div>
 
@@ -1005,7 +1061,7 @@ const BulkUpload = () => {
                     <input
                       type="text"
                       className="bu-search-input"
-                      placeholder="Search by category, vehicle/ref, voucher, or beneficiary..."
+                      placeholder="Search by vehicle, expense amount, or date..."
                       value={expensesSearch}
                       onChange={(e) => {
                         setExpensesSearch(e.target.value)
@@ -1031,14 +1087,8 @@ const BulkUpload = () => {
                       <tr>
                         <th style={{ width: 44 }}>#</th>
                         <th>Date</th>
-                        <th>Category</th>
-                        <th>Vehicle / Ref</th>
-                        <th>Voucher No</th>
-                        <th>Paid To</th>
-                        <th>Payment Method</th>
-                        <th>Amount</th>
-                        <th>Site Allocation</th>
-                        <th>Remarks</th>
+                        <th>Vehicle Number</th>
+                        <th>Expense</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1046,18 +1096,15 @@ const BulkUpload = () => {
                         <tr key={idx}>
                           <td className="bu-td-num">{expensesPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
                           <td>{item.date || '—'}</td>
-                          <td><strong>{item.category}</strong></td>
                           <td>
-                            <span className="bu-veh-pill">{item.refNo}</span>
+                            <span className="bu-veh-pill">
+                              <CIcon icon={cilTruck} size="sm" style={{ color: '#059669' }} />
+                              {item.vehicleNumber || '—'}
+                            </span>
                           </td>
-                          <td>{item.voucherNo}</td>
-                          <td>{item.paidTo}</td>
-                          <td>{item.method}</td>
-                          <td className="bu-currency-pill" style={{ color: '#dc2626' }}>
-                            Rs. {formatCurrency(item.amount)}
+                          <td className="bu-currency-pill" style={{ color: '#dc2626', fontWeight: 700 }}>
+                            Rs. {formatCurrency(item.expense)}
                           </td>
-                          <td>{item.site}</td>
-                          <td>{item.remarks || '—'}</td>
                         </tr>
                       ))}
                     </tbody>

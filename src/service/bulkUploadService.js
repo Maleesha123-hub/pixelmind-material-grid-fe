@@ -4,7 +4,8 @@
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-const API_BASE = `${BASE_URL}/api/v1/daily-routes`
+const DAILY_ROUTES_API_BASE = `${BASE_URL}/api/v1/daily-routes`
+const VEHICLE_EXPENSES_API_BASE = `${BASE_URL}/api/v1/vehicle-expenses`
 
 export const bulkUploadService = {
   /**
@@ -20,7 +21,7 @@ export const bulkUploadService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await fetch(`${DAILY_ROUTES_API_BASE}/upload`, {
       method: 'POST',
       body: formData,
       signal,
@@ -65,7 +66,7 @@ export const bulkUploadService = {
 
   /**
    * Upload Daily Expenses Sheet to Backend
-   * Endpoint: POST /api/material-grid/daily-routes/daily-expenses
+   * Endpoint: POST /api/v1/vehicle-expenses/upload
    * @param {File} file - Excel or CSV file
    * @param {AbortSignal} [signal] - Optional abort signal
    * @returns {Promise<any>}
@@ -74,31 +75,48 @@ export const bulkUploadService = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${API_BASE}/daily-expenses`, {
+    const response = await fetch(`${VEHICLE_EXPENSES_API_BASE}/upload`, {
       method: 'POST',
       body: formData,
       signal,
     })
 
-    if (!response.ok) {
-      let errorMessage = `Server responded with status: ${response.status}`
-      try {
-        const errorData = await response.json()
-        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData)
-      } catch {
-        const errorText = await response.text().catch(() => '')
-        if (errorText) errorMessage = errorText
-      }
-      throw new Error(errorMessage)
-    }
-
+    let responseData = null
     const contentType = response.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {
-      return await response.json()
+      try {
+        responseData = await response.json()
+      } catch {
+        responseData = null
+      }
+    } else {
+      const text = await response.text().catch(() => '')
+      responseData = text
     }
-    return await response.text()
+
+    if (!response.ok) {
+      let errorMessage = `Server responded with status: ${response.status}`
+      if (responseData && typeof responseData === 'object') {
+        errorMessage =
+          responseData.message ||
+          responseData.data?.message ||
+          responseData.error ||
+          JSON.stringify(responseData)
+      } else if (typeof responseData === 'string' && responseData) {
+        errorMessage = responseData
+      }
+
+      const err = new Error(errorMessage)
+      err.response = { data: responseData?.data || responseData }
+      err.errors =
+        responseData?.data?.errors ||
+        responseData?.errors ||
+        (Array.isArray(responseData?.data) ? responseData.data : [])
+      throw err
+    }
+
+    return responseData
   },
 }
 
 export default bulkUploadService
-
