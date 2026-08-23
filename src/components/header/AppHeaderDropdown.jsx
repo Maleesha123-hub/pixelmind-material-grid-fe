@@ -12,6 +12,20 @@ import CIcon from '@coreui/icons-react'
 const AppHeaderDropdown = () => {
   const navigate = useNavigate()
 
+  const handleLogout = async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }).catch(() => null)
+    } finally {
+      navigate('/login')
+    }
+  }
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
@@ -35,7 +49,7 @@ const AppHeaderDropdown = () => {
       <CDropdownMenu className="py-1" placement="bottom-end" style={{ minWidth: '150px' }}>
         <CDropdownItem
           as="button"
-          onClick={() => navigate('/login')}
+          onClick={handleLogout}
           className="d-flex align-items-center text-danger py-2"
           style={{ cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
         >

@@ -23,7 +23,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     setErrorMessage('')
 
@@ -39,11 +39,33 @@ const Login = () => {
 
     setIsLoading(true)
 
-    // Standard login flow
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+        }),
+      })
+
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok || (data && data.success === false)) {
+        setErrorMessage(data?.message || 'Invalid username or password')
+        return
+      }
+
+      // Login success -> simply redirect to dashboard
       navigate('/dashboard')
-    }, 400)
+    } catch (err) {
+      setErrorMessage(err.message || 'Connection error. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
