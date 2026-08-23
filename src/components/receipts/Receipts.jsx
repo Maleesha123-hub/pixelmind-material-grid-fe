@@ -604,8 +604,7 @@ const Receipts = () => {
       </CCard>
 
       {/* ── KPI Summary Cards ── */}
-      <div className="rc-kpi-grid">
-        {/* Total Trips */}
+      {/* <div className="rc-kpi-grid">
         <div className="rc-kpi-card rc-kpi-card--blue">
           <div className="d-flex justify-content-between align-items-start">
             <div>
@@ -619,7 +618,6 @@ const Receipts = () => {
           </div>
         </div>
 
-        {/* Total Cubes */}
         <div className="rc-kpi-card rc-kpi-card--emerald">
           <div className="d-flex justify-content-between align-items-start">
             <div>
@@ -635,7 +633,6 @@ const Receipts = () => {
           </div>
         </div>
 
-        {/* Gross Transport Revenue */}
         <div className="rc-kpi-card rc-kpi-card--indigo">
           <div className="d-flex justify-content-between align-items-start">
             <div>
@@ -649,7 +646,6 @@ const Receipts = () => {
           </div>
         </div>
 
-        {/* Daily Expenses Deductions */}
         <div className="rc-kpi-card rc-kpi-card--red">
           <div className="d-flex justify-content-between align-items-start">
             <div>
@@ -663,7 +659,6 @@ const Receipts = () => {
           </div>
         </div>
 
-        {/* Net Settlement Total */}
         <div className="rc-kpi-card rc-kpi-card--slate">
           <div className="d-flex justify-content-between align-items-start">
             <div>
@@ -676,7 +671,7 @@ const Receipts = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ── Interactive Backend PDF Preview Modal ── */}
       <CModal
