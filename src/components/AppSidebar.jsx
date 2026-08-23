@@ -70,14 +70,14 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom px-3 d-flex align-items-center justify-content-between">
-        <CSidebarBrand to="/" className="d-flex align-items-center text-decoration-none">
-          <div className="sidebar-brand-full d-flex align-items-center gap-2">
+        <CSidebarBrand to="/" className="text-decoration-none">
+          <div className="sidebar-brand-full">
             <div className="mg-brand-badge">
               <CIcon icon={cilTruck} size="lg" />
             </div>
             <div className="d-flex flex-column text-start">
-              <span className="mg-brand-title">MATERIAL GRID</span>
-              <span className="mg-brand-subtitle">Hardware & Logistics</span>
+              <span className="mg-brand-title">MALSHI SUPPLIERS</span>
+              <span className="mg-brand-subtitle">Materials &amp; Transport Services</span>
             </div>
           </div>
           <div className="sidebar-brand-narrow">

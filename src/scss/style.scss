@@ -111,6 +111,66 @@ body {
     min-height: calc(4rem + 1px);
   }
 
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .sidebar-brand-full {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar-brand-narrow {
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // Handle narrow / unfoldable collapsed sidebar
+  &.sidebar-narrow-unfoldable:not(:hover),
+  &.sidebar-narrow {
+    .sidebar-header {
+      padding-left: 0.25rem !important;
+      padding-right: 0.25rem !important;
+      justify-content: center !important;
+    }
+
+    .sidebar-brand {
+      justify-content: center !important;
+      width: 100% !important;
+      padding: 0 !important;
+    }
+
+    .sidebar-brand-full {
+      display: none !important;
+    }
+
+    .sidebar-brand-narrow {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      width: 100% !important;
+    }
+  }
+
+  // Handle expanded sidebar or hovered unfoldable
+  &:not(.sidebar-narrow-unfoldable):not(.sidebar-narrow),
+  &.sidebar-narrow-unfoldable:hover {
+    .sidebar-brand-full {
+      display: flex !important;
+    }
+
+    .sidebar-brand-narrow {
+      display: none !important;
+    }
+  }
+
   // Brand Logo Badge
   .mg-brand-badge {
     width: 38px;
@@ -125,27 +185,30 @@ body {
     flex-shrink: 0;
 
     &--sm {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 8px;
     }
   }
 
   .mg-brand-title {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     color: #ffffff;
-    line-height: 1.1;
+    line-height: 1.15;
+    white-space: nowrap;
   }
 
   .mg-brand-subtitle {
-    font-size: 0.68rem;
-    font-weight: 600;
+    font-size: 0.58rem;
+    font-weight: 700;
     color: var(--mg-amber-500);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    margin-top: 1px;
+    margin-top: 2px;
+    white-space: nowrap;
+    line-height: 1.2;
   }
 
   // Section Dividers (OPERATIONS, MASTER DATA, etc.)

@@ -39,12 +39,11 @@ const Login = () => {
 
     setIsLoading(true)
 
-    // Simulate standard authentication flow
+    // Standard login flow
     setTimeout(() => {
       setIsLoading(false)
-      // Navigate to main application dashboard
       navigate('/dashboard')
-    }, 600)
+    }, 400)
   }
 
   return (
@@ -65,10 +64,10 @@ const Login = () => {
               <span>Enterprise Logistics Portal</span>
             </div>
             <h1 className="mg-product-title">
-              MATERIAL <span>GRID</span>
+              MALSHI <span>SUPPLIERS</span>
             </h1>
             <p className="mg-company-sub">
-              Developed by <strong>MESKORA Technologies (PVT) Ltd</strong>
+              Building Materials Suppliers &amp; Transport Services
             </p>
           </div>
         </div>
@@ -157,7 +156,7 @@ const Login = () => {
               </>
             ) : (
               <>
-                <span>Sign In to Material Grid</span>
+                <span>Sign In to Portal</span>
                 <CIcon icon={cilArrowRight} />
               </>
             )}
@@ -167,9 +166,9 @@ const Login = () => {
         {/* Footer info */}
         <div className="mg-login-footer">
           <div>
-            <strong>Material Grid</strong> &copy; {new Date().getFullYear()}
+            <strong>Malshi Suppliers</strong> &copy; {new Date().getFullYear()}
           </div>
-          <div>Proprietary Logistics Management &bull; MESKORA Technologies (PVT) Ltd</div>
+          <div>Powered by &bull; MESKORA Technologies (PVT) Ltd</div>
         </div>
       </div>
     </div>

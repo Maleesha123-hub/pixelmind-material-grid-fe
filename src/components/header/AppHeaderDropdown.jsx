@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  CAvatar,
   CBadge,
   CDropdown,
   CDropdownDivider,
@@ -86,7 +85,7 @@ const AppHeaderDropdown = () => {
           Settings
         </CDropdownItem>
         <CDropdownDivider />
-        <CDropdownItem href="#">
+        <CDropdownItem href="#/login">
           <CIcon icon={cilLockLocked} className="me-2" />
           Lock Account
         </CDropdownItem>
@@ -96,4 +95,3 @@ const AppHeaderDropdown = () => {
 }
 
 export default AppHeaderDropdown
-
