@@ -143,18 +143,15 @@ const CustomVehicleOption = (props) => {
       {...innerProps}
       className={`rc-select-option ${isSelected ? 'is-selected' : isFocused ? 'is-focused' : ''}`}
     >
-      <div className="d-flex align-items-center justify-content-between">
-        <div className="d-flex align-items-center gap-2">
-          <span className="rc-option-plate">{data.vehicleNumber || data.label}</span>
-          <div>
-            <div className="rc-option-driver">
-              <CIcon icon={cilUser} size="sm" className="me-1 text-muted" />
-              {data.driverName || 'Assigned Driver'}
-            </div>
-            {data.vehicleType && <div className="rc-option-type">{data.vehicleType}</div>}
+      <div className="d-flex align-items-center gap-2">
+        <span className="rc-option-plate">{data.vehicleNumber || data.label}</span>
+        <div>
+          <div className="rc-option-driver">
+            <CIcon icon={cilUser} size="sm" className="me-1 text-muted" />
+            {data.driverName || 'Assigned Driver'}
           </div>
+          {data.vehicleType && <div className="rc-option-type">{data.vehicleType}</div>}
         </div>
-        <span className="rc-badge-pill rc-badge-pill--active">Active</span>
       </div>
     </div>
   )
@@ -162,15 +159,11 @@ const CustomVehicleOption = (props) => {
 
 // ─── Today Date String Helper ───────────────────────────────────────────────
 const getTodayStr = () => new Date().toISOString().split('T')[0]
-const getYesterdayStr = () => {
-  const d = new Date()
-  d.setDate(d.getDate() - 1)
-  return d.toISOString().split('T')[0]
-}
 
 const Receipts = () => {
   // ─── Filter State ─────────────────────────────────────────────────────────
-  const [selectedDate, setSelectedDate] = useState(getTodayStr)
+  const [startDate, setStartDate] = useState(getTodayStr)
+  const [endDate, setEndDate] = useState(getTodayStr)
   const [selectedVehicle, setSelectedVehicle] = useState(DEFAULT_VEHICLE_OPTION)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -263,7 +256,7 @@ const Receipts = () => {
     const controller = new AbortController()
 
     const fetchReceiptSummary = async () => {
-      if (!selectedDate || selectedVehicle?.vehicleId == 'ALL') {
+      if ((!startDate && !endDate) || selectedVehicle?.vehicleId === 'ALL') {
         setBackendSummary(null)
         return
       }
@@ -276,8 +269,7 @@ const Receipts = () => {
 
       try {
         const summaryDto = await dailyRouteService.getSummary(
-          selectedDate,
-          vehicleId,
+          { startDate, endDate, vehicleId },
           controller.signal,
         )
 
@@ -299,7 +291,7 @@ const Receipts = () => {
       ignore = true
       controller.abort()
     }
-  }, [selectedDate, selectedVehicle, refreshKey])
+  }, [startDate, endDate, selectedVehicle, refreshKey])
 
   // ─── Summary Totals from Backend DTO (DailyRouteReportController.getSummary) ───
   const totalDispatches = backendSummary?.totalDispatches ?? 0
@@ -314,11 +306,11 @@ const Receipts = () => {
 
   // ─── Action: Preview Backend PDF (Streamed from Backend) ──────────────────
   const handlePreviewBackendPdf = async () => {
-    if (!selectedDate || !selectedVehicle || selectedVehicle?.value === 'ALL') {
+    if ((!startDate && !endDate) || !selectedVehicle || selectedVehicle?.value === 'ALL') {
       Swal.fire({
         icon: 'warning',
         title: 'Vehicle & Date Required',
-        text: 'Please select both a date and an assigned vehicle to preview the receipt.',
+        text: 'Please select date range and an assigned vehicle to preview the receipt.',
         confirmButtonColor: '#f59e0b',
       })
       return
@@ -330,7 +322,8 @@ const Receipts = () => {
 
     try {
       const pdfBlob = await dailyRouteService.getReceiptPdfBlob({
-        date: selectedDate,
+        startDate,
+        endDate,
         vehicleId,
       })
 
@@ -339,7 +332,7 @@ const Receipts = () => {
       setPreviewPdfUrl(blobUrl)
       setPreviewMeta({
         vehicle: selectedVehicle?.label || `Vehicle #${vehicleId}`,
-        date: selectedDate,
+        dateRange: startDate && endDate ? `${startDate} to ${endDate}` : startDate || endDate,
         count: totalDispatches,
         payable: totalNetPayable,
         vehicleId,
@@ -362,25 +355,26 @@ const Receipts = () => {
 
   // ─── Action: Download Backend PDF (Streamed from Backend) ─────────────────
   const handleDownloadBackendPdf = async () => {
-    if (!selectedDate || !selectedVehicle || selectedVehicle?.value === 'ALL') {
+    if ((!startDate && !endDate) || !selectedVehicle || selectedVehicle?.value === 'ALL') {
       Swal.fire({
         icon: 'warning',
         title: 'Vehicle & Date Required',
-        text: 'Please select both a date and an assigned vehicle to download the official receipt.',
+        text: 'Please select date range and an assigned vehicle to download the official receipt.',
         confirmButtonColor: '#f59e0b',
       })
       return
     }
 
     const vehicleId = selectedVehicle?.id || selectedVehicle?.vehicleId || selectedVehicle?.value
-    const dateVal = selectedDate
-    const fileName = `Material_Grid_Receipt_${selectedVehicle?.vehicleNumber || `Vehicle_${vehicleId}`}_${dateVal}.pdf`
+    const dateLabel = startDate && endDate ? `${startDate}_to_${endDate}` : startDate || endDate || 'export'
+    const fileName = `Material_Grid_Receipt_${selectedVehicle?.vehicleNumber || `Vehicle_${vehicleId}`}_${dateLabel}.pdf`
 
     setDownloadLoading(true)
 
     try {
       await dailyRouteService.downloadReceiptPdf({
-        date: dateVal,
+        startDate,
+        endDate,
         vehicleId,
         fileName,
       })
@@ -419,21 +413,6 @@ const Receipts = () => {
       setPreviewPdfUrl(null)
     }
     setPreviewMeta(null)
-  }
-
-  // ─── Preset Quick Date Setter ─────────────────────────────────────────────
-  const setQuickDate = (type) => {
-    if (type === 'today') {
-      setSelectedDate(getTodayStr())
-    } else if (type === 'yesterday') {
-      setSelectedDate(getYesterdayStr())
-    } else if (type === 'all') {
-      setSelectedDate('')
-    }
-  }
-
-  const handleDateChange = (val) => {
-    setSelectedDate(val)
   }
 
   const handleVehicleChange = (opt) => {
@@ -486,7 +465,8 @@ const Receipts = () => {
             <button
               className="rc-btn-reset"
               onClick={() => {
-                setSelectedDate(getTodayStr())
+                setStartDate(getTodayStr())
+                setEndDate(getTodayStr())
                 setSelectedVehicle(DEFAULT_VEHICLE_OPTION)
               }}
             >
@@ -497,42 +477,39 @@ const Receipts = () => {
 
         <CCardBody className="rc-card-body">
           <CRow className="g-3">
-            {/* Date Input with Quick Selectors */}
-            <CCol xs={12} md={6}>
-              <div className="d-flex justify-content-between align-items-center mb-1">
-                <CFormLabel className="rc-label mb-0">
-                  <CIcon icon={cilCalendar} size="sm" className="text-warning" />
-                  Statement Date
-                </CFormLabel>
-                <div className="rc-quick-dates">
-                  <button
-                    type="button"
-                    className={`rc-quick-btn ${selectedDate === getTodayStr() ? 'active' : ''}`}
-                    onClick={() => setQuickDate('today')}
-                  >
-                    Today
-                  </button>
-                  <button
-                    type="button"
-                    className={`rc-quick-btn ${selectedDate === getYesterdayStr() ? 'active' : ''}`}
-                    onClick={() => setQuickDate('yesterday')}
-                  >
-                    Yesterday
-                  </button>
-                  <button
-                    type="button"
-                    className={`rc-quick-btn ${!selectedDate ? 'active' : ''}`}
-                    onClick={() => setQuickDate('all')}
-                  >
-                    All
-                  </button>
-                </div>
-              </div>
+            {/* Start Date */}
+            <CCol xs={12} sm={6} md={3}>
+              <CFormLabel className="rc-label">
+                <CIcon icon={cilCalendar} size="sm" className="text-warning" />
+                Start Date
+              </CFormLabel>
               <CFormInput
                 type="date"
                 className="rc-input"
-                value={selectedDate}
-                onChange={(e) => handleDateChange(e.target.value)}
+                value={startDate}
+                max={endDate || undefined}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setStartDate(val)
+                  if (endDate && val && new Date(val) > new Date(endDate)) {
+                    setEndDate('')
+                  }
+                }}
+              />
+            </CCol>
+
+            {/* End Date */}
+            <CCol xs={12} sm={6} md={3}>
+              <CFormLabel className="rc-label">
+                <CIcon icon={cilCalendar} size="sm" className="text-warning" />
+                End Date
+              </CFormLabel>
+              <CFormInput
+                type="date"
+                className="rc-input"
+                value={endDate}
+                min={startDate || undefined}
+                onChange={(e) => setEndDate(e.target.value)}
               />
             </CCol>
 
@@ -576,7 +553,11 @@ const Receipts = () => {
                     ? 'All Vehicles (Consolidated)'
                     : selectedVehicle?.label || selectedVehicle?.vehicleNumber}
                 </strong>
-                {selectedDate ? ` • ${selectedDate}` : ' • All Dates'}
+                {startDate && endDate
+                  ? ` • ${startDate} to ${endDate}`
+                  : startDate || endDate
+                  ? ` • ${startDate || endDate}`
+                  : ' • All Dates'}
               </span>
               <span className="text-muted ms-2" style={{ fontSize: '0.8rem' }}>
                 ({totalDispatches} recorded dispatches)
@@ -712,7 +693,7 @@ const Receipts = () => {
           </CModalTitle>
           <div className="d-flex align-items-center gap-2 me-3">
             <span className="rc-modal-pill">
-              <CIcon icon={cilCalendar} size="sm" /> {previewMeta?.date || 'Selected Period'}
+              <CIcon icon={cilCalendar} size="sm" /> {previewMeta?.dateRange || 'Selected Period'}
             </span>
             <span className="rc-modal-pill rc-modal-pill--amber">
               {previewMeta?.count} Trip{previewMeta?.count !== 1 ? 's' : ''}

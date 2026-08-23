@@ -94,21 +94,51 @@ const apiFetchBlob = async (url, options = {}) => {
 
 export const dailyRouteService = {
   /**
-   * Fetch receipt summary from DailyRouteReportController.getSummary(date, vehicleId)
-   * GET /api/v1/daily-routes/report/summary?date=YYYY-MM-DD&vehicleId=...
+   * Fetch receipt summary from DailyRouteReportController.getSummary
+   * GET /api/v1/daily-routes/report/summary?startDate=...&endDate=...&date=...&vehicleId=...
    *
-   * @param {string} date - Date in YYYY-MM-DD format
-   * @param {string|number} [vehicleId] - Numeric vehicle ID
+   * @param {Object|string} paramsOrDate - Object with { startDate, endDate, date, vehicleId } or date string
+   * @param {string|number} [maybeEndDateOrVehId] - End date or numeric vehicle ID
+   * @param {string|number} [maybeVehicleId] - Numeric vehicle ID
    * @param {AbortSignal} [signal]
    * @returns {Promise<any>}
    */
-  getSummary: async (date, vehicleId = 'ALL', signal) => {
-    if (!date) {
-      throw new Error('Please select a date to fetch summary.')
+  getSummary: async (paramsOrDate, maybeEndDateOrVehId = 'ALL', maybeVehicleId = 'ALL', signal) => {
+
+    // TODO: implement feature in future
+    return {}
+
+    let startDate = ''
+    let endDate = ''
+    let date = ''
+    let vehicleId = 'ALL'
+    let abortSignal = signal
+
+    if (typeof paramsOrDate === 'object' && paramsOrDate !== null && !(paramsOrDate instanceof AbortSignal)) {
+      startDate = paramsOrDate.startDate || ''
+      endDate = paramsOrDate.endDate || ''
+      date = paramsOrDate.date || ''
+      vehicleId = paramsOrDate.vehicleId || 'ALL'
+      abortSignal = maybeEndDateOrVehId instanceof AbortSignal ? maybeEndDateOrVehId : signal
+    } else {
+      if (typeof maybeEndDateOrVehId === 'string' && maybeEndDateOrVehId.includes('-')) {
+        startDate = paramsOrDate || ''
+        endDate = maybeEndDateOrVehId || ''
+        vehicleId = maybeVehicleId || 'ALL'
+      } else {
+        date = paramsOrDate || ''
+        vehicleId = maybeEndDateOrVehId || 'ALL'
+        abortSignal = maybeVehicleId instanceof AbortSignal ? maybeVehicleId : signal
+      }
     }
 
     const vehIdParam = vehicleId === 'ALL' ? '' : vehicleId
-    const qs = buildQuery({ date, vehicleId: vehIdParam })
+    const qs = buildQuery({
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      date: (!startDate && !endDate && date) ? date : (startDate && !endDate ? startDate : undefined),
+      vehicleId: vehIdParam,
+    })
 
     const endpoints = [
       `${BASE_URL}/api/v1/daily-routes/report/summary?${qs}`,
@@ -117,10 +147,10 @@ export const dailyRouteService = {
     let lastError = null
     for (let i = 0; i < endpoints.length; i++) {
       try {
-        const result = await apiFetch(endpoints[i], { method: 'GET', signal })
+        const result = await apiFetch(endpoints[i], { method: 'GET', signal: abortSignal })
         return unwrap(result)
       } catch (err) {
-        if (signal?.aborted) throw err
+        if (abortSignal?.aborted) throw err
         lastError = err
       }
     }
@@ -137,22 +167,24 @@ export const dailyRouteService = {
 
   /**
    * Fetch backend-generated PDF receipt stream as a Blob (application/pdf)
-   * Calls DailyRouteReportController.preview(date, vehicleId)
-   * GET /api/v1/daily-routes/report/preview?date=YYYY-MM-DD&vehicleId=...
+   * Calls DailyRouteReportController.preview
    *
    * @param {Object} params
-   * @param {string} params.date - Date in YYYY-MM-DD format
+   * @param {string} [params.startDate] - Start Date YYYY-MM-DD
+   * @param {string} [params.endDate]   - End Date YYYY-MM-DD
+   * @param {string} [params.date]      - Date in YYYY-MM-DD format
    * @param {string|number} [params.vehicleId] - Vehicle ID
    * @param {AbortSignal} [params.signal]
    * @returns {Promise<Blob>}
    */
-  getReceiptPdfBlob: async ({ date, vehicleId = 'ALL' } = {}, signal) => {
-    if (!date) {
-      throw new Error('Please select a date to preview the PDF receipt.')
-    }
-
+  getReceiptPdfBlob: async ({ startDate = '', endDate = '', date = '', vehicleId = 'ALL' } = {}, signal) => {
     const vehIdParam = vehicleId === 'ALL' ? '' : vehicleId
-    const qs = buildQuery({ date, vehicleId: vehIdParam })
+    const qs = buildQuery({
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      date: (!startDate && !endDate && date) ? date : (startDate && !endDate ? startDate : undefined),
+      vehicleId: vehIdParam,
+    })
 
     const endpoints = [
       `${BASE_URL}/api/v1/daily-routes/report/preview?${qs}`,
@@ -173,17 +205,24 @@ export const dailyRouteService = {
 
   /**
    * Directly download the backend-generated PDF receipt to the client
-   * Calls DailyRouteReportController.download(date, vehicleId) or preview with attachment
+   * Calls DailyRouteReportController.download
    *
    * @param {Object} params
-   * @param {string} params.date
+   * @param {string} [params.startDate]
+   * @param {string} [params.endDate]
+   * @param {string} [params.date]
    * @param {string|number} [params.vehicleId]
    * @param {string} [params.fileName]
    * @param {AbortSignal} [params.signal]
    */
-  downloadReceiptPdf: async ({ date, vehicleId = 'ALL', fileName = '' } = {}, signal) => {
+  downloadReceiptPdf: async ({ startDate = '', endDate = '', date = '', vehicleId = 'ALL', fileName = '' } = {}, signal) => {
     const vehIdParam = vehicleId === 'ALL' ? '' : vehicleId
-    const qs = buildQuery({ date, vehicleId: vehIdParam })
+    const qs = buildQuery({
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      date: (!startDate && !endDate && date) ? date : (startDate && !endDate ? startDate : undefined),
+      vehicleId: vehIdParam,
+    })
 
     const downloadEndpoints = [
       `${BASE_URL}/api/v1/daily-routes/report/download?${qs}`,
@@ -205,9 +244,10 @@ export const dailyRouteService = {
       throw lastError || new Error('Failed to download PDF receipt from backend')
     }
 
+    const dateLabel = startDate && endDate ? `${startDate}_to_${endDate}` : startDate || date || 'export'
     const resolvedFileName =
       fileName ||
-      `Material_Grid_Receipt_${vehicleId !== 'ALL' ? `Vehicle_${vehicleId}` : 'All_Vehicles'}_${date || 'export'}.pdf`
+      `Material_Grid_Receipt_${vehicleId !== 'ALL' ? `Vehicle_${vehicleId}` : 'All_Vehicles'}_${dateLabel}.pdf`
 
     const blobUrl = URL.createObjectURL(blob)
     const link = document.createElement('a')
