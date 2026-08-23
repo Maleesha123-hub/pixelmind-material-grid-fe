@@ -63,10 +63,11 @@ const buildQuery = (params) => {
 
 export const licenseService = {
   /**
-   * GET /api/v1/licenses?startDate=&endDate=&page=&size=&sort=
-   * Paginated list of licenses, filterable by date range.
+   * GET /api/v1/licenses?search=&startDate=&endDate=&page=&size=&sort=
+   * Paginated list of licenses, filterable by search term and date range.
    *
    * @param {Object} [params]
+   * @param {string}  [params.search]    - Search term (code/price)
    * @param {string}  [params.startDate] - ISO date string YYYY-MM-DD
    * @param {string}  [params.endDate]   - ISO date string YYYY-MM-DD
    * @param {number}  [params.page=0]    - 0-based page index
@@ -75,8 +76,11 @@ export const licenseService = {
    * @param {AbortSignal} [signal]
    * @returns {Promise<PageResponse<LicenseResponse>>}
    */
-  getLicenses: async ({ startDate = '', endDate = '', page = 0, size = 15, sort = 'id,desc' } = {}, signal) => {
-    const qs = buildQuery({ startDate, endDate, page, size, sort })
+  getLicenses: async (
+    { search = '', startDate = '', endDate = '', page = 0, size = 15, sort = 'id,desc' } = {},
+    signal,
+  ) => {
+    const qs = buildQuery({ search: search.trim() || undefined, startDate, endDate, page, size, sort })
     const result = await apiFetch(`${API_BASE}${qs ? `?${qs}` : ''}`, { signal })
     return unwrap(result)
   },

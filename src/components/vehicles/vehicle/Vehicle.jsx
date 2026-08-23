@@ -49,7 +49,7 @@ import './Vehicle.css'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PAGE_SIZE = 15
-const EMPTY_FORM = { vehicleNumber: '', capacity: '', status: 'ACTIVE' }
+const EMPTY_FORM = { vehicleNumber: '', capacity: '' }
 
 // ─── Debounce hook ────────────────────────────────────────────────────────────
 function useDebounce(value, delay = 400) {
@@ -70,7 +70,6 @@ const Vehicle = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
-  const [statusFilter, setStatusFilter] = useState('ALL')
 
   // ── Modal / form state ───────────────────────────────────────────────────────
   const [modalVisible, setModalVisible] = useState(false)
@@ -85,7 +84,7 @@ const Vehicle = () => {
   const abortRef = useRef(null)
 
   // ── Load vehicles ────────────────────────────────────────────────────────────
-  const loadVehicles = useCallback(async (page = 0, search = '', statusF = 'ALL') => {
+  const loadVehicles = useCallback(async (page = 0, search = '') => {
     if (abortRef.current) abortRef.current.abort()
     abortRef.current = new AbortController()
     setLoading(true)
@@ -94,10 +93,7 @@ const Vehicle = () => {
         { search, page, size: PAGE_SIZE, sort: 'id,asc' },
         abortRef.current.signal,
       )
-      let content = result?.content ?? (Array.isArray(result) ? result : [])
-      if (statusF !== 'ALL') {
-        content = content.filter((v) => v.status === statusF)
-      }
+      const content = result?.content ?? (Array.isArray(result) ? result : [])
       setVehicles(content)
       setTotalElements(result?.totalElements ?? content.length)
       setTotalPages(result?.totalPages ?? 1)
@@ -113,13 +109,13 @@ const Vehicle = () => {
   }, [])
 
   useEffect(() => {
-    loadVehicles(0, debouncedSearch, statusFilter)
+    loadVehicles(0, debouncedSearch)
     setCurrentPage(0)
-  }, [debouncedSearch, statusFilter, loadVehicles])
+  }, [debouncedSearch, loadVehicles])
 
   const goToPage = (page) => {
     if (page < 0 || page >= totalPages) return
-    loadVehicles(page, debouncedSearch, statusFilter)
+    loadVehicles(page, debouncedSearch)
     setCurrentPage(page)
   }
 
@@ -157,7 +153,6 @@ const Vehicle = () => {
     setForm({
       vehicleNumber: v.vehicleNumber || '',
       capacity: v.capacity != null ? String(v.capacity) : '',
-      status: v.status || 'ACTIVE',
     })
     setErrors({})
     setModalVisible(true)
@@ -167,19 +162,13 @@ const Vehicle = () => {
   const handleSave = async () => {
     if (!validate()) return
     setSaving(true)
-    // VehicleCreateRequest accepts only: vehicleNumber, capacity
     const payload = {
       vehicleNumber: form.vehicleNumber.trim().toUpperCase(),
       capacity: Number(form.capacity),
-      status: form.status === 'ACTIVE' ? true : false,
     }
     try {
       if (editMode) {
         await vehicleService.updateVehicle(selectedId, payload)
-        // Apply status change separately if changed
-        if (form.status) {
-          await vehicleService.toggleVehicleStatus(selectedId, form.status).catch(() => {})
-        }
         Swal.fire({
           icon: 'success',
           title: 'Vehicle Updated',
@@ -200,7 +189,7 @@ const Vehicle = () => {
         })
       }
       setModalVisible(false)
-      loadVehicles(editMode ? currentPage : 0, debouncedSearch, statusFilter)
+      loadVehicles(editMode ? currentPage : 0, debouncedSearch)
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -210,44 +199,6 @@ const Vehicle = () => {
       })
     } finally {
       setSaving(false)
-    }
-  }
-
-  // ── Toggle status ────────────────────────────────────────────────────────────
-  const handleToggle = async (v) => {
-    const next = v.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-    const label = next === 'ACTIVE' ? 'Activate' : 'Deactivate'
-    const color = next === 'ACTIVE' ? '#059669' : '#dc2626'
-    const res = await Swal.fire({
-      title: `${label} ${v.vehicleNumber}?`,
-      text: `Vehicle will be marked as ${next}.`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: label,
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: color,
-      cancelButtonColor: '#64748b',
-      reverseButtons: true,
-    })
-    if (!res.isConfirmed) return
-    try {
-      await vehicleService.toggleVehicleStatus(v.id, next)
-      Swal.fire({
-        icon: 'success',
-        title: next === 'ACTIVE' ? 'Activated' : 'Deactivated',
-        text: `${v.vehicleNumber} is now ${next}.`,
-        confirmButtonColor: '#d97706',
-        timer: 1800,
-        timerProgressBar: true,
-      })
-      loadVehicles(currentPage, debouncedSearch, statusFilter)
-    } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Failed',
-        text: err.message,
-        confirmButtonColor: '#dc2626',
-      })
     }
   }
 
@@ -275,7 +226,7 @@ const Vehicle = () => {
         timer: 1800,
         timerProgressBar: true,
       })
-      loadVehicles(currentPage, debouncedSearch, statusFilter)
+      loadVehicles(currentPage, debouncedSearch)
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -289,8 +240,6 @@ const Vehicle = () => {
   }
 
   // ── Counts ───────────────────────────────────────────────────────────────────
-  const activeCount = vehicles.filter((v) => v.status === 'ACTIVE').length
-  const inactiveCount = vehicles.filter((v) => v.status === 'INACTIVE').length
   const startItem = totalElements === 0 ? 0 : currentPage * PAGE_SIZE + 1
   const endItem = Math.min((currentPage + 1) * PAGE_SIZE, totalElements)
 
@@ -336,17 +285,16 @@ const Vehicle = () => {
             className="vm-btn-reset"
             onClick={() => {
               setSearchInput('')
-              setStatusFilter('ALL')
             }}
           >
             <CIcon icon={cilReload} size="sm" />
-            Reset Filters
+            Reset Filter
           </button>
         </CCardHeader>
         <CCardBody className="vm-card-body">
           <CRow className="g-3">
             {/* Search */}
-            <CCol xs={12} md={6}>
+            <CCol xs={12} sm={8} md={5} lg={4}>
               <label className="vm-label">
                 <CIcon icon={cilSearch} size="sm" className="text-warning" />
                 Search Vehicle Number
@@ -371,24 +319,6 @@ const Vehicle = () => {
                 />
               </div>
             </CCol>
-
-            {/* Status Filter */}
-            <CCol xs={12} md={6}>
-              <label className="vm-label">
-                <CIcon icon={cilFilter} size="sm" className="text-warning" />
-                Filter by Status
-              </label>
-              <select
-                id="vehicle-status-filter"
-                className="vm-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="INACTIVE">Inactive Only</option>
-              </select>
-            </CCol>
           </CRow>
         </CCardBody>
       </CCard>
@@ -408,22 +338,21 @@ const Vehicle = () => {
                     <th style={{ width: 44 }}>#</th>
                     <th>Vehicle Number</th>
                     <th>Capacity (cube)</th>
-                    <th>Status</th>
                     <th style={{ textAlign: 'center', width: 120 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {vehicles.length === 0 ? (
                     <tr>
-                      <td colSpan={5}>
+                      <td colSpan={4}>
                         <div className="vm-empty">
                           <div className="vm-empty-icon">
                             <CIcon icon={cilTruck} size="xl" />
                           </div>
                           <h3>No vehicles found</h3>
                           <p>
-                            {searchInput || statusFilter !== 'ALL'
-                              ? 'Try a different search term or filter.'
+                            {searchInput
+                              ? 'Try a different search term.'
                               : 'Click "Add Vehicle" to register the first vehicle.'}
                           </p>
                         </div>
@@ -443,14 +372,6 @@ const Vehicle = () => {
                           <span className="vm-capacity-val">
                             {v.capacity ?? '—'}
                             <span className="vm-capacity-unit">cube</span>
-                          </span>
-                        </td>
-                        <td>
-                          <span
-                            className={`vm-badge ${v.status === 'ACTIVE' ? 'active' : 'inactive'}`}
-                          >
-                            <span className="vm-badge-dot" />
-                            {v.status === 'ACTIVE' ? 'Active' : 'Inactive'}
                           </span>
                         </td>
                         <td>
@@ -560,10 +481,6 @@ const Vehicle = () => {
                 placeholder="e.g. LC-4838"
                 value={form.vehicleNumber}
                 onChange={(e) => setField('vehicleNumber', e.target.value)}
-                // disabled={editMode}
-                // style={
-                //   editMode ? { background: '#f9fafb', cursor: 'not-allowed', color: '#6b7280' } : {}
-                // }
                 autoFocus={!editMode}
               />
               {errors.vehicleNumber ? (
@@ -593,25 +510,6 @@ const Vehicle = () => {
                 <div className="vm-input-hint">Load capacity in cubic meters</div>
               )}
             </CCol>
-
-            {/* Status — only shown in edit mode */}
-            {editMode && (
-              <CCol xs={12}>
-                <label className="vm-label" htmlFor="field-status">
-                  Status
-                </label>
-                <select
-                  id="field-status"
-                  className="vm-select"
-                  value={form.status}
-                  onChange={(e) => setField('status', e.target.value)}
-                >
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                </select>
-                <div className="vm-input-hint">Change vehicle status</div>
-              </CCol>
-            )}
           </CRow>
         </CModalBody>
 
@@ -648,7 +546,7 @@ const Vehicle = () => {
       <VehicleBulkUploadModal
         visible={bulkModalVisible}
         onClose={() => setBulkModalVisible(false)}
-        onSuccess={() => loadVehicles(0, debouncedSearch, statusFilter)}
+        onSuccess={() => loadVehicles(0, debouncedSearch)}
       />
     </div>
   )

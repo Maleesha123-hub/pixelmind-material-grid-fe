@@ -65,7 +65,7 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
   // ─── Download Sample Excel Template ──────────────────────────────────────────
   const handleDownloadTemplate = () => {
     const wsData = [
-      ['Vehicle Number', 'Capacity (cube)'],
+      ['Vehicle Number', 'Capacity'],
       ['LC-4838', 4.5],
       ['LI-8902', 3.8],
       ['LK-5177', 5.0],

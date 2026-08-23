@@ -50,7 +50,6 @@ const EMPTY_FORM = {
   startDate: '',
   endDate: '',
   price: '',
-  status: 'ACTIVE',
 }
 
 // ─── Debounce Hook ────────────────────────────────────────────────────────────
@@ -101,7 +100,6 @@ const VehicleLicense = () => {
   const [searchInput, setSearchInput] = useState('')
   const [startDateFilter, setStartDateFilter] = useState('')
   const [endDateFilter, setEndDateFilter] = useState('')
-  const [statusFilter, setStatusFilter] = useState('ALL')
 
   // ── Modal / Form State ───────────────────────────────────────────────────────
   const [modalVisible, setModalVisible] = useState(false)
@@ -116,7 +114,7 @@ const VehicleLicense = () => {
 
   // ── Load Licenses ───────────────────────────────────────────────────────────
   const loadLicenses = useCallback(
-    async (page = 0, search = '', startD = '', endD = '', statusF = 'ALL') => {
+    async (page = 0, search = '', startD = '', endD = '') => {
       if (abortRef.current) abortRef.current.abort()
       abortRef.current = new AbortController()
       setLoading(true)
@@ -124,6 +122,7 @@ const VehicleLicense = () => {
       try {
         const result = await licenseService.getLicenses(
           {
+            search: search.trim() || undefined,
             startDate: startD || undefined,
             endDate: endD || undefined,
             page,
@@ -135,10 +134,18 @@ const VehicleLicense = () => {
 
         let content = result?.content ?? (Array.isArray(result) ? result : [])
 
-        // Apply status filter if active/inactive
-        if (statusF !== 'ALL') {
-          content = content.filter((item) => {
-            return statusF === item.status
+        // Fallback client-side filtering for search code / price
+        if (search && search.trim()) {
+          const q = search.trim().toLowerCase()
+          content = content.filter((lic) => {
+            const code = (lic.licenseCode || `LIC-${lic.id}` || '').toLowerCase()
+            const priceStr = lic.price != null ? String(lic.price) : ''
+            const formattedPrice = formatCurrency(lic.price).toLowerCase()
+            return (
+              code.includes(q) ||
+              priceStr.includes(q) ||
+              formattedPrice.includes(q)
+            )
           })
         }
 
@@ -159,13 +166,13 @@ const VehicleLicense = () => {
   )
 
   useEffect(() => {
-    loadLicenses(0, debouncedSearch, startDateFilter, endDateFilter, statusFilter)
+    loadLicenses(0, debouncedSearch, startDateFilter, endDateFilter)
     setCurrentPage(0)
-  }, [debouncedSearch, startDateFilter, endDateFilter, statusFilter, loadLicenses])
+  }, [debouncedSearch, startDateFilter, endDateFilter, loadLicenses])
 
   const goToPage = (page) => {
     if (page < 0 || page >= totalPages) return
-    loadLicenses(page, debouncedSearch, startDateFilter, endDateFilter, statusFilter)
+    loadLicenses(page, debouncedSearch, startDateFilter, endDateFilter)
     setCurrentPage(page)
   }
 
@@ -211,13 +218,10 @@ const VehicleLicense = () => {
   const openEdit = (license) => {
     setEditMode(true)
     setSelectedId(license.id)
-    const isAct =
-      license.active !== false && license.status !== false && license.status !== 'INACTIVE'
     setForm({
       startDate: license.startDate || '',
       endDate: license.endDate || '',
       price: license.price != null ? String(license.price) : '',
-      status: isAct ? 'ACTIVE' : 'INACTIVE',
     })
     setErrors({})
     setModalVisible(true)
@@ -236,10 +240,7 @@ const VehicleLicense = () => {
 
     try {
       if (editMode) {
-        await licenseService.updateLicense(selectedId, {
-          ...payload,
-          status: form.status === 'ACTIVE',
-        })
+        await licenseService.updateLicense(selectedId, payload)
         Swal.fire({
           icon: 'success',
           title: 'License Updated',
@@ -265,7 +266,6 @@ const VehicleLicense = () => {
         debouncedSearch,
         startDateFilter,
         endDateFilter,
-        statusFilter,
       )
     } catch (err) {
       Swal.fire({
@@ -305,7 +305,7 @@ const VehicleLicense = () => {
         timer: 1800,
         timerProgressBar: true,
       })
-      loadLicenses(currentPage, debouncedSearch, startDateFilter, endDateFilter, statusFilter)
+      loadLicenses(currentPage, debouncedSearch, startDateFilter, endDateFilter)
     } catch (err) {
       Swal.fire({
         icon: 'error',
@@ -356,7 +356,6 @@ const VehicleLicense = () => {
               setSearchInput('')
               setStartDateFilter('')
               setEndDateFilter('')
-              setStatusFilter('ALL')
             }}
             id="btn-reset-filters"
           >
@@ -367,8 +366,34 @@ const VehicleLicense = () => {
 
         <CCardBody className="vlm-card-body">
           <CRow className="g-3">
+            {/* Search by Code / Keyword */}
+            <CCol xs={12} sm={6} md={4}>
+              <label className="vlm-label" htmlFor="filter-search">
+                <CIcon icon={cilSearch} size="sm" className="text-warning" />
+                Search Code / Price
+              </label>
+              <div className="vlm-search-wrap">
+                <span className="vlm-search-icon">
+                  {loading ? (
+                    <CSpinner size="sm" style={{ color: '#d97706', width: 13, height: 13 }} />
+                  ) : (
+                    <CIcon icon={cilSearch} size="sm" />
+                  )}
+                </span>
+                <input
+                  id="filter-search"
+                  type="text"
+                  className="vlm-search-input"
+                  placeholder="e.g. LIC-0001 or 15000"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+            </CCol>
+
             {/* Start Date Filter */}
-            <CCol xs={12} sm={6} md={3}>
+            <CCol xs={12} sm={6} md={4}>
               <label className="vlm-label" htmlFor="filter-start-date">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
                 Start Date
@@ -390,7 +415,7 @@ const VehicleLicense = () => {
             </CCol>
 
             {/* End Date Filter */}
-            <CCol xs={12} sm={6} md={3}>
+            <CCol xs={12} sm={6} md={4}>
               <label className="vlm-label" htmlFor="filter-end-date">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
                 End Date
@@ -403,50 +428,6 @@ const VehicleLicense = () => {
                 min={startDateFilter || undefined}
                 onChange={(e) => setEndDateFilter(e.target.value)}
               />
-            </CCol>
-
-            {/* Status Filter */}
-            <CCol xs={12} sm={6} md={3}>
-              <label className="vlm-label" htmlFor="filter-status">
-                <CIcon icon={cilFilter} size="sm" className="text-warning" />
-                Status
-              </label>
-              <select
-                id="filter-status"
-                className="vlm-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="INACTIVE">Inactive Only</option>
-              </select>
-            </CCol>
-
-            {/* Search by Code / Keyword */}
-            <CCol xs={12} sm={6} md={3}>
-              <label className="vlm-label" htmlFor="filter-search">
-                <CIcon icon={cilSearch} size="sm" className="text-warning" />
-                Search Code / Price
-              </label>
-              <div className="vlm-search-wrap">
-                <span className="vlm-search-icon">
-                  {loading ? (
-                    <CSpinner size="sm" style={{ color: '#d97706', width: 13, height: 13 }} />
-                  ) : (
-                    <CIcon icon={cilSearch} size="sm" />
-                  )}
-                </span>
-                <input
-                  id="filter-search"
-                  type="text"
-                  className="vlm-search-input"
-                  placeholder="e.g. LIC-0001"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  autoComplete="off"
-                />
-              </div>
             </CCol>
           </CRow>
         </CCardBody>
@@ -470,14 +451,13 @@ const VehicleLicense = () => {
                     <th>End Date</th>
                     <th>Validity Period</th>
                     <th>Price</th>
-                    <th>Status</th>
                     <th style={{ textAlign: 'center', width: 120 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {licenses.length === 0 ? (
                     <tr>
-                      <td colSpan={8}>
+                      <td colSpan={7}>
                         <div className="vlm-empty">
                           <div className="vlm-empty-icon">
                             <CIcon icon={cilContact} size="xl" />
@@ -486,8 +466,7 @@ const VehicleLicense = () => {
                           <p>
                             {searchInput ||
                             startDateFilter ||
-                            endDateFilter ||
-                            statusFilter !== 'ALL'
+                            endDateFilter
                               ? 'Try adjusting your date range or filter criteria.'
                               : 'Click "Add License" to create the first vehicle license.'}
                           </p>
@@ -496,8 +475,6 @@ const VehicleLicense = () => {
                     </tr>
                   ) : (
                     licenses.map((lic, i) => {
-                      const isAct =
-                        lic.active !== false && lic.status !== false && lic.status !== 'INACTIVE'
                       const isExpired = lic.endDate ? new Date(lic.endDate) < new Date() : false
 
                       return (
@@ -530,12 +507,6 @@ const VehicleLicense = () => {
                           </td>
                           <td>
                             <span className="vlm-price-pill">Rs. {formatCurrency(lic.price)}</span>
-                          </td>
-                          <td>
-                            <span className={`vlm-badge ${isAct ? 'active' : 'inactive'}`}>
-                              <span className="vlm-badge-dot" />
-                              {isAct ? 'Active' : 'Inactive'}
-                            </span>
                           </td>
                           <td>
                             <div className="vlm-actions">
@@ -629,7 +600,7 @@ const VehicleLicense = () => {
         <CModalHeader className="vlm-modal-header">
           <CModalTitle className="vlm-modal-title">
             <CIcon icon={editMode ? cilPencil : cilPlus} style={{ color: '#f59e0b' }} />
-            {editMode ? 'Edit Vehicle License' : 'Add Vehicle License'}
+            {editMode ? 'Edit License' : 'Add License'}
           </CModalTitle>
         </CModalHeader>
 
@@ -676,7 +647,7 @@ const VehicleLicense = () => {
             </CCol>
 
             {/* Price */}
-            <CCol xs={12} md={editMode ? 6 : 12}>
+            <CCol xs={12}>
               <label className="vlm-label" htmlFor="field-price">
                 Price (LKR / Amount) <span className="req">*</span>
               </label>
@@ -700,25 +671,6 @@ const VehicleLicense = () => {
                 <div className="vlm-input-hint">Total cost of the license</div>
               )}
             </CCol>
-
-            {/* Status (In Edit Mode) */}
-            {editMode && (
-              <CCol xs={12} md={6}>
-                <label className="vlm-label" htmlFor="field-status">
-                  Status
-                </label>
-                <select
-                  id="field-status"
-                  className="vlm-select"
-                  value={form.status}
-                  onChange={(e) => setField('status', e.target.value)}
-                >
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                </select>
-                <div className="vlm-input-hint">License activation state</div>
-              </CCol>
-            )}
           </CRow>
         </CModalBody>
 
