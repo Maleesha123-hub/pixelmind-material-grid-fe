@@ -1,18 +1,28 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
-} from '@coreui/react'
+import { CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle } from '@coreui/react'
 import { cilAccountLogout, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
+import Swal from 'sweetalert2'
 
 const AppHeaderDropdown = () => {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
+    const res = await Swal.fire({
+      title: 'Sign Out?',
+      text: 'Are you sure you want to log out of your session?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Sign Out',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d97706',
+      cancelButtonColor: '#64748b',
+      reverseButtons: true,
+    })
+
+    if (!res.isConfirmed) return
+
     try {
       await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/logout`, {
         method: 'POST',
