@@ -148,16 +148,10 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Vehicle License',
-    to: '/vehicle-license',
+    name: 'License',
+    to: '/license',
     icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
   },
-  // {
-  //   component: CNavItem,
-  //   name: 'Vehicles',
-  //   to: '/vehicles',
-  //   icon: <CIcon icon={cilCarAlt} customClassName="nav-icon" />,
-  // },
   {
     component: CNavItem,
     name: 'Routes',

@@ -331,6 +331,7 @@ const Routes = () => {
                 <thead>
                   <tr>
                     <th style={{ width: 44 }}>#</th>
+                    <th>Route Code</th>
                     <th>Route (Start → End)</th>
                     <th>Start Location</th>
                     <th>End Location</th>
@@ -341,7 +342,7 @@ const Routes = () => {
                 <tbody>
                   {routesList.length === 0 ? (
                     <tr>
-                      <td colSpan={6}>
+                      <td colSpan={7}>
                         <div className="rt-empty">
                           <div className="rt-empty-icon">
                             <CIcon icon={cilLocationPin} size="xl" />
@@ -359,6 +360,9 @@ const Routes = () => {
                     routesList.map((r, i) => (
                       <tr key={r.id || i}>
                         <td className="rt-td-num">{startItem + i}</td>
+                        <td>
+                          <span className="rt-code-badge">{r.routeCode || '—'}</span>
+                        </td>
                         <td>
                           <span className="rt-route-pill">
                             <CIcon icon={cilLocationPin} size="sm" style={{ color: '#f59e0b' }} />

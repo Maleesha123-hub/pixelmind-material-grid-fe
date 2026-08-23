@@ -69,7 +69,7 @@ export const routes = [
   { path: '/logistics/bulk-upload', name: 'Bulk Upload', element: BulkUpload },
   { path: '/receipts', name: 'Receipts', element: Receipts },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
-  { path: '/vehicle-license', name: 'Vehicle License', element: VehicleLicense },
+  { path: '/license', name: 'License', element: VehicleLicense },
   { path: '/routes', name: 'Routes', element: RoutesPage },
   { path: '/price-rates', name: 'Price Rates', element: PriceRate },
 ]

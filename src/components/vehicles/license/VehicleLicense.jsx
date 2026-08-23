@@ -329,7 +329,7 @@ const VehicleLicense = () => {
             <CIcon icon={cilContact} size="xl" />
           </div>
           <div>
-            <h1 className="vlm-page-title">Vehicle License Management</h1>
+            <h1 className="vlm-page-title">License Management</h1>
             <p className="vlm-page-subtitle">
               Manage validity periods, pricing, and license registrations
             </p>

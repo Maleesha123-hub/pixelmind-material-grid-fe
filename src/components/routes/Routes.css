@@ -343,6 +343,22 @@
   align-items: center;
 }
 
+/* Route Code Badge */
+.rt-code-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
 .rt-loc-badge {
   display: inline-flex;
   align-items: center;
