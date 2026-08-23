@@ -68,7 +68,7 @@ const Login = () => {
               MATERIAL <span>GRID</span>
             </h1>
             <p className="mg-company-sub">
-              Developed by <strong>PixelMind Solutions</strong>
+              Developed by <strong>MESKORA Technologies (PVT) Ltd</strong>
             </p>
           </div>
         </div>
@@ -169,7 +169,7 @@ const Login = () => {
           <div>
             <strong>Material Grid</strong> &copy; {new Date().getFullYear()}
           </div>
-          <div>Proprietary Logistics Management &bull; PixelMind Solutions</div>
+          <div>Proprietary Logistics Management &bull; MESKORA Technologies (PVT) Ltd</div>
         </div>
       </div>
     </div>

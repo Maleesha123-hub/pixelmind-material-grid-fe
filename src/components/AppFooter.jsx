@@ -6,7 +6,7 @@ const AppFooter = () => {
     <CFooter className="px-4">
       <div>
         <strong>Material Grid</strong>
-        <span className="ms-1">&copy; 2026 PixelMind Solutions. All rights reserved.</span>
+        <span className="ms-1">&copy; {new Date().getFullYear()} MESKORA Technologies (PVT) Ltd. All rights reserved.</span>
       </div>
       <div className="ms-auto">
         <span className="me-1">Hardware Logistics Management System</span>
