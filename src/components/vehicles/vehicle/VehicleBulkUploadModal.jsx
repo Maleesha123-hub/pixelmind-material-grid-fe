@@ -351,9 +351,9 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
               <table className="vm-bulk-val-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 60 }}>Row</th>
+                    <th style={{ width: 70 }}>Row</th>
                     <th style={{ width: 140 }}>Field</th>
-                    <th style={{ width: 130 }}>Entered Value</th>
+                    <th style={{ width: 150 }}>Entered Value</th>
                     <th>Validation Error</th>
                   </tr>
                 </thead>
@@ -391,10 +391,8 @@ export const VehicleBulkUploadModal = ({ visible, onClose, onSuccess }) => {
                 </tbody>
               </table>
             </div>
-            <br></br>
-            <div className="vm-bulk-val-footer-hint">
-              💡 Please fix these rows in your Excel file or remove duplicate vehicles, then
-              re-upload.
+            <div className="vm-bulk-val-footer-hint mt-2">
+              💡 Please fix these rows in your Excel file (e.g. check vehicle number or capacity format), then re-upload.
             </div>
           </div>
         )}

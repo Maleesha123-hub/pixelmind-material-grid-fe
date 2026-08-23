@@ -202,14 +202,17 @@ export const vehicleService = {
 
     if (!response.ok || (result && typeof result === 'object' && result.success === false)) {
       let errorMessage =
-        typeof result === 'object' && result?.message
-          ? result.message
+        typeof result === 'object' && (result?.message || result?.data?.message || result?.error)
+          ? (result?.message || result?.data?.message || result?.error)
           : `Server responded with status: ${response.status}`
 
       const err = new Error(errorMessage)
-      err.response = result
+      err.response = result?.data ? result : { data: result }
       err.status = response.status
-      err.errors = result?.data?.errors || result?.errors || []
+      err.errors =
+        result?.data?.errors ||
+        result?.errors ||
+        (Array.isArray(result?.data) ? result.data : [])
       throw err
     }
 

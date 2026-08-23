@@ -95,10 +95,10 @@ const BulkUpload = () => {
   const downloadTripsTemplate = () => {
     const wsData = [
       ['Date', 'Vehicle Number', 'Bil Number', 'Route Code', 'Check By'],
-      ['8/7/2026', 'LC-4838', '7901', 'RT000001', 'Loku akka'],
-      ['8/7/2026', 'LI-8902', '7902', 'RT000001', 'Loku akka'],
-      ['8/7/2026', 'LM-4535', '7903', 'RT000001', 'Loku akka'],
-      ['8/7/2026', 'LK-5177', '7904', 'RT000001', 'surendra'],
+      ['2026-08-07', 'LC-4838', '7901', 'RT000001', 'Loku akka'],
+      ['2026-08-07', 'LI-8902', '7902', 'RT000001', 'Loku akka'],
+      ['2026-08-07', 'LM-4535', '7903', 'RT000001', 'Loku akka'],
+      ['2026-08-07', 'LK-5177', '7904', 'RT000001', 'surendra'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     ws['!cols'] = [
@@ -126,13 +126,13 @@ const BulkUpload = () => {
         'Site Allocation',
         'Remarks',
       ],
-      ['8/7/2026', 'Fuel / Diesel', 'WP-CAC-1234', 'EXP-1001', 'Ceypetco Station', 'Fuel Card', 45000.0, '28+580', '120L Diesel'],
-      ['8/7/2026', 'Driver Advance', 'DRV-001', 'EXP-1002', 'Kamal Perera', 'Cash', 10000.0, '28+580', 'Trip Advance'],
-      ['8/7/2026', 'Machinery Hire', 'Excavator #1', 'EXP-1003', 'Plant Hire Ltd', 'Bank Transfer', 100000.0, 'Quarry Land L', '10-hour hire'],
+      ['2026-08-07', 'Fuel / Diesel', 'WP-CAC-1234', 'EXP-1001', 'Ceypetco Station', 'Fuel Card', 45000.0, '28+580', '120L Diesel'],
+      ['2026-08-07', 'Driver Advance', 'DRV-001', 'EXP-1002', 'Kamal Perera', 'Cash', 10000.0, '28+580', 'Trip Advance'],
+      ['2026-08-07', 'Machinery Hire', 'Excavator #1', 'EXP-1003', 'Plant Hire Ltd', 'Bank Transfer', 100000.0, 'Quarry Land L', '10-hour hire'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     ws['!cols'] = [
-      { wch: 12 },
+      { wch: 14 },
       { wch: 18 },
       { wch: 16 },
       { wch: 14 },
@@ -170,14 +170,27 @@ const BulkUpload = () => {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result)
-        const workbook = XLSX.read(data, { type: 'array' })
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
         const formatted = json
           .map((row) => {
-            const rawDate = row['Date'] || row['date'] || ''
+            let rawDate = row['Date'] || row['date'] || ''
+            if (rawDate instanceof Date) {
+              rawDate = rawDate.toISOString().split('T')[0]
+            } else if (typeof rawDate === 'string' && rawDate.trim()) {
+              const str = rawDate.trim()
+              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
+              if (mdy) {
+                const mm = mdy[1].padStart(2, '0')
+                const dd = mdy[2].padStart(2, '0')
+                const yyyy = mdy[3]
+                rawDate = `${yyyy}-${mm}-${dd}`
+              }
+            }
+
             const rawVeh =
               row['Vehicle Number'] ||
               row['vehicleNumber'] ||
@@ -211,7 +224,7 @@ const BulkUpload = () => {
               ''
 
             return {
-              date: rawDate,
+              date: String(rawDate).trim(),
               vehicleNumber: String(rawVeh).trim(),
               billNumber: String(rawBill).trim(),
               routeCode: String(rawRouteCode).trim(),
