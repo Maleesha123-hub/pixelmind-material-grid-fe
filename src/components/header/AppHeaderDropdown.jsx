@@ -1,26 +1,17 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
-  CBadge,
   CDropdown,
-  CDropdownDivider,
-  CDropdownHeader,
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import {
-  cilBell,
-  cilTruck,
-  cilDescription,
-  cilHistory,
-  cilSettings,
-  cilUser,
-  cilLockLocked,
-  cilChartLine,
-} from '@coreui/icons'
+import { cilAccountLogout, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
 const AppHeaderDropdown = () => {
+  const navigate = useNavigate()
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
@@ -41,53 +32,15 @@ const AppHeaderDropdown = () => {
           <CIcon icon={cilUser} size="lg" />
         </div>
       </CDropdownToggle>
-      <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Activity</CDropdownHeader>
-        <CDropdownItem href="#">
-          <CIcon icon={cilTruck} className="me-2" />
-          Active Trips
-          <CBadge color="info" className="ms-2">
-            3
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilDescription} className="me-2" />
-          Pending Receipts
-          <CBadge color="warning" className="ms-2">
-            7
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilHistory} className="me-2" />
-          Recent Deliveries
-          <CBadge color="success" className="ms-2">
-            12
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilBell} className="me-2" />
-          Alerts
-          <CBadge color="danger" className="ms-2">
-            2
-          </CBadge>
-        </CDropdownItem>
-        <CDropdownHeader className="bg-body-secondary fw-semibold my-2">Account</CDropdownHeader>
-        <CDropdownItem href="#">
-          <CIcon icon={cilUser} className="me-2" />
-          Profile
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilChartLine} className="me-2" />
-          Reports
-        </CDropdownItem>
-        <CDropdownItem href="#">
-          <CIcon icon={cilSettings} className="me-2" />
-          Settings
-        </CDropdownItem>
-        <CDropdownDivider />
-        <CDropdownItem href="#/login">
-          <CIcon icon={cilLockLocked} className="me-2" />
-          Lock Account
+      <CDropdownMenu className="py-1" placement="bottom-end" style={{ minWidth: '150px' }}>
+        <CDropdownItem
+          as="button"
+          onClick={() => navigate('/login')}
+          className="d-flex align-items-center text-danger py-2"
+          style={{ cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+        >
+          <CIcon icon={cilAccountLogout} className="me-2 text-danger" size="sm" />
+          <span>Sign Out</span>
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
