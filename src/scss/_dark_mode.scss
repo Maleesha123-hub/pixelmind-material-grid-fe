@@ -96,7 +96,6 @@
   .vm-page-title,
   .vlm-page-title,
   .rt-page-title,
-  .pr-page-title,
   .rc-page-title,
   .bu-page-title,
   .pt-page-title {
@@ -106,7 +105,6 @@
   .vm-page-subtitle,
   .vlm-page-subtitle,
   .rt-page-subtitle,
-  .pr-page-subtitle,
   .rc-page-subtitle,
   .bu-page-subtitle,
   .pt-page-subtitle,
@@ -118,7 +116,6 @@
   .vm-header-icon,
   .vlm-header-icon,
   .rt-header-icon,
-  .pr-header-icon,
   .rc-header-icon,
   .bu-header-icon,
   .pt-header-icon {
@@ -133,7 +130,6 @@
   .vm-card,
   .vlm-card,
   .rt-card,
-  .pr-card,
   .rc-card,
   .bu-card,
   .pt-card {
@@ -147,7 +143,6 @@
   .vm-card-header,
   .vlm-card-header,
   .rt-card-header,
-  .pr-card-header,
   .rc-card-header,
   .bu-card-header,
   .pt-card-header {
@@ -160,7 +155,6 @@
   .vm-card-title,
   .vlm-card-title,
   .rt-card-title,
-  .pr-card-title,
   .rc-card-title,
   .bu-card-title,
   .pt-card-title {
@@ -171,7 +165,6 @@
   .vm-card-body,
   .vlm-card-body,
   .rt-card-body,
-  .pr-card-body,
   .rc-card-body,
   .bu-card-body,
   .pt-card-body {
@@ -184,18 +177,15 @@
   .vm-input,
   .vlm-input,
   .rt-input,
-  .pr-input,
   .rc-input,
   .bu-search-input,
   .vlm-search-input,
   .vm-search-input,
   .rt-search-input,
-  .pr-search-input,
   .pt-input,
   .vm-select,
   .vlm-select,
-  .rt-select,
-  .pr-select {
+  .rt-select {
     background-color: #131d31 !important;
     border: 1px solid #334155 !important;
     color: #f8fafc !important;
@@ -221,7 +211,6 @@
   .vm-label,
   .vlm-label,
   .rt-label,
-  .pr-label,
   .rc-label,
   .form-label {
     color: #cbd5e1 !important;
@@ -237,7 +226,7 @@
 
   .vlm-currency-prefix,
   .vm-currency-prefix,
-  .pr-currency-prefix {
+  .rt-currency-prefix {
     color: #94a3b8 !important;
   }
 
@@ -245,7 +234,6 @@
   .vlm-btn-reset,
   .vm-btn-reset,
   .rt-btn-reset,
-  .pr-btn-reset,
   .rc-btn-reset {
     background: #131d31 !important;
     border: 1px solid #334155 !important;
@@ -265,7 +253,6 @@
   .vm-table,
   .vlm-table,
   .rt-table,
-  .pr-table,
   .rc-table,
   .bu-table,
   .pt-table {
@@ -308,7 +295,6 @@
   .vm-table-wrap,
   .vlm-table-wrap,
   .rt-table-wrap,
-  .pr-table-wrap,
   .rc-table-wrap,
   .bu-table-wrap,
   .pt-table-wrap {
@@ -328,13 +314,11 @@
   .vlm-table-footer,
   .vm-table-footer,
   .rt-table-footer,
-  .pr-table-footer,
   .rc-table-footer,
   .bu-pagination-bar,
   .vm-pagination-bar,
   .rc-pagination-bar,
-  .rt-pagination-bar,
-  .pr-pagination-bar {
+  .rt-pagination-bar {
     background: #0f172a !important;
     border-top: 1px solid #1e293b !important;
     color: #94a3b8 !important;
@@ -351,7 +335,6 @@
     .vm-count-chip,
     .vlm-count-chip,
     .rt-count-chip,
-    .pr-count-chip,
     .rc-count-chip {
       background: #1e293b !important;
       border: 1px solid #334155 !important;
@@ -366,7 +349,6 @@
     .vm-page-btn,
     .rc-page-btn,
     .rt-page-btn,
-    .pr-page-btn,
     .bu-page-btn {
       background: #131d31 !important;
       border: 1px solid #334155 !important;
@@ -451,7 +433,7 @@
 
   // Price Pills
   .vlm-price-pill,
-  .pr-rate-pill,
+  .rt-price-pill,
   .bu-currency-pill,
   .rc-currency-pill {
     background: rgba(245, 158, 11, 0.15) !important;
@@ -541,8 +523,7 @@
   // ─── Table Action Icon Buttons ─────────────────────────────────────────────
   .vlm-icon-btn,
   .vm-icon-btn,
-  .rt-icon-btn,
-  .pr-icon-btn {
+  .rt-icon-btn {
     background: #131d31 !important;
     border: 1px solid #334155 !important;
     color: #cbd5e1 !important;
@@ -578,7 +559,6 @@
   .bu-btn-remove-file,
   .vm-btn-action,
   .rt-btn-action,
-  .pr-btn-action,
   .vlm-btn-action {
     background: #131d31 !important;
     border: 1px solid #334155 !important;
@@ -612,7 +592,6 @@
   .vlm-btn-cancel,
   .vm-btn-cancel,
   .rt-btn-cancel,
-  .pr-btn-cancel,
   .pt-btn-cancel,
   .modal-footer .btn-light,
   .modal-footer .btn-secondary {
@@ -640,14 +619,12 @@
   .bu-metrics-grid,
   .rc-kpi-grid,
   .vm-stats-grid,
-  .rt-stats-grid,
-  .pr-stats-grid {
+  .rt-stats-grid {
     .bu-metric-card,
     .rc-kpi-card,
     .vm-stat-card,
     .vlm-stat-card,
-    .rt-stat-card,
-    .pr-stat-card {
+    .rt-stat-card {
       background: #131d31 !important;
       border: 1px solid #1e293b !important;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
@@ -655,16 +632,14 @@
       .bu-metric-label,
       .rc-kpi-label,
       .vm-stat-label,
-      .rt-stat-label,
-      .pr-stat-label {
+      .rt-stat-label {
         color: #94a3b8 !important;
       }
 
       .bu-metric-value,
       .rc-kpi-value,
       .vm-stat-value,
-      .rt-stat-value,
-      .pr-stat-value {
+      .rt-stat-value {
         color: #f8fafc !important;
 
         &.highlight {
@@ -681,81 +656,6 @@
       .rt-stat-sub {
         color: #64748b !important;
       }
-    }
-  }
-
-  // Spotlight Banner in Price Rates
-  .pr-spotlight-card {
-    background: linear-gradient(135deg, #131d31 0%, #0f172a 100%) !important;
-    border: 1.5px solid #1e293b !important;
-    border-left: 5px solid #10b981 !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
-
-    .pr-spotlight-icon {
-      background: rgba(16, 185, 129, 0.18) !important;
-      border: 1px solid rgba(16, 185, 129, 0.35) !important;
-      color: #34d399 !important;
-    }
-
-    .pr-spotlight-label {
-      color: #34d399 !important;
-    }
-
-    .pr-spotlight-title {
-      color: #f8fafc !important;
-    }
-
-    .pr-spotlight-sub {
-      color: #94a3b8 !important;
-    }
-
-    .pr-spotlight-rate {
-      color: #34d399 !important;
-    }
-
-    .pr-spotlight-unit {
-      color: #94a3b8 !important;
-    }
-
-    .pr-spotlight-meta {
-      color: #94a3b8 !important;
-
-      strong {
-        color: #f8fafc !important;
-      }
-    }
-  }
-
-  // Price Rate Table User Pill & Status Badges
-  .pr-user-pill {
-    background: #1e293b !important;
-    border: 1px solid #334155 !important;
-    color: #cbd5e1 !important;
-
-    svg {
-      color: #94a3b8 !important;
-    }
-  }
-
-  .pr-date-cell {
-    color: #cbd5e1 !important;
-
-    .pr-date-icon {
-      color: #94a3b8 !important;
-    }
-  }
-
-  .pr-badge {
-    &.active {
-      background: rgba(16, 185, 129, 0.18) !important;
-      color: #34d399 !important;
-      border: 1px solid rgba(16, 185, 129, 0.35) !important;
-    }
-
-    &.inactive {
-      background: #1e293b !important;
-      color: #94a3b8 !important;
-      border: 1px solid #334155 !important;
     }
   }
 
@@ -947,7 +847,6 @@
   .vm-modal,
   .vlm-modal,
   .rt-modal,
-  .pr-modal,
   .vm-bulk-modal {
     background-color: #0f172a !important;
     border: 1px solid #334155 !important;
@@ -957,8 +856,7 @@
     .modal-header,
     .vm-modal-header,
     .vlm-modal-header,
-    .rt-modal-header,
-    .pr-modal-header {
+    .rt-modal-header {
       background: linear-gradient(90deg, #131d31 0%, #0f172a 100%) !important;
       border-bottom: 1px solid #1e293b !important;
       color: #f8fafc !important;
@@ -967,39 +865,22 @@
     .modal-title,
     .vm-modal-title,
     .vlm-modal-title,
-    .rt-modal-title,
-    .pr-modal-title {
+    .rt-modal-title {
       color: #f8fafc !important;
     }
 
     .modal-body,
     .vm-modal-body,
     .vlm-modal-body,
-    .rt-modal-body,
-    .pr-modal-body {
+    .rt-modal-body {
       background-color: #0f172a !important;
       color: #cbd5e1 !important;
-    }
-
-    .pr-modal-notice {
-      background: rgba(2, 132, 199, 0.12) !important;
-      border: 1px solid rgba(2, 132, 199, 0.3) !important;
-      color: #38bdf8 !important;
-
-      strong {
-        color: #7dd3fc !important;
-      }
-
-      svg {
-        color: #38bdf8 !important;
-      }
     }
 
     .modal-footer,
     .vm-modal-footer,
     .vlm-modal-footer,
-    .rt-modal-footer,
-    .pr-modal-footer {
+    .rt-modal-footer {
       background-color: #0f172a !important;
       border-top: 1px solid #1e293b !important;
     }
@@ -1114,7 +995,6 @@
   .vm-empty,
   .vlm-empty,
   .rt-empty,
-  .pr-empty,
   .rc-empty,
   .bu-empty {
     background: #131d31 !important;
@@ -1124,7 +1004,6 @@
     .vm-empty-title,
     .vlm-empty-title,
     .rt-empty-title,
-    .pr-empty-title,
     h3 {
       color: #f8fafc !important;
     }
@@ -1132,7 +1011,6 @@
     .vm-empty-text,
     .vlm-empty-text,
     .rt-empty-text,
-    .pr-empty-text,
     p {
       color: #94a3b8 !important;
     }
