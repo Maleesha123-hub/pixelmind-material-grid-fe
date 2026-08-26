@@ -120,6 +120,7 @@ export const routeService = {
    * @param {string} payload.startLocation  - Required, e.g. "Quarry Site A"
    * @param {string} payload.endLocation    - Required, e.g. "Plant 1"
    * @param {number} payload.km             - Required, e.g. 24.5
+   * @param {number} payload.price          - Required, e.g. 1500.00
    * @param {boolean|string} [payload.status] - true/false or ACTIVE/INACTIVE
    * @returns {Promise<Object>}
    */
@@ -136,7 +137,7 @@ export const routeService = {
    * Update an existing route.
    *
    * @param {number|string} id
-   * @param {Object} payload - { startLocation, endLocation, km, status }
+   * @param {Object} payload - { startLocation, endLocation, km, price, status }
    * @returns {Promise<Object>}
    */
   updateRoute: async (id, payload) => {
