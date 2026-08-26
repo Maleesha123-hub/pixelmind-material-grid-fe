@@ -45,6 +45,17 @@ const EMPTY_FORM = {
   startLocation: '',
   endLocation: '',
   km: '',
+  price: '',
+}
+
+// ─── Currency Formatter Helper ────────────────────────────────────────────────
+const formatCurrency = (val) => {
+  const num = Number(val)
+  if (isNaN(num)) return '0.00'
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 }
 
 // ─── Debounce hook ────────────────────────────────────────────────────────────
@@ -132,6 +143,13 @@ const Routes = () => {
       e.km = 'Enter a valid positive distance in km'
     }
 
+    const priceVal = Number(form.price)
+    if (!form.price && form.price !== 0) {
+      e.price = 'Price is required'
+    } else if (isNaN(priceVal) || priceVal <= 0) {
+      e.price = 'Enter a valid positive price'
+    }
+
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -152,6 +170,7 @@ const Routes = () => {
       startLocation: route.startLocation || '',
       endLocation: route.endLocation || '',
       km: route.km != null ? String(route.km) : '',
+      price: route.price != null ? String(route.price) : '',
     })
     setErrors({})
     setModalVisible(true)
@@ -166,6 +185,7 @@ const Routes = () => {
       startLocation: form.startLocation.trim(),
       endLocation: form.endLocation.trim(),
       km: Number(form.km),
+      price: Number(form.price),
     }
 
     try {
@@ -184,7 +204,7 @@ const Routes = () => {
         Swal.fire({
           icon: 'success',
           title: 'Route Added',
-          text: `Route "${payload.startLocation} → ${payload.endLocation}" (${payload.km} km) created.`,
+          text: `Route "${payload.startLocation} → ${payload.endLocation}" (${payload.km} km, Rs. ${formatCurrency(payload.price)}) created.`,
           confirmButtonColor: '#d97706',
           timer: 2200,
           timerProgressBar: true,
@@ -257,7 +277,9 @@ const Routes = () => {
           </div>
           <div>
             <h1 className="rt-page-title">Routes Management</h1>
-            <p className="rt-page-subtitle">Start location, end location &amp; distance (km)</p>
+            <p className="rt-page-subtitle">
+              Start location, end location, distance (km) &amp; price
+            </p>
           </div>
         </div>
         <div className="rt-header-actions">
@@ -334,13 +356,14 @@ const Routes = () => {
                     <th>Start Location</th>
                     <th>End Location</th>
                     <th>Distance (km)</th>
+                    <th>Price</th>
                     <th style={{ textAlign: 'center', width: 120 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {routesList.length === 0 ? (
                     <tr>
-                      <td colSpan={7}>
+                      <td colSpan={8}>
                         <div className="rt-empty">
                           <div className="rt-empty-icon">
                             <CIcon icon={cilLocationPin} size="xl" />
@@ -380,6 +403,9 @@ const Routes = () => {
                             {r.km ?? '—'}
                             <span className="rt-km-unit">km</span>
                           </span>
+                        </td>
+                        <td>
+                          <span className="rt-price-pill">Rs. {formatCurrency(r.price)}</span>
                         </td>
                         <td>
                           <div className="rt-actions">
@@ -512,15 +538,15 @@ const Routes = () => {
             </CCol>
 
             {/* Distance (km) */}
-            <CCol xs={12}>
+            <CCol xs={12} md={6}>
               <label className="rt-label" htmlFor="field-km">
                 Distance (km) <span className="req">*</span>
               </label>
               <input
                 id="field-km"
                 type="number"
-                step="0.1"
-                min="0.1"
+                step="0.01"
+                min="0.01"
                 className={`rt-input ${errors.km ? 'error' : ''}`}
                 placeholder="e.g. 24.5"
                 value={form.km}
@@ -530,6 +556,31 @@ const Routes = () => {
                 <div className="rt-input-error">⚠ {errors.km}</div>
               ) : (
                 <div className="rt-input-hint">Distance in kilometers</div>
+              )}
+            </CCol>
+
+            {/* Price */}
+            <CCol xs={12} md={6}>
+              <label className="rt-label" htmlFor="field-price">
+                Price (Rs.) <span className="req">*</span>
+              </label>
+              <div className="rt-input-currency-wrap">
+                <span className="rt-currency-prefix">Rs.</span>
+                <input
+                  id="field-price"
+                  type="number"
+                  step="0.01"
+                  min="0.0001"
+                  className={`rt-input with-prefix ${errors.price ? 'error' : ''}`}
+                  placeholder="e.g. 1500.00"
+                  value={form.price}
+                  onChange={(e) => setField('price', e.target.value)}
+                />
+              </div>
+              {errors.price ? (
+                <div className="rt-input-error">⚠ {errors.price}</div>
+              ) : (
+                <div className="rt-input-hint">Transport rate / unit price</div>
               )}
             </CCol>
           </CRow>

@@ -4,6 +4,7 @@
  * Streamlined interface for uploading, validating, and previewing:
  *   1. Daily Routes / Material Transport Trips Sheet
  *   2. Daily Fleet & Site Expenses Sheet
+ *   3. Vehicle Licenses Sheet
  *
  * Features:
  *   - Drag & Drop Excel/CSV upload with file details preview
@@ -33,6 +34,7 @@ import {
   cilDescription,
   cilTruck,
   cilMoney,
+  cilContact,
   cilSearch,
   cilTrash,
   cilCheckCircle,
@@ -68,7 +70,7 @@ const formatCurrency = (val) => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 const BulkUpload = () => {
-  const [activeTab, setActiveTab] = useState('trips') // 'trips' | 'expenses'
+  const [activeTab, setActiveTab] = useState('trips') // 'trips' | 'expenses' | 'licenses'
 
   // ── Trips State ─────────────────────────────────────────────────────────────
   const [tripsFile, setTripsFile] = useState(null)
@@ -91,6 +93,17 @@ const BulkUpload = () => {
   const [expensesSummary, setExpensesSummary] = useState(null)
   const [expensesDragOver, setExpensesDragOver] = useState(false)
   const expenseFileInputRef = useRef(null)
+
+  // ── Licenses State ──────────────────────────────────────────────────────────
+  const [licensesFile, setLicensesFile] = useState(null)
+  const [licensesData, setLicensesData] = useState([])
+  const [licensesLoading, setLicensesLoading] = useState(false)
+  const [licensesSearch, setLicensesSearch] = useState('')
+  const [licensesPage, setLicensesPage] = useState(0)
+  const [licensesErrors, setLicensesErrors] = useState([])
+  const [licensesSummary, setLicensesSummary] = useState(null)
+  const [licensesDragOver, setLicensesDragOver] = useState(false)
+  const licenseFileInputRef = useRef(null)
 
   // ─── Sample Template Downloads ──────────────────────────────────────────────
   const downloadTripsTemplate = () => {
@@ -132,6 +145,28 @@ const BulkUpload = () => {
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Daily Expenses')
     XLSX.writeFile(wb, 'Daily_Expenses_Template.xlsx')
+  }
+
+  const downloadLicensesTemplate = () => {
+    const wsData = [
+      ['Date', 'Vehicle Number', 'License Code'],
+      ['2026-08-05', 'LM-4565', 'LIC000001'],
+      ['2026-08-07', 'lf-3769', 'LIC000001'],
+      ['2026-08-07', 'LJ-4472', 'LIC000001'],
+      ['2026-08-07', 'LM-4687', 'LIC000001'],
+      ['2026-08-07', 'LI-8790', 'LIC000001'],
+      ['2026-08-07', 'LN-8877', 'LIC000003'],
+      ['2026-08-07', 'LM-4565', 'LIC000003'],
+    ]
+    const ws = XLSX.utils.aoa_to_sheet(wsData)
+    ws['!cols'] = [
+      { wch: 14 },
+      { wch: 18 },
+      { wch: 18 },
+    ]
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Vehicle Licenses')
+    XLSX.writeFile(wb, 'Vehicle_Licenses_Template.xlsx')
   }
 
   // ─── File Validation ─────────────────────────────────────────────────────────
@@ -295,6 +330,68 @@ const BulkUpload = () => {
     reader.readAsArrayBuffer(file)
   }
 
+  // ─── Parse Local Licenses Sheet ─────────────────────────────────────────────
+  const parseLicensesLocal = (file) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result)
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
+        const sheetName = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetName]
+        const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
+
+        const formatted = json
+          .map((row) => {
+            let rawDate = row['Date'] || row['date'] || ''
+            if (rawDate instanceof Date) {
+              rawDate = rawDate.toISOString().split('T')[0]
+            } else if (typeof rawDate === 'string' && rawDate.trim()) {
+              const str = rawDate.trim()
+              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
+              if (mdy) {
+                const mm = mdy[1].padStart(2, '0')
+                const dd = mdy[2].padStart(2, '0')
+                const yyyy = mdy[3]
+                rawDate = `${yyyy}-${mm}-${dd}`
+              }
+            }
+
+            const rawVeh =
+              row['Vehicle Number'] ||
+              row['vehicleNumber'] ||
+              row['Vehicle/Ref'] ||
+              row['Vehicle'] ||
+              row['vehicle'] ||
+              row['Vehial Number'] ||
+              row['Vehical'] ||
+              ''
+            const rawLicenseCode =
+              row['License Code'] ||
+              row['licenseCode'] ||
+              row['LicenseCode'] ||
+              row['License'] ||
+              row['license'] ||
+              row['License Number'] ||
+              ''
+
+            return {
+              date: String(rawDate).trim(),
+              vehicleNumber: String(rawVeh).trim(),
+              licenseCode: String(rawLicenseCode).trim(),
+            }
+          })
+          .filter((item) => item.vehicleNumber || item.licenseCode || item.date)
+
+        setLicensesData(formatted)
+        setLicensesPage(0)
+      } catch (err) {
+        console.warn('Local preview parse error (licenses):', err)
+      }
+    }
+    reader.readAsArrayBuffer(file)
+  }
+
   // ─── Handle File Selections ──────────────────────────────────────────────────
   const handleSelectTripsFile = (file) => {
     if (!validateFile(file)) return
@@ -310,6 +407,14 @@ const BulkUpload = () => {
     setExpensesErrors([])
     setExpensesSummary(null)
     parseExpensesLocal(file)
+  }
+
+  const handleSelectLicensesFile = (file) => {
+    if (!validateFile(file)) return
+    setLicensesFile(file)
+    setLicensesErrors([])
+    setLicensesSummary(null)
+    parseLicensesLocal(file)
   }
 
   // ─── Upload to Backend Handlers ──────────────────────────────────────────────
@@ -421,6 +526,60 @@ const BulkUpload = () => {
     }
   }
 
+  const handleUploadLicenses = async () => {
+    if (!licensesFile) return
+    setLicensesLoading(true)
+    setLicensesErrors([])
+    setLicensesSummary(null)
+
+    try {
+      const response = await bulkUploadService.uploadVehicleLicenses(licensesFile)
+      const successMessage =
+        response?.message ||
+        response?.data?.message ||
+        (typeof response === 'string'
+          ? response
+          : `Vehicle licenses from "${licensesFile.name}" were uploaded and processed successfully.`)
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Licenses Uploaded!',
+        text: successMessage,
+        confirmButtonColor: '#0284c7',
+        timer: 4000,
+        timerProgressBar: true,
+      })
+    } catch (err) {
+      console.error('License upload error:', err)
+      const rawErrors =
+        err.errors ||
+        err.response?.data?.errors ||
+        err.response?.errors ||
+        []
+      const summaryData = err.response?.data || null
+
+      if (rawErrors.length > 0) {
+        setLicensesErrors(rawErrors)
+        setLicensesSummary(summaryData)
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Failed',
+          text: err.message || 'Please check the validation errors listed below.',
+          confirmButtonColor: '#dc2626',
+        })
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Upload Failed',
+          text: err.message || 'Unable to upload vehicle licenses sheet. Please check your data format.',
+          confirmButtonColor: '#dc2626',
+        })
+      }
+    } finally {
+      setLicensesLoading(false)
+    }
+  }
+
   // ─── Reset Handlers ──────────────────────────────────────────────────────────
   const handleResetTrips = () => {
     setTripsFile(null)
@@ -440,6 +599,16 @@ const BulkUpload = () => {
     setExpensesSearch('')
     setExpensesPage(0)
     if (expenseFileInputRef.current) expenseFileInputRef.current.value = ''
+  }
+
+  const handleResetLicenses = () => {
+    setLicensesFile(null)
+    setLicensesData([])
+    setLicensesErrors([])
+    setLicensesSummary(null)
+    setLicensesSearch('')
+    setLicensesPage(0)
+    if (licenseFileInputRef.current) licenseFileInputRef.current.value = ''
   }
 
   // ─── Trips Filter & Metrics ──────────────────────────────────────────────────
@@ -491,6 +660,35 @@ const BulkUpload = () => {
     (expensesPage + 1) * PREVIEW_PAGE_SIZE,
   )
 
+  // ─── Licenses Filter & Metrics ──────────────────────────────────────────────
+  const filteredLicenses = useMemo(() => {
+    if (!licensesSearch.trim()) return licensesData
+    const q = licensesSearch.toLowerCase()
+    return licensesData.filter(
+      (item) =>
+        (item.vehicleNumber || '').toLowerCase().includes(q) ||
+        (item.licenseCode || '').toLowerCase().includes(q) ||
+        (item.date || '').includes(q),
+    )
+  }, [licensesData, licensesSearch])
+
+  const totalLicensesCount = licensesData.length
+  const uniqueLicenseVehiclesCount = new Set(
+    licensesData.map((item) => item.vehicleNumber).filter(Boolean),
+  ).size
+  const uniqueLicensesCount = new Set(
+    licensesData.map((item) => item.licenseCode).filter(Boolean),
+  ).size
+  const uniqueLicenseDatesCount = new Set(
+    licensesData.map((item) => item.date).filter(Boolean),
+  ).size
+
+  const licensesTotalPages = Math.ceil(filteredLicenses.length / PREVIEW_PAGE_SIZE) || 1
+  const paginatedLicenses = filteredLicenses.slice(
+    licensesPage * PREVIEW_PAGE_SIZE,
+    (licensesPage + 1) * PREVIEW_PAGE_SIZE,
+  )
+
   return (
     <div className="bu-page">
       {/* ── Page Header ── */}
@@ -502,19 +700,25 @@ const BulkUpload = () => {
           <div>
             <h1 className="bu-page-title">Logistics Bulk Excel Uploader</h1>
             <p className="bu-page-subtitle">
-              Import material dispatch routes and fleet site expense spreadsheets
+              Import material dispatch routes, fleet site expenses, and vehicle license spreadsheets
             </p>
           </div>
         </div>
 
         <div className="bu-header-actions">
-          {activeTab === 'trips' ? (
+          {activeTab === 'trips' && (
             <button className="bu-btn-download" onClick={downloadTripsTemplate} id="btn-dl-routes-tpl">
               <CIcon icon={cilCloudDownload} /> Download Routes Template
             </button>
-          ) : (
+          )}
+          {activeTab === 'expenses' && (
             <button className="bu-btn-download" onClick={downloadExpensesTemplate} id="btn-dl-expenses-tpl">
               <CIcon icon={cilCloudDownload} /> Download Expenses Template
+            </button>
+          )}
+          {activeTab === 'licenses' && (
+            <button className="bu-btn-download" onClick={downloadLicensesTemplate} id="btn-dl-licenses-tpl">
+              <CIcon icon={cilCloudDownload} /> Download Licenses Template
             </button>
           )}
         </div>
@@ -540,6 +744,16 @@ const BulkUpload = () => {
           <CIcon icon={cilMoney} size="lg" />
           <span>Daily Expenses Sheet</span>
           {expensesData.length > 0 && <span className="bu-tab-count">{expensesData.length} records</span>}
+        </button>
+
+        <button
+          className={`bu-tab-btn bu-tab-btn--licenses ${activeTab === 'licenses' ? 'active' : ''}`}
+          onClick={() => setActiveTab('licenses')}
+          id="tab-licenses-sheet"
+        >
+          <CIcon icon={cilContact} size="lg" />
+          <span>Vehicle Licenses Sheet</span>
+          {licensesData.length > 0 && <span className="bu-tab-count">{licensesData.length} records</span>}
         </button>
       </div>
 
@@ -1143,6 +1357,314 @@ const BulkUpload = () => {
                         className="bu-page-btn"
                         onClick={() => setExpensesPage((p) => Math.min(expensesTotalPages - 1, p + 1))}
                         disabled={expensesPage >= expensesTotalPages - 1}
+                      >
+                        <CIcon icon={cilChevronRight} size="sm" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </CCardBody>
+            </CCard>
+          )}
+        </>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          TAB 3: VEHICLE LICENSES SHEET
+         ══════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'licenses' && (
+        <>
+          <CCard className="bu-card">
+            <CCardHeader className="bu-card-header">
+              <div className="bu-card-title">
+                <CIcon icon={cilContact} className="text-info" />
+                <span>Upload Vehicle Licenses Sheet</span>
+              </div>
+            </CCardHeader>
+
+            <CCardBody className="bu-card-body">
+              {/* Upload Dropzone */}
+              {!licensesFile ? (
+                <div
+                  className={`bu-dropzone ${licensesDragOver ? 'dragover' : ''}`}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    setLicensesDragOver(true)
+                  }}
+                  onDragLeave={() => setLicensesDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setLicensesDragOver(false)
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                      handleSelectLicensesFile(e.dataTransfer.files[0])
+                    }
+                  }}
+                  onClick={() => licenseFileInputRef.current?.click()}
+                  id="dropzone-licenses-sheet"
+                >
+                  <input
+                    type="file"
+                    ref={licenseFileInputRef}
+                    style={{ display: 'none' }}
+                    accept=".xlsx, .xls, .csv"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleSelectLicensesFile(e.target.files[0])
+                      }
+                    }}
+                  />
+                  <div className="bu-dropzone-icon">
+                    <CIcon icon={cilCloudUpload} size="xl" />
+                  </div>
+                  <h4 className="bu-dropzone-heading">Drag &amp; drop your vehicle licenses Excel sheet here</h4>
+                  <p className="bu-dropzone-sub">
+                    or <span className="bu-browse-link">browse from your computer</span>
+                  </p>
+                  <span className="bu-format-pill">Accepts .xlsx, .xls, .csv</span>
+                </div>
+              ) : (
+                /* Selected File Card */
+                <div className="bu-file-card">
+                  <div className="bu-file-left">
+                    <div className="bu-file-icon">
+                      <CIcon icon={cilDescription} />
+                    </div>
+                    <div>
+                      <div className="bu-file-name">{licensesFile.name}</div>
+                      <div className="bu-file-meta">
+                        <span>{formatFileSize(licensesFile.size)}</span>
+                        <span>•</span>
+                        <span>{licensesData.length} records parsed</span>
+                        <span>•</span>
+                        <span className="bu-file-status-pill">Ready to Upload</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bu-file-actions">
+                    <button
+                      className="bu-btn-remove-file"
+                      onClick={handleResetLicenses}
+                      disabled={licensesLoading}
+                      id="btn-remove-licenses-file"
+                    >
+                      <CIcon icon={cilTrash} size="sm" /> Change File
+                    </button>
+                    <button
+                      className="bu-btn-upload-now"
+                      onClick={handleUploadLicenses}
+                      disabled={licensesLoading}
+                      id="btn-submit-licenses-file"
+                    >
+                      {licensesLoading ? (
+                        <>
+                          <CSpinner size="sm" style={{ marginRight: 6 }} /> Processing…
+                        </>
+                      ) : (
+                        <>
+                          <CIcon icon={cilCloudUpload} /> Upload &amp; Process to Server
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Validation Errors Display */}
+              {licensesErrors.length > 0 && (
+                <div className="bu-val-box" id="licenses-upload-validation-errors">
+                  <div className="bu-val-header">
+                    <div className="bu-val-title">
+                      <CIcon icon={cilWarning} className="text-danger" />
+                      <span>Upload Validation Errors</span>
+                      <span className="bu-val-count-badge">{licensesErrors.length} Failed</span>
+                    </div>
+                    {licensesSummary?.totalRows != null && (
+                      <div className="bu-val-summary-text">
+                        Total Rows: <strong>{licensesSummary.totalRows}</strong> | Errors:{' '}
+                        <strong className="text-danger">
+                          {licensesSummary.errorCount ?? licensesErrors.length}
+                        </strong>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bu-val-table-wrap">
+                    <table className="bu-val-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: 70 }}>Row</th>
+                          <th style={{ width: 140 }}>Field</th>
+                          <th style={{ width: 150 }}>Entered Value</th>
+                          <th>Validation Error</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {licensesErrors.map((err, idx) => (
+                          <tr key={idx}>
+                            <td>
+                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                            </td>
+                            <td>
+                              <span className="bu-val-field">{err.field || '—'}</span>
+                            </td>
+                            <td>
+                              <code className="bu-val-value">
+                                {err.value !== undefined &&
+                                err.value !== null &&
+                                String(err.value).trim() !== ''
+                                  ? String(err.value)
+                                  : '[Empty]'}
+                              </code>
+                            </td>
+                            <td>
+                              <div className="bu-val-msg">
+                                <CIcon
+                                  icon={cilBan}
+                                  size="sm"
+                                  className="text-danger"
+                                  style={{ flexShrink: 0 }}
+                                />
+                                <span>{err.message || 'Validation error'}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="bu-val-footer-hint mt-2">
+                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers, license codes, or duplicate dates), then re-upload.
+                  </div>
+                </div>
+              )}
+            </CCardBody>
+          </CCard>
+
+          {/* Parsed Live Preview Section */}
+          {licensesData.length > 0 && (
+            <CCard className="bu-card">
+              <CCardHeader className="bu-card-header">
+                <div className="bu-card-title">
+                  <CIcon icon={cilContact} className="text-info" />
+                  <span>Parsed Vehicle Licenses Preview &amp; Summary</span>
+                </div>
+              </CCardHeader>
+
+              <CCardBody className="bu-card-body">
+                {/* Metrics Summary Grid */}
+                <div className="bu-metrics-grid">
+                  <div className="bu-metric-card">
+                    <span className="bu-metric-label">Total Records</span>
+                    <span className="bu-metric-value">{totalLicensesCount}</span>
+                  </div>
+                  <div className="bu-metric-card">
+                    <span className="bu-metric-label">Active Vehicles</span>
+                    <span className="bu-metric-value highlight">{uniqueLicenseVehiclesCount} vehicles</span>
+                  </div>
+                  <div className="bu-metric-card">
+                    <span className="bu-metric-label">License Codes</span>
+                    <span className="bu-metric-value" style={{ color: '#0284c7' }}>
+                      {uniqueLicensesCount} codes
+                    </span>
+                  </div>
+                  <div className="bu-metric-card">
+                    <span className="bu-metric-label">Active Dates</span>
+                    <span className="bu-metric-value green">{uniqueLicenseDatesCount} dates</span>
+                  </div>
+                </div>
+
+                {/* Search Bar */}
+                <div className="bu-search-row">
+                  <div className="bu-search-wrap">
+                    <CIcon icon={cilSearch} size="sm" className="bu-search-icon" />
+                    <input
+                      type="text"
+                      className="bu-search-input"
+                      placeholder="Search by vehicle, license code, or date..."
+                      value={licensesSearch}
+                      onChange={(e) => {
+                        setLicensesSearch(e.target.value)
+                        setLicensesPage(0)
+                      }}
+                    />
+                  </div>
+                  {licensesSearch && (
+                    <button
+                      className="bu-btn-remove-file"
+                      onClick={() => setLicensesSearch('')}
+                      style={{ padding: '0.45rem 0.75rem', fontSize: '0.78rem' }}
+                    >
+                      <CIcon icon={cilReload} size="sm" /> Clear Search
+                    </button>
+                  )}
+                </div>
+
+                {/* Data Preview Table */}
+                <div className="bu-table-wrap">
+                  <table className="bu-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: 44 }}>#</th>
+                        <th>Date</th>
+                        <th>Vehicle Number</th>
+                        <th>License Code</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedLicenses.map((item, idx) => (
+                        <tr key={idx}>
+                          <td className="bu-td-num">{licensesPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
+                          <td>{item.date || '—'}</td>
+                          <td>
+                            <span className="bu-veh-pill">
+                              <CIcon icon={cilTruck} size="sm" style={{ color: '#0284c7' }} />
+                              {item.vehicleNumber || '—'}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="bu-code-badge" style={{ background: '#e0f2fe', color: '#0369a1', borderColor: '#bae6fd' }}>
+                              {item.licenseCode || '—'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="bu-pagination-bar">
+                  <span>
+                    Showing {filteredLicenses.length === 0 ? 0 : licensesPage * PREVIEW_PAGE_SIZE + 1}–
+                    {Math.min((licensesPage + 1) * PREVIEW_PAGE_SIZE, filteredLicenses.length)} of{' '}
+                    <strong>{filteredLicenses.length}</strong> preview records
+                  </span>
+
+                  {licensesTotalPages > 1 && (
+                    <div className="bu-page-controls">
+                      <button
+                        className="bu-page-btn"
+                        onClick={() => setLicensesPage((p) => Math.max(0, p - 1))}
+                        disabled={licensesPage === 0}
+                      >
+                        <CIcon icon={cilChevronLeft} size="sm" />
+                      </button>
+                      {Array.from({ length: licensesTotalPages }, (_, i) => i)
+                        .filter((p) => Math.abs(p - licensesPage) <= 2)
+                        .map((p) => (
+                          <button
+                            key={p}
+                            className={`bu-page-btn ${p === licensesPage ? 'active' : ''}`}
+                            onClick={() => setLicensesPage(p)}
+                          >
+                            {p + 1}
+                          </button>
+                        ))}
+                      <button
+                        className="bu-page-btn"
+                        onClick={() => setLicensesPage((p) => Math.min(licensesTotalPages - 1, p + 1))}
+                        disabled={licensesPage >= licensesTotalPages - 1}
                       >
                         <CIcon icon={cilChevronRight} size="sm" />
                       </button>

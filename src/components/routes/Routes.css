@@ -130,6 +130,26 @@
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
+.rt-input-currency-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rt-currency-prefix {
+  position: absolute;
+  left: 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.rt-input.with-prefix {
+  padding-left: 2.5rem;
+}
+
 .rt-select {
   width: 100%;
   height: 42px;
@@ -379,6 +399,22 @@
   color: #64748b;
   font-weight: 500;
   margin-left: 3px;
+}
+
+/* ── Price Pill ──────────────────────────────────────────────────────────── */
+.rt-price-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 /* ── Status Badge ────────────────────────────────────────────────────────── */
