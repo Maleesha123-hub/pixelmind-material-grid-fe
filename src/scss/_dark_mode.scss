@@ -697,6 +697,17 @@
           color: #065f46 !important;
         }
       }
+
+      &--licenses.active {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4) !important;
+
+        .bu-tab-count {
+          background: #ffffff !important;
+          color: #0369a1 !important;
+        }
+      }
     }
   }
 

@@ -153,6 +153,25 @@
   color: #047857;
 }
 
+/* ── Licenses Tab (Sky / Ocean Blue Theme) ── */
+.bu-tab-btn--licenses:hover:not(.active) {
+  color: #0369a1;
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.bu-tab-btn--licenses.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  border-color: transparent !important;
+}
+
+.bu-tab-btn--licenses.active .bu-tab-count {
+  background: #ffffff;
+  color: #0369a1;
+}
+
 .bu-tab-count {
   font-size: 0.75rem;
   padding: 0.15rem 0.55rem;
