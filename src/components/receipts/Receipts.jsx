@@ -86,9 +86,7 @@ const getSelectStyles = (isDark) => ({
     ...base,
     borderRadius: '10px',
     zIndex: 99999,
-    boxShadow: isDark
-      ? '0 16px 36px rgba(0, 0, 0, 0.65)'
-      : '0 12px 28px rgba(15, 23, 42, 0.16)',
+    boxShadow: isDark ? '0 16px 36px rgba(0, 0, 0, 0.65)' : '0 12px 28px rgba(15, 23, 42, 0.16)',
     backgroundColor: isDark ? '#0f172a' : '#ffffff',
     border: isDark ? '1px solid #334155' : '1px solid #cbd5e1',
     overflow: 'hidden',
@@ -104,15 +102,11 @@ const getSelectStyles = (isDark) => ({
     backgroundColor: state.isSelected
       ? '#d97706'
       : state.isFocused
-      ? isDark
-        ? '#1e293b'
-        : '#fef3c7'
-      : 'transparent',
-    color: state.isSelected
-      ? '#ffffff'
-      : isDark
-      ? '#f8fafc'
-      : '#0f172a',
+        ? isDark
+          ? '#1e293b'
+          : '#fef3c7'
+        : 'transparent',
+    color: state.isSelected ? '#ffffff' : isDark ? '#f8fafc' : '#0f172a',
     fontSize: '0.85rem',
     cursor: 'pointer',
     borderRadius: '6px',
@@ -237,7 +231,7 @@ const Receipts = () => {
       v.regNo ||
       v.number ||
       (rawId ? `Vehicle #${rawId}` : '')
-    const type = v.vehicleType || v.type || v.model || (v.capacity ? `${v.capacity} m³` : '')
+    const type = v.vehicleType || v.type || v.model || (v.capacity ? `${v.capacity} cube` : '')
     const driver = v.driverName || v.driver || ''
 
     let label = num
@@ -413,7 +407,8 @@ const Receipts = () => {
     }
 
     const vehicleId = selectedVehicle?.id || selectedVehicle?.vehicleId || selectedVehicle?.value
-    const dateLabel = startDate && endDate ? `${startDate}_to_${endDate}` : startDate || endDate || 'export'
+    const dateLabel =
+      startDate && endDate ? `${startDate}_to_${endDate}` : startDate || endDate || 'export'
     const fileName = `Material_Grid_Receipt_${selectedVehicle?.vehicleNumber || `Vehicle_${vehicleId}`}_${dateLabel}.pdf`
 
     setDownloadLoading(true)
@@ -603,8 +598,8 @@ const Receipts = () => {
                 {startDate && endDate
                   ? ` • ${startDate} to ${endDate}`
                   : startDate || endDate
-                  ? ` • ${startDate || endDate}`
-                  : ' • All Dates'}
+                    ? ` • ${startDate || endDate}`
+                    : ' • All Dates'}
               </span>
               <span className="text-muted ms-2" style={{ fontSize: '0.8rem' }}>
                 ({totalDispatches} recorded dispatches)
@@ -737,9 +732,9 @@ const Receipts = () => {
             <span className="rc-modal-pill">
               <CIcon icon={cilCalendar} size="sm" /> {previewMeta?.dateRange || 'Selected Period'}
             </span>
-            <span className="rc-modal-pill rc-modal-pill--amber">
+            {/* <span className="rc-modal-pill rc-modal-pill--amber">
               {previewMeta?.count} Trip{previewMeta?.count !== 1 ? 's' : ''}
-            </span>
+            </span> */}
           </div>
         </CModalHeader>
 
