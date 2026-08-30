@@ -888,14 +888,6 @@ const DailyRoutes = () => {
                 value={selectedExcel}
                 onChange={(opt) => setSelectedExcel(opt)}
                 onInputChange={onExcelInputChange}
-                onMenuOpen={() => {
-                  if (excelOptions.length === 0 && allExcelOptionsRef.current.length > 0) {
-                    setExcelOptions(allExcelOptionsRef.current)
-                  } else if (excelOptions.length === 0) {
-                    loadFilterOptions()
-                  }
-                }}
-                isLoading={optionsLoading}
                 components={{ Option: CustomExcelOption, SingleValue: CustomExcelSingleValue }}
                 placeholder="Search upload batch/file..."
                 styles={selectStyles}

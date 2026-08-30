@@ -61,18 +61,16 @@ export const fileHistoryService = {
    * Endpoint: GET /api/v1/file-histories/by-file-type?fileType=...&fileName=...
    *
    * @param {string} [fileType='DAILY_ROUTE'] - FileType enum value (e.g. DAILY_ROUTE)
-   * @param {string} [fileName=''] - File name search query
+   * @param {string} [fileName=''] - File name search query (always sent as at least empty string)
    * @param {AbortSignal} [signal]
    * @returns {Promise<Array>}
    */
   getFilesByFileType: async (fileType = 'DAILY_ROUTE', fileName = '', signal) => {
-    const qs = buildQuery({
-      fileType: fileType || undefined,
-      fileName: typeof fileName === 'string' && fileName.trim() ? fileName.trim() : undefined,
-    })
-    const url = qs
-      ? `${BASE_URL}/api/v1/file-histories/by-file-type?${qs}`
-      : `${BASE_URL}/api/v1/file-histories/by-file-type`
+    const safeType = fileType || 'DAILY_ROUTE'
+    const safeFileName = typeof fileName === 'string' ? fileName : ''
+    const qs = `fileType=${encodeURIComponent(safeType)}&fileName=${encodeURIComponent(safeFileName)}`
+    const url = `${BASE_URL}/api/v1/file-history/by-file-type?${qs}`
+
     const result = await apiFetch(url, { signal })
     const data = unwrap(result)
     if (Array.isArray(data)) return data
