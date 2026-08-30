@@ -597,7 +597,9 @@ const DailyRoutes = () => {
     if (!form.date) e.date = 'Daily route date is required'
     if (!form.billNumber.trim()) e.billNumber = 'Bill number is required'
     if (!form.vehicleId && !form.vehicleNumber) e.vehicleId = 'Please select or enter a vehicle'
-    if (!form.routeId && !form.routeCode) e.routeId = 'Please select or enter a route'
+    if (!editMode && !form.routeId && !form.routeCode) {
+      e.routeId = 'Please select or enter a route'
+    }
 
     setErrors(e)
     return Object.keys(e).length === 0
@@ -619,8 +621,6 @@ const DailyRoutes = () => {
 
     const routeVehId = route.vehicle?.id ?? route.vehicleId ?? ''
     const routeVehNum = route.vehicle?.vehicleNumber ?? route.vehicleNumber ?? ''
-    const routeRouteId = route.route?.id ?? route.routeId ?? ''
-    const routeRouteCode = route.route?.routeCode ?? route.routeCode ?? ''
     const routeBillNo = route.bilNumber ?? route.billNumber ?? ''
 
     const vehMatch = vehicleOptions.find(
@@ -632,25 +632,14 @@ const DailyRoutes = () => {
       label: routeVehNum || (routeVehId ? `Vehicle #${routeVehId}` : ''),
     }
 
-    const routeMatch = routeOptions.find(
-      (r) =>
-        (routeRouteId && (r.value === routeRouteId || r.id === routeRouteId)) ||
-        (routeRouteCode && (r.routeCode === routeRouteCode || r.label.includes(routeRouteCode))),
-    ) || {
-      value: routeRouteId,
-      label: routeRouteCode || (routeRouteId ? `Route #${routeRouteId}` : ''),
-    }
-
     setForm({
       date: route.date ? route.date.split('T')[0] : '',
       vehicleId: vehMatch.value,
       vehicleNumber: routeVehNum || vehMatch.label,
-      routeId: routeMatch.value,
-      routeCode: routeRouteCode || routeMatch.label,
       billNumber: routeBillNo,
     })
     setFormVehicle(vehMatch)
-    setFormRoute(routeMatch)
+    setFormRoute(null)
     setErrors({})
     setModalVisible(true)
   }
@@ -666,8 +655,12 @@ const DailyRoutes = () => {
       bilNumber: form.billNumber.trim(),
       vehicleId: form.vehicleId || undefined,
       vehicleNumber: form.vehicleNumber || undefined,
-      routeId: form.routeId || undefined,
-      routeCode: form.routeCode || undefined,
+      ...(!editMode
+        ? {
+            routeId: form.routeId || undefined,
+            routeCode: form.routeCode || undefined,
+          }
+        : {}),
     }
 
     try {
@@ -1220,27 +1213,29 @@ const DailyRoutes = () => {
               {errors.vehicleId && <div className="dr-form-error">{errors.vehicleId}</div>}
             </div>
 
-            {/* Route Selection */}
-            <div className="dr-filter-group mb-3">
-              <label className="dr-label">
-                Route Code <span className="req">*</span>
-              </label>
-              <Select
-                isClearable
-                isSearchable
-                options={routeOptions}
-                value={formRoute}
-                onChange={(opt) => {
-                  setFormRoute(opt)
-                  setFormField('routeId', opt ? opt.value : '')
-                  setFormField('routeCode', opt ? opt.routeCode || opt.label : '')
-                }}
-                placeholder="Select route..."
-                styles={selectStyles}
-                menuPortalTarget={document.body}
-              />
-              {errors.routeId && <div className="dr-form-error">{errors.routeId}</div>}
-            </div>
+            {/* Route Selection (Add New Daily Route only) */}
+            {!editMode && (
+              <div className="dr-filter-group mb-3">
+                <label className="dr-label">
+                  Route Code <span className="req">*</span>
+                </label>
+                <Select
+                  isClearable
+                  isSearchable
+                  options={routeOptions}
+                  value={formRoute}
+                  onChange={(opt) => {
+                    setFormRoute(opt)
+                    setFormField('routeId', opt ? opt.value : '')
+                    setFormField('routeCode', opt ? opt.routeCode || opt.label : '')
+                  }}
+                  placeholder="Select route..."
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                />
+                {errors.routeId && <div className="dr-form-error">{errors.routeId}</div>}
+              </div>
+            )}
           </div>
         </CModalBody>
 

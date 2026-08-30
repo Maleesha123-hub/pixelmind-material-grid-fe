@@ -127,9 +127,7 @@ export const dailyRouteService = {
       sort: params.sort || 'id,desc',
     })
 
-    const endpoints = [
-      `${BASE_URL}/api/v1/daily-routes?${qs}`,
-    ]
+    const endpoints = [`${BASE_URL}/api/v1/daily-routes?${qs}`]
 
     let lastError = null
     for (let i = 0; i < endpoints.length; i++) {
@@ -215,7 +213,10 @@ export const dailyRouteService = {
    * @returns {Promise<Array>}
    */
   getUploadedExcelList: async (fileName = '', signal) => {
-    const qs = buildQuery({ fileType: 'DAILY_ROUTE', fileName: typeof fileName === 'string' ? fileName.trim() || undefined : undefined })
+    const qs = buildQuery({
+      fileType: 'DAILY_ROUTE',
+      fileName: typeof fileName === 'string' ? fileName.trim() || undefined : undefined,
+    })
     try {
       const result = await apiFetch(`${BASE_URL}/api/v1/file-histories/by-file-type?${qs}`, {
         method: 'GET',
