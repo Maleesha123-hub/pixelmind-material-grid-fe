@@ -35,6 +35,7 @@ import {
   cilShieldAlt,
   cilLockLocked,
   cilContact,
+  cilMoney,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -126,6 +127,24 @@ const _nav = [
         name: 'Bulk Upload',
         to: '/logistics/bulk-upload',
         icon: <CIcon icon={cilCloudUpload} customClassName="nav-icon" />,
+      },
+      {
+        component: CNavItem,
+        name: 'Daily Routes',
+        to: '/logistics/daily-routes',
+        icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+      },
+      {
+        component: CNavItem,
+        name: 'Daily Expenses',
+        to: '/logistics/daily-expenses',
+        icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
+      },
+      {
+        component: CNavItem,
+        name: 'Vehicle License',
+        to: '/logistics/vehicle-license-management',
+        icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
       },
     ],
   },

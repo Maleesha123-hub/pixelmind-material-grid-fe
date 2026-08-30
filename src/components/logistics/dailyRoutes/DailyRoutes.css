@@ -1,0 +1,899 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Daily Routes Management — DailyRoutes.css
+   Matches the design system of Vehicle.css, Routes.css & Receipts.css
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Page Root ─────────────────────────────────────────────────────────── */
+.dr-page {
+  padding: 1.25rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Page Header ─────────────────────────────────────────────────────────── */
+.dr-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.dr-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dr-header-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
+  flex-shrink: 0;
+}
+
+.dr-page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dr-page-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.dr-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.dr-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 0.62rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+  transition: all 0.2s ease;
+}
+
+.dr-btn-add:hover {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45);
+  transform: translateY(-1px);
+}
+
+/* ── Card Styles ─────────────────────────────────────────────────────────── */
+.dr-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.dr-card-header {
+  background: linear-gradient(90deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dr-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.dr-card-body {
+  padding: 1.25rem;
+}
+
+/* ── Metrics Summary Grid ────────────────────────────────────────────────── */
+.dr-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dr-metric-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.dr-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+.dr-metric-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.dr-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dr-metric-value.highlight {
+  color: #d97706;
+}
+
+.dr-metric-value.blue {
+  color: #0284c7;
+}
+
+.dr-metric-value.green {
+  color: #059669;
+}
+
+/* ── Filter Controls Grid ────────────────────────────────────────────────── */
+.dr-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.1rem;
+  align-items: flex-end;
+}
+
+.dr-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.dr-filter-group--wide {
+  grid-column: span 2;
+  min-width: 320px;
+}
+
+@media (max-width: 1200px) {
+  .dr-filter-group--wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .dr-filter-group--wide {
+    grid-column: span 1;
+    min-width: 100%;
+  }
+}
+
+.dr-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dr-label span.req {
+  color: #dc2626;
+}
+
+.dr-input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 0.85rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.dr-input:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.dr-input.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.dr-filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.dr-btn-reset {
+  height: 42px;
+  padding: 0 1rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.dr-btn-reset:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* ── Active Filter Pills Bar ─────────────────────────────────────────────── */
+.dr-active-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.dr-active-filters-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.dr-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+}
+
+.dr-filter-pill-remove {
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+  color: #b45309;
+}
+
+.dr-filter-pill-remove:hover {
+  color: #dc2626;
+}
+
+/* ── Table Styling ───────────────────────────────────────────────────────── */
+.dr-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.dr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.dr-table thead tr {
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.dr-table th {
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.dr-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.dr-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dr-table tbody tr:hover {
+  background: #fcfcfd;
+}
+
+.dr-td-num {
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.8rem;
+  width: 44px;
+}
+
+.dr-veh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.28rem 0.65rem;
+  border-radius: 7px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #0f172a;
+  letter-spacing: 0.03em;
+}
+
+.dr-bill-badge {
+  display: inline-block;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #b45309;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.dr-code-badge {
+  display: inline-block;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+/* ── Excel Column & Badge (Fixed size with multiline break) ── */
+.dr-excel-col {
+  width: 220px;
+  min-width: 200px;
+  max-width: 240px;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.dr-excel-badge {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #1d4ed8;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+.dr-excel-badge-text {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  display: inline-block;
+  min-width: 0;
+  flex: 1;
+}
+
+.dr-manual-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.dr-date-text {
+  font-weight: 600;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dr-created-text {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.dr-amount-text {
+  font-weight: 700;
+  color: #059669;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Actions Buttons ─────────────────────────────────────────────────────── */
+.dr-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.dr-btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+}
+
+.dr-btn-action.edit {
+  color: #d97706;
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.dr-btn-action.edit:hover {
+  background: #f59e0b;
+  color: #ffffff;
+  border-color: #f59e0b;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.dr-btn-action.delete {
+  color: #dc2626;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.dr-btn-action.delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+}
+
+/* ── Pagination Bar ──────────────────────────────────────────────────────── */
+.dr-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0 0;
+  margin-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.82rem;
+  color: #64748b;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.dr-page-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dr-page-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 0.5rem;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.dr-page-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.dr-page-btn.active {
+  background: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+}
+
+.dr-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Empty & Loading States ──────────────────────────────────────────────── */
+.dr-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #64748b;
+}
+
+.dr-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: #94a3b8;
+}
+
+.dr-empty-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.35rem;
+}
+
+.dr-empty-sub {
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Modal Customizations ────────────────────────────────────────────────── */
+.dr-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .dr-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dr-form-error {
+  font-size: 0.76rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* ── Dark Mode Overrides ─────────────────────────────────────────────────── */
+[data-coreui-theme='dark'] .dr-page-title,
+.dark-theme .dr-page-title {
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .dr-card,
+.dark-theme .dr-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-coreui-theme='dark'] .dr-card-header,
+.dark-theme .dr-card-header {
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
+}
+
+[data-coreui-theme='dark'] .dr-card-title,
+.dark-theme .dr-card-title {
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .dr-metric-card,
+.dark-theme .dr-metric-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-coreui-theme='dark'] .dr-metric-value,
+.dark-theme .dr-metric-value {
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .dr-label,
+.dark-theme .dr-label {
+  color: #cbd5e1;
+}
+
+[data-coreui-theme='dark'] .dr-input,
+.dark-theme .dr-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .dr-btn-reset,
+.dark-theme .dr-btn-reset {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-coreui-theme='dark'] .dr-btn-reset:hover,
+.dark-theme .dr-btn-reset:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+[data-coreui-theme='dark'] .dr-table-wrap,
+.dark-theme .dr-table-wrap {
+  border-color: #334155;
+  background: #1e293b;
+}
+
+[data-coreui-theme='dark'] .dr-table thead tr,
+.dark-theme .dr-table thead tr {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-coreui-theme='dark'] .dr-table th,
+.dark-theme .dr-table th {
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .dr-table td,
+.dark-theme .dr-table td {
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-coreui-theme='dark'] .dr-table tbody tr:hover,
+.dark-theme .dr-table tbody tr:hover {
+  background: #182234;
+}
+
+[data-coreui-theme='dark'] .dr-veh-pill,
+.dark-theme .dr-veh-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .dr-page-btn,
+.dark-theme .dr-page-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-coreui-theme='dark'] .dr-page-btn:hover:not(:disabled),
+.dark-theme .dr-page-btn:hover:not(:disabled) {
+  background: #1e293b;
+  border-color: #475569;
+  color: #ffffff;
+}
+
+[data-coreui-theme='dark'] .dr-date-text,
+.dark-theme .dr-date-text {
+  color: #e2e8f0;
+}
+
+[data-coreui-theme='dark'] .dr-date-text .text-muted,
+.dark-theme .dr-date-text .text-muted {
+  color: #94a3b8 !important;
+}
+
+[data-coreui-theme='dark'] .dr-created-text,
+.dark-theme .dr-created-text {
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .dr-td-num,
+.dark-theme .dr-td-num {
+  color: #64748b;
+}
+
+[data-coreui-theme='dark'] .dr-amount-text,
+.dark-theme .dr-amount-text {
+  color: #34d399;
+}
+
+/* ── Badges in Dark Mode ─────────────────────────────────────────────────── */
+[data-coreui-theme='dark'] .dr-bill-badge,
+.dark-theme .dr-bill-badge {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.32);
+  color: #fbbf24;
+}
+
+[data-coreui-theme='dark'] .dr-code-badge,
+.dark-theme .dr-code-badge {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.32);
+  color: #34d399;
+}
+
+[data-coreui-theme='dark'] .dr-excel-badge,
+.dark-theme .dr-excel-badge {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.32);
+  color: #93c5fd;
+}
+
+[data-coreui-theme='dark'] .dr-manual-badge,
+.dark-theme .dr-manual-badge {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+/* ── Action Buttons in Dark Mode ─────────────────────────────────────────── */
+[data-coreui-theme='dark'] .dr-btn-action.edit,
+.dark-theme .dr-btn-action.edit {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+}
+
+[data-coreui-theme='dark'] .dr-btn-action.edit:hover,
+.dark-theme .dr-btn-action.edit:hover {
+  background: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+[data-coreui-theme='dark'] .dr-btn-action.delete,
+.dark-theme .dr-btn-action.delete {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.28);
+  color: #f87171;
+}
+
+[data-coreui-theme='dark'] .dr-btn-action.delete:hover,
+.dark-theme .dr-btn-action.delete:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* ── Filter Pills & Pagination in Dark Mode ──────────────────────────────── */
+[data-coreui-theme='dark'] .dr-active-filters-bar,
+.dark-theme .dr-active-filters-bar {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-coreui-theme='dark'] .dr-active-filters-title,
+.dark-theme .dr-active-filters-title {
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .dr-filter-pill,
+.dark-theme .dr-filter-pill {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+}
+
+[data-coreui-theme='dark'] .dr-filter-pill-remove,
+.dark-theme .dr-filter-pill-remove {
+  background: rgba(245, 158, 11, 0.3);
+  color: #fde68a;
+}
+
+[data-coreui-theme='dark'] .dr-pagination-bar,
+.dark-theme .dr-pagination-bar {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .dr-pagination-bar strong,
+.dark-theme .dr-pagination-bar strong {
+  color: #f8fafc;
+}
+
+/* ── Modal in Dark Mode ──────────────────────────────────────────────────── */
+[data-coreui-theme='dark'] .modal-content,
+.dark-theme .modal-content {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-coreui-theme='dark'] .modal-header,
+[data-coreui-theme='dark'] .modal-footer,
+.dark-theme .modal-header,
+.dark-theme .modal-footer {
+  border-color: #334155 !important;
+}
+
+/* ── Custom Select Option Styles ─────────────────────────────────────────── */
+.dr-select-option {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.12s ease;
+}
+
+.dr-select-option:hover,
+.dr-select-option.is-focused {
+  background: #fef3c7;
+}
+
+.dr-select-option.is-selected {
+  background: #d97706 !important;
+  color: #ffffff !important;
+}
+
+[data-coreui-theme='dark'] .dr-select-option:hover,
+[data-coreui-theme='dark'] .dr-select-option.is-focused {
+  background: #1e293b;
+}
+
+[data-coreui-theme='dark'] .dr-select-option.is-selected {
+  background: #d97706 !important;
+  color: #ffffff !important;
+}
+
