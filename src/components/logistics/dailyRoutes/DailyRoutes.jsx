@@ -1169,6 +1169,7 @@ const DailyRoutes = () => {
                 type="date"
                 className={`dr-input ${errors.date ? 'error' : ''}`}
                 value={form.date}
+                disabled={editMode}
                 onChange={(e) => setFormField('date', e.target.value)}
               />
               {errors.date && <div className="dr-form-error">{errors.date}</div>}
@@ -1195,8 +1196,9 @@ const DailyRoutes = () => {
                 Vehicle <span className="req">*</span>
               </label>
               <Select
-                isClearable
-                isSearchable
+                isClearable={!editMode}
+                isSearchable={!editMode}
+                isDisabled={editMode}
                 options={vehicleOptions}
                 value={formVehicle}
                 onChange={(opt) => {
