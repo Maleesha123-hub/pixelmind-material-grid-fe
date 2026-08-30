@@ -261,54 +261,26 @@ const formatExcelOption = (f) => {
 
 // ─── Custom Select Option & SingleValue Components ───────────────────────────
 const CustomVehicleOption = (props) => {
-  const { data, innerRef, innerProps, isSelected, isFocused } = props
+  const { data } = props
   return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className={`vl-select-option ${isSelected ? 'is-selected' : isFocused ? 'is-focused' : ''}`}
-      style={{ padding: '8px 12px' }}
-    >
+    <components.Option {...props}>
       <div className="d-flex align-items-center justify-content-between gap-2">
         <div className="d-flex align-items-center gap-2" style={{ minWidth: 0, flex: 1 }}>
-          <CIcon
-            icon={cilTruck}
-            size="sm"
-            style={{ color: isSelected ? '#ffffff' : '#0284c7', flexShrink: 0 }}
-          />
-          <span
-            style={{
-              fontWeight: 700,
-              fontSize: '0.86rem',
-              color: isSelected ? '#ffffff' : 'inherit',
-            }}
-          >
+          <CIcon icon={cilTruck} size="sm" className="text-secondary flex-shrink-0" />
+          <span style={{ fontWeight: 600, fontSize: '0.86rem' }}>
             {data.vehicleNumber || data.label}
           </span>
           {data.capacity && (
-            <span
-              style={{
-                fontSize: '0.75rem',
-                color: isSelected ? 'rgba(255,255,255,0.85)' : '#64748b',
-              }}
-            >
-              ({data.capacity}m³)
-            </span>
+            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>({data.capacity}m³)</span>
           )}
         </div>
         {data.driverName && (
-          <span
-            style={{
-              fontSize: '0.74rem',
-              color: isSelected ? 'rgba(255,255,255,0.85)' : '#94a3b8',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <span style={{ fontSize: '0.74rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>
             {data.driverName}
           </span>
         )}
       </div>
-    </div>
+    </components.Option>
   )
 }
 
@@ -342,39 +314,24 @@ const CustomVehicleSingleValue = (props) => {
 }
 
 const CustomLicenseOption = (props) => {
-  const { data, innerRef, innerProps, isSelected, isFocused } = props
+  const { data } = props
   const raw = data.raw || {}
   const hasDates = raw.startDate || raw.endDate
   const priceFormatted =
     raw.price !== undefined && raw.price !== null ? formatCurrency(raw.price) : null
 
   return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className={`vl-select-option ${isSelected ? 'is-selected' : isFocused ? 'is-focused' : ''}`}
-      style={{ padding: '8px 12px' }}
-    >
+    <components.Option {...props}>
       <div className="d-flex align-items-center justify-content-between gap-2">
         <div className="d-flex align-items-center gap-2" style={{ minWidth: 0, flex: 1 }}>
-          <CIcon
-            icon={cilContact}
-            size="sm"
-            style={{ color: isSelected ? '#ffffff' : '#0284c7', flexShrink: 0 }}
-          />
-          <span
-            style={{
-              fontWeight: 700,
-              fontSize: '0.86rem',
-              color: isSelected ? '#ffffff' : 'inherit',
-            }}
-          >
+          <CIcon icon={cilContact} size="sm" className="text-info flex-shrink-0" />
+          <span style={{ fontWeight: 600, fontSize: '0.86rem' }}>
             {data.licenseCode || data.label}
           </span>
         </div>
         {priceFormatted && (
           <span
-            className={`badge ${isSelected ? 'bg-light text-dark' : 'bg-info-subtle text-info'}`}
+            className="badge bg-info-subtle text-info"
             style={{ fontSize: '0.75rem', fontWeight: 600 }}
           >
             {priceFormatted}
@@ -385,7 +342,7 @@ const CustomLicenseOption = (props) => {
         <div
           style={{
             fontSize: '0.74rem',
-            color: isSelected ? 'rgba(255,255,255,0.85)' : '#64748b',
+            color: '#64748b',
             marginTop: '2px',
             paddingLeft: '22px',
           }}
@@ -393,7 +350,7 @@ const CustomLicenseOption = (props) => {
           Valid: {formatDateDisplay(raw.startDate)} → {formatDateDisplay(raw.endDate)}
         </div>
       )}
-    </div>
+    </components.Option>
   )
 }
 
@@ -441,26 +398,16 @@ const CustomLicenseSingleValue = (props) => {
 }
 
 const CustomExcelOption = (props) => {
-  const { data, innerRef, innerProps, isSelected, isFocused } = props
+  const { data } = props
   return (
-    <div
-      ref={innerRef}
-      {...innerProps}
-      className={`vl-select-option ${isSelected ? 'is-selected' : isFocused ? 'is-focused' : ''}`}
-      style={{ padding: '8px 12px' }}
-    >
+    <components.Option {...props}>
       <div className="d-flex align-items-center justify-content-between gap-3">
         <div className="d-flex align-items-center gap-2" style={{ minWidth: 0, flex: 1 }}>
-          <CIcon
-            icon={cilDescription}
-            size="sm"
-            style={{ color: isSelected ? '#ffffff' : '#0284c7', flexShrink: 0 }}
-          />
+          <CIcon icon={cilDescription} size="sm" className="text-primary flex-shrink-0" />
           <span
             style={{
               fontSize: '0.84rem',
               fontWeight: 600,
-              color: isSelected ? '#ffffff' : 'inherit',
               whiteSpace: 'normal',
               wordBreak: 'break-all',
             }}
@@ -472,7 +419,7 @@ const CustomExcelOption = (props) => {
           <span
             style={{
               fontSize: '0.73rem',
-              color: isSelected ? 'rgba(255,255,255,0.85)' : '#94a3b8',
+              color: '#94a3b8',
               flexShrink: 0,
               whiteSpace: 'nowrap',
             }}
@@ -481,7 +428,7 @@ const CustomExcelOption = (props) => {
           </span>
         )}
       </div>
-    </div>
+    </components.Option>
   )
 }
 
@@ -611,35 +558,7 @@ const VehicleLicenseManagement = () => {
     loadFilterOptions()
   }, [loadFilterOptions])
 
-  // ─── Search Handlers for Select Inputs ──────────────────────────────────────
-  const onVehicleInputChange = useCallback((inputValue, { action }) => {
-    if (action === 'input-change') {
-      const query = (inputValue || '').toLowerCase().trim()
-      if (!query) {
-        setVehicleOptions(allVehiclesRef.current)
-        return
-      }
-      const filtered = allVehiclesRef.current.filter((opt) =>
-        opt.label.toLowerCase().includes(query),
-      )
-      setVehicleOptions(filtered)
-    }
-  }, [])
-
-  const onLicenseInputChange = useCallback((inputValue, { action }) => {
-    if (action === 'input-change') {
-      const query = (inputValue || '').toLowerCase().trim()
-      if (!query) {
-        setLicenseOptions(allLicensesRef.current)
-        return
-      }
-      const filtered = allLicensesRef.current.filter((opt) =>
-        opt.label.toLowerCase().includes(query),
-      )
-      setLicenseOptions(filtered)
-    }
-  }, [])
-
+  // ─── Debounced Excel Search ─────────────────────────────────────────────────
   const handleExcelSearch = useRef(
     debounce(async (query) => {
       if (!query || !query.trim()) {
@@ -785,41 +704,66 @@ const VehicleLicenseManagement = () => {
     setModalVisible(true)
   }
 
+  // ─── Edit Modal Opener ──────────────────────────────────────────────────────
   const openEditModal = (item) => {
     setEditMode(true)
     setSelectedId(item.id)
 
-    const vehId = item.vehicle?.id ?? item.vehicleId ?? ''
-    const vehNum = item.vehicle?.vehicleNumber ?? item.vehicleNumber ?? ''
+    const vehId = item.vehicle?.id ?? item.vehicleId ?? item.vehicle?.vehicleId ?? ''
+    const vehNum = item.vehicle?.vehicleNumber ?? item.vehicleNumber ?? item.vehicle?.number ?? ''
 
-    const vehMatch = vehicleOptions.find(
-      (v) =>
-        (vehId && (v.value === vehId || v.id === vehId)) ||
-        (vehNum && (v.raw?.vehicleNumber === vehNum || v.label.includes(vehNum))),
-    ) || {
-      value: vehId,
-      label: vehNum || (vehId ? `Vehicle #${vehId}` : ''),
-      vehicleNumber: vehNum,
-    }
+    const vehMatch =
+      vehicleOptions.find(
+        (v) =>
+          (vehId && (String(v.value) === String(vehId) || String(v.id) === String(vehId))) ||
+          (vehNum &&
+            (v.vehicleNumber === vehNum ||
+              v.raw?.vehicleNumber === vehNum ||
+              v.label?.includes(vehNum))),
+      ) ||
+      (vehId || vehNum
+        ? {
+            value: vehId,
+            id: vehId,
+            vehicleId: vehId,
+            vehicleNumber: vehNum,
+            label: vehNum || `Vehicle #${vehId}`,
+            raw: item.vehicle || {},
+          }
+        : null)
 
-    const licId = item.license?.id ?? item.licenseId ?? ''
-    const licCode = item.license?.licenseCode ?? item.licenseCode ?? ''
+    const licId = item.license?.id ?? item.licenseId ?? item.license?.licenseId ?? ''
+    const licCode =
+      item.license?.licenseCode ??
+      item.licenseCode ??
+      item.license?.code ??
+      (licId ? `LIC-${licId}` : '')
 
-    const licMatch = licenseOptions.find(
-      (l) =>
-        (licId && (l.value === licId || l.id === licId)) ||
-        (licCode && (l.raw?.licenseCode === licCode || l.label.includes(licCode))),
-    ) || {
-      value: licId,
-      label: licCode || (licId ? `License #${licId}` : ''),
-      licenseCode: licCode,
-    }
+    const licMatch =
+      licenseOptions.find(
+        (l) =>
+          (licId && (String(l.value) === String(licId) || String(l.id) === String(licId))) ||
+          (licCode &&
+            (l.licenseCode === licCode ||
+              l.raw?.licenseCode === licCode ||
+              l.label?.includes(licCode))),
+      ) ||
+      (licId || licCode
+        ? {
+            value: licId,
+            id: licId,
+            licenseId: licId,
+            licenseCode: licCode,
+            label: item.license ? formatLicenseOption(item.license)?.label || licCode : licCode,
+            raw: item.license || {},
+          }
+        : null)
 
     setForm({
-      vehicleId: vehMatch.value,
-      vehicleNumber: vehNum || vehMatch.label,
-      licenseId: licMatch.value,
-      licenseCode: licCode || licMatch.label,
+      vehicleId: vehMatch ? vehMatch.value : '',
+      vehicleNumber: vehMatch ? vehMatch.vehicleNumber || vehMatch.label : '',
+      licenseId: licMatch ? licMatch.value : '',
+      licenseCode: licMatch ? licMatch.licenseCode || licMatch.label : '',
     })
     setFormVehicle(vehMatch)
     setFormLicense(licMatch)
@@ -977,7 +921,6 @@ const VehicleLicenseManagement = () => {
                 options={licenseOptions}
                 value={selectedLicense}
                 onChange={setSelectedLicense}
-                onInputChange={onLicenseInputChange}
                 components={{
                   Option: CustomLicenseOption,
                   SingleValue: CustomLicenseSingleValue,
@@ -1001,7 +944,6 @@ const VehicleLicenseManagement = () => {
                 options={vehicleOptions}
                 value={selectedVehicle}
                 onChange={setSelectedVehicle}
-                onInputChange={onVehicleInputChange}
                 components={{
                   Option: CustomVehicleOption,
                   SingleValue: CustomVehicleSingleValue,
@@ -1369,9 +1311,11 @@ const VehicleLicenseManagement = () => {
                 onChange={(opt) => {
                   setFormVehicle(opt)
                   setFormField('vehicleId', opt ? opt.value : '')
-                  setFormField('vehicleNumber', opt ? opt.raw?.vehicleNumber || opt.label : '')
+                  setFormField(
+                    'vehicleNumber',
+                    opt ? opt.vehicleNumber || opt.raw?.vehicleNumber || opt.label : '',
+                  )
                 }}
-                onInputChange={onVehicleInputChange}
                 components={{
                   Option: CustomVehicleOption,
                   SingleValue: CustomVehicleSingleValue,
@@ -1396,9 +1340,11 @@ const VehicleLicenseManagement = () => {
                 onChange={(opt) => {
                   setFormLicense(opt)
                   setFormField('licenseId', opt ? opt.value : '')
-                  setFormField('licenseCode', opt ? opt.raw?.licenseCode || opt.label : '')
+                  setFormField(
+                    'licenseCode',
+                    opt ? opt.licenseCode || opt.raw?.licenseCode || opt.label : '',
+                  )
                 }}
-                onInputChange={onLicenseInputChange}
                 components={{
                   Option: CustomLicenseOption,
                   SingleValue: CustomLicenseSingleValue,
