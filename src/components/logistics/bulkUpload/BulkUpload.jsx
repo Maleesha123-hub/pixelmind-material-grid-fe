@@ -108,11 +108,11 @@ const BulkUpload = () => {
   // ─── Sample Template Downloads ──────────────────────────────────────────────
   const downloadTripsTemplate = () => {
     const wsData = [
-      ['Date', 'Vehicle Number', 'Bil Number', 'Route Code', 'Check By'],
-      ['2026-08-07', 'LC-4838', '7901', 'RT000001', 'Loku akka'],
-      ['2026-08-07', 'LI-8902', '7902', 'RT000001', 'Loku akka'],
-      ['2026-08-07', 'LM-4535', '7903', 'RT000001', 'Loku akka'],
-      ['2026-08-07', 'LK-5177', '7904', 'RT000001', 'surendra'],
+      ['Date', 'Vehicle Number', 'Bil Number', 'Route Code'],
+      ['2026-08-07', 'LC-4838', '7901', 'RT000001'],
+      ['2026-08-07', 'LI-8902', '7902', 'RT000001'],
+      ['2026-08-07', 'LM-4535', '7903', 'RT000001'],
+      ['2026-08-07', 'LK-5177', '7904', 'RT000001'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     ws['!cols'] = [
@@ -120,7 +120,6 @@ const BulkUpload = () => {
       { wch: 18 },
       { wch: 16 },
       { wch: 16 },
-      { wch: 18 },
     ]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Daily Routes')
@@ -149,18 +148,17 @@ const BulkUpload = () => {
 
   const downloadLicensesTemplate = () => {
     const wsData = [
-      ['Date', 'Vehicle Number', 'License Code'],
-      ['2026-08-05', 'LM-4565', 'LIC000001'],
-      ['2026-08-07', 'lf-3769', 'LIC000001'],
-      ['2026-08-07', 'LJ-4472', 'LIC000001'],
-      ['2026-08-07', 'LM-4687', 'LIC000001'],
-      ['2026-08-07', 'LI-8790', 'LIC000001'],
-      ['2026-08-07', 'LN-8877', 'LIC000003'],
-      ['2026-08-07', 'LM-4565', 'LIC000003'],
+      ['Vehicle Number', 'License Code'],
+      ['LM-4565', 'LIC000001'],
+      ['lf-3769', 'LIC000001'],
+      ['LJ-4472', 'LIC000001'],
+      ['LM-4687', 'LIC000001'],
+      ['LI-8790', 'LIC000001'],
+      ['LN-8877', 'LIC000003'],
+      ['LM-4565', 'LIC000003'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
     ws['!cols'] = [
-      { wch: 14 },
       { wch: 18 },
       { wch: 18 },
     ]
@@ -236,25 +234,16 @@ const BulkUpload = () => {
               row['Route'] ||
               row['route'] ||
               ''
-            const rawCheckBy =
-              row['Check By'] ||
-              row['Checked By'] ||
-              row['checkBy'] ||
-              row['checkedBy'] ||
-              row['Check by'] ||
-              row['Checked by'] ||
-              ''
 
             return {
               date: String(rawDate).trim(),
               vehicleNumber: String(rawVeh).trim(),
               billNumber: String(rawBill).trim(),
               routeCode: String(rawRouteCode).trim(),
-              checkBy: String(rawCheckBy).trim(),
             }
           })
           .filter(
-            (item) => item.vehicleNumber || item.billNumber || item.routeCode || item.date || item.checkBy,
+            (item) => item.vehicleNumber || item.billNumber || item.routeCode || item.date,
           )
 
         setTripsData(formatted)
@@ -339,24 +328,8 @@ const BulkUpload = () => {
         const workbook = XLSX.read(data, { type: 'array', cellDates: true })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
-        const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
-
         const formatted = json
           .map((row) => {
-            let rawDate = row['Date'] || row['date'] || ''
-            if (rawDate instanceof Date) {
-              rawDate = rawDate.toISOString().split('T')[0]
-            } else if (typeof rawDate === 'string' && rawDate.trim()) {
-              const str = rawDate.trim()
-              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
-              if (mdy) {
-                const mm = mdy[1].padStart(2, '0')
-                const dd = mdy[2].padStart(2, '0')
-                const yyyy = mdy[3]
-                rawDate = `${yyyy}-${mm}-${dd}`
-              }
-            }
-
             const rawVeh =
               row['Vehicle Number'] ||
               row['vehicleNumber'] ||
@@ -376,12 +349,11 @@ const BulkUpload = () => {
               ''
 
             return {
-              date: String(rawDate).trim(),
               vehicleNumber: String(rawVeh).trim(),
               licenseCode: String(rawLicenseCode).trim(),
             }
           })
-          .filter((item) => item.vehicleNumber || item.licenseCode || item.date)
+          .filter((item) => item.vehicleNumber || item.licenseCode)
 
         setLicensesData(formatted)
         setLicensesPage(0)
@@ -620,7 +592,6 @@ const BulkUpload = () => {
         (item.vehicleNumber || '').toLowerCase().includes(q) ||
         (item.billNumber || '').toString().toLowerCase().includes(q) ||
         (item.routeCode || '').toLowerCase().includes(q) ||
-        (item.checkBy || '').toLowerCase().includes(q) ||
         (item.date || '').includes(q),
     )
   }, [tripsData, tripsSearch])
@@ -628,7 +599,7 @@ const BulkUpload = () => {
   const totalTripsCount = tripsData.length
   const uniqueVehiclesCount = new Set(tripsData.map((item) => item.vehicleNumber).filter(Boolean)).size
   const uniqueRoutesCount = new Set(tripsData.map((item) => item.routeCode).filter(Boolean)).size
-  const uniqueInspectorsCount = new Set(tripsData.map((item) => item.checkBy).filter(Boolean)).size
+  const uniqueDatesCount = new Set(tripsData.map((item) => item.date).filter(Boolean)).size
 
   const tripsTotalPages = Math.ceil(filteredTrips.length / PREVIEW_PAGE_SIZE) || 1
   const paginatedTrips = filteredTrips.slice(
@@ -667,8 +638,7 @@ const BulkUpload = () => {
     return licensesData.filter(
       (item) =>
         (item.vehicleNumber || '').toLowerCase().includes(q) ||
-        (item.licenseCode || '').toLowerCase().includes(q) ||
-        (item.date || '').includes(q),
+        (item.licenseCode || '').toLowerCase().includes(q),
     )
   }, [licensesData, licensesSearch])
 
@@ -678,9 +648,6 @@ const BulkUpload = () => {
   ).size
   const uniqueLicensesCount = new Set(
     licensesData.map((item) => item.licenseCode).filter(Boolean),
-  ).size
-  const uniqueLicenseDatesCount = new Set(
-    licensesData.map((item) => item.date).filter(Boolean),
   ).size
 
   const licensesTotalPages = Math.ceil(filteredLicenses.length / PREVIEW_PAGE_SIZE) || 1
@@ -957,8 +924,8 @@ const BulkUpload = () => {
                     </span>
                   </div>
                   <div className="bu-metric-card">
-                    <span className="bu-metric-label">Checked By</span>
-                    <span className="bu-metric-value green">{uniqueInspectorsCount} persons</span>
+                    <span className="bu-metric-label">Active Dates</span>
+                    <span className="bu-metric-value green">{uniqueDatesCount} dates</span>
                   </div>
                 </div>
 
@@ -969,7 +936,7 @@ const BulkUpload = () => {
                     <input
                       type="text"
                       className="bu-search-input"
-                      placeholder="Search by vehicle, bil number, route code, check by, or date..."
+                      placeholder="Search by vehicle, bil number, route code, or date..."
                       value={tripsSearch}
                       onChange={(e) => {
                         setTripsSearch(e.target.value)
@@ -998,7 +965,6 @@ const BulkUpload = () => {
                         <th>Vehicle Number</th>
                         <th>Bil Number</th>
                         <th>Route Code</th>
-                        <th>Check By</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1018,7 +984,6 @@ const BulkUpload = () => {
                           <td>
                             <span className="bu-code-badge">{item.routeCode || '—'}</span>
                           </td>
-                          <td>{item.checkBy || '—'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1534,7 +1499,7 @@ const BulkUpload = () => {
                     </table>
                   </div>
                   <div className="bu-val-footer-hint mt-2">
-                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers, license codes, or duplicate dates), then re-upload.
+                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers or license codes), then re-upload.
                   </div>
                 </div>
               )}
@@ -1568,10 +1533,6 @@ const BulkUpload = () => {
                       {uniqueLicensesCount} codes
                     </span>
                   </div>
-                  <div className="bu-metric-card">
-                    <span className="bu-metric-label">Active Dates</span>
-                    <span className="bu-metric-value green">{uniqueLicenseDatesCount} dates</span>
-                  </div>
                 </div>
 
                 {/* Search Bar */}
@@ -1581,7 +1542,7 @@ const BulkUpload = () => {
                     <input
                       type="text"
                       className="bu-search-input"
-                      placeholder="Search by vehicle, license code, or date..."
+                      placeholder="Search by vehicle or license code..."
                       value={licensesSearch}
                       onChange={(e) => {
                         setLicensesSearch(e.target.value)
@@ -1606,7 +1567,6 @@ const BulkUpload = () => {
                     <thead>
                       <tr>
                         <th style={{ width: 44 }}>#</th>
-                        <th>Date</th>
                         <th>Vehicle Number</th>
                         <th>License Code</th>
                       </tr>
@@ -1615,7 +1575,6 @@ const BulkUpload = () => {
                       {paginatedLicenses.map((item, idx) => (
                         <tr key={idx}>
                           <td className="bu-td-num">{licensesPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
-                          <td>{item.date || '—'}</td>
                           <td>
                             <span className="bu-veh-pill">
                               <CIcon icon={cilTruck} size="sm" style={{ color: '#0284c7' }} />

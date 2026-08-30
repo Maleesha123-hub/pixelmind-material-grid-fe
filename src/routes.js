@@ -29,6 +29,11 @@ const Route = React.lazy(() => import('./components/transportTrip/route/Route.js
 
 // Logistics
 const BulkUpload = React.lazy(() => import('./components/logistics/bulkUpload/BulkUpload.jsx'))
+const DailyRoutes = React.lazy(() => import('./components/logistics/dailyRoutes/DailyRoutes.jsx'))
+const DailyExpenses = React.lazy(() => import('./components/logistics/dailyExpenses/DailyExpenses.jsx'))
+const VehicleLicenseManagement = React.lazy(
+  () => import('./components/logistics/vehicleLicenseManagement/VehicleLicenseManagement.jsx'),
+)
 
 // Receipts
 const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
@@ -64,6 +69,13 @@ export const routes = [
   { path: '/transport-trips/process-trip', name: 'Process Trip', element: processTrip },
   { path: '/transport-trips/trip-history', name: 'Trip History', element: tripHistory },
   { path: '/logistics/bulk-upload', name: 'Bulk Upload', element: BulkUpload },
+  { path: '/logistics/daily-routes', name: 'Daily Routes', element: DailyRoutes },
+  { path: '/logistics/daily-expenses', name: 'Daily Expenses', element: DailyExpenses },
+  {
+    path: '/logistics/vehicle-license-management',
+    name: 'Vehicle License',
+    element: VehicleLicenseManagement,
+  },
   { path: '/receipts', name: 'Receipts', element: Receipts },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
   { path: '/license', name: 'License', element: VehicleLicense },
