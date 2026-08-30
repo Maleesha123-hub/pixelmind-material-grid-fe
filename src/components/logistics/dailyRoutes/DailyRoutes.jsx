@@ -19,7 +19,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Swal from 'sweetalert2'
-import Select from 'react-select'
+import Select, { components } from 'react-select'
 import CIcon from '@coreui/icons-react'
 import {
   CRow,
@@ -77,7 +77,6 @@ const getSelectStyles = (isDark) => ({
   control: (base, state) => ({
     ...base,
     minHeight: '42px',
-    height: '42px',
     borderRadius: '8px',
     borderColor: state.isFocused ? '#f59e0b' : isDark ? '#334155' : '#cbd5e1',
     boxShadow: state.isFocused ? '0 0 0 3px rgba(245,158,11,0.2)' : 'none',
@@ -135,17 +134,12 @@ const getSelectStyles = (isDark) => ({
   valueContainer: (base) => ({
     ...base,
     padding: '2px 8px',
-    overflow: 'hidden',
-    flexWrap: 'nowrap',
   }),
   singleValue: (base) => ({
     ...base,
     color: isDark ? '#f8fafc' : '#0f172a',
     fontSize: '0.85rem',
     fontWeight: 600,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
     maxWidth: 'calc(100% - 10px)',
   }),
   indicatorSeparator: (base) => ({
@@ -288,26 +282,27 @@ const formatExcelOption = (e) => {
 }
 
 // ─── Custom Excel Single Value (what displays in the input box when selected)
-const CustomExcelSingleValue = ({ children, data, ...props }) => {
+const CustomExcelSingleValue = (props) => {
   return (
-    <div
-      className="d-flex align-items-center gap-2"
-      style={{ overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '100%' }}
-      {...props}
-    >
-      <CIcon icon={cilFile} size="sm" style={{ color: '#0284c7', flexShrink: 0 }} />
+    <components.SingleValue {...props}>
       <span
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          fontWeight: 600,
-          fontSize: '0.85rem',
-        }}
+        className="d-inline-flex align-items-center gap-1"
+        style={{ maxWidth: '100%', overflow: 'hidden' }}
       >
-        {data.fileName || data.label}
+        <CIcon icon={cilFile} size="sm" style={{ color: '#0284c7', flexShrink: 0 }} />
+        <span
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontWeight: 600,
+            fontSize: '0.84rem',
+          }}
+        >
+          {props.data.fileName || props.data.label}
+        </span>
       </span>
-    </div>
+    </components.SingleValue>
   )
 }
 
@@ -521,6 +516,7 @@ const DailyRoutes = () => {
           vehicleId: selectedVehicle?.value || undefined,
           routeId: selectedRoute?.value || undefined,
           fileHistoryId: selectedExcel?.id ?? selectedExcel?.fileHistoryId ?? undefined,
+          fileName: selectedExcel?.fileName || undefined,
           uploadedExcel: selectedExcel?.fileName || selectedExcel?.value || undefined,
         }
 

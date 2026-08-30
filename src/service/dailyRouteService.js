@@ -118,6 +118,8 @@ export const dailyRouteService = {
       billNumber: params.billNumber || undefined,
       vehicleId: params.vehicleId || undefined,
       routeId: params.routeId || undefined,
+      fileHistoryId: params.fileHistoryId || undefined,
+      fileName: params.fileName || undefined,
       uploadedExcel: params.uploadedExcel || undefined,
       search: params.search || undefined,
       page: params.page ?? 0,
