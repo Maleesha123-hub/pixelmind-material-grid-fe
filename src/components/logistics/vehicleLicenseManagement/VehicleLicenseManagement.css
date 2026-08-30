@@ -1,0 +1,777 @@
+/* ==========================================================================
+   Vehicle License Management - Component Stylesheet
+   ========================================================================== */
+
+/* ── Container & Layout ─────────────────────────────────────────────────── */
+.vl-page {
+  padding: 1.25rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  padding-bottom: 2rem;
+}
+
+/* ── Page Header (Topic) ─────────────────────────────────────────────────── */
+.vl-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.vl-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.vl-header-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #334155;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0284c7;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
+  flex-shrink: 0;
+}
+
+.vl-page-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.vl-page-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.vl-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.vl-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  background: #ffffff;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.vl-card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.vl-card-header {
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.vl-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.vl-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.vl-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 0.62rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.vl-btn-add:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
+  transform: translateY(-1px);
+}
+
+.vl-btn-reset {
+  height: 42px;
+  padding: 0 1rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.vl-btn-reset:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* ── Filter Controls Grid (3 items per row) ──────────────────────────────── */
+.vl-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+  align-items: flex-end;
+}
+
+.vl-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.vl-filter-group--wide {
+  grid-column: span 2;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .vl-filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vl-filter-group--wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .vl-filter-grid {
+    grid-template-columns: 1fr;
+  }
+  .vl-filter-group--wide {
+    grid-column: span 1;
+    min-width: 100%;
+  }
+}
+
+.vl-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vl-label span.req {
+  color: #dc2626;
+}
+
+.vl-input {
+  width: 100%;
+  min-height: 42px;
+  height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 0.85rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.vl-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+}
+
+.vl-input.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* ── Active Filter Pills Bar ─────────────────────────────────────────────── */
+.vl-active-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.vl-active-filters-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.vl-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+}
+
+.vl-filter-pill-remove {
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1;
+  color: #0284c7;
+}
+
+.vl-filter-pill-remove:hover {
+  color: #dc2626;
+}
+
+/* ── Table Styling ───────────────────────────────────────────────────────── */
+.vl-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.vl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.vl-table thead tr {
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.vl-table th {
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.vl-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.vl-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.vl-table tbody tr:hover {
+  background: #fcfcfd;
+}
+
+.vl-td-num {
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* ── Badges & Pills ──────────────────────────────────────────────────────── */
+.vl-veh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.83rem;
+  color: #0f172a;
+  letter-spacing: 0.02em;
+}
+
+.vl-license-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  color: #0284c7;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.83rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── Excel Column & Badge (Fixed size with multiline break) ── */
+.vl-excel-col {
+  width: 220px;
+  min-width: 200px;
+  max-width: 240px;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.vl-excel-badge {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #1d4ed8;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+.vl-excel-badge-text {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+  display: inline-block;
+  min-width: 0;
+  flex: 1;
+}
+
+.vl-manual-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.vl-date-text {
+  font-weight: 600;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vl-created-text {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.vl-amount-text {
+  font-weight: 700;
+  color: #0284c7;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Actions Cell ────────────────────────────────────────────────────────── */
+.vl-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vl-btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: #f8fafc;
+}
+
+.vl-btn-action.edit {
+  color: #0284c7;
+  border-color: #bae6fd;
+  background: #f0f9ff;
+}
+
+.vl-btn-action.edit:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.vl-btn-action.delete {
+  color: #dc2626;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.vl-btn-action.delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+/* ── Pagination Footer ───────────────────────────────────────────────────── */
+.vl-pagination-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0 0 0;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.vl-page-info {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.vl-page-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vl-page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.vl-page-btn:hover:not(:disabled) {
+  border-color: #0284c7;
+  color: #0284c7;
+  background: #f0f9ff;
+}
+
+.vl-page-btn.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+.vl-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Empty State ─────────────────────────────────────────────────────────── */
+.vl-empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  color: #64748b;
+}
+
+.vl-empty-state svg {
+  margin-bottom: 0.75rem;
+  opacity: 0.4;
+}
+
+.vl-empty-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.3rem;
+}
+
+.vl-empty-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ── Form Error Text ─────────────────────────────────────────────────────── */
+.vl-form-error {
+  font-size: 0.76rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* ── Modal Grid ──────────────────────────────────────────────────────────── */
+.vl-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .vl-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Custom Select Option Styling ────────────────────────────────────────── */
+.vl-select-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.12s ease;
+}
+
+.vl-select-option.is-focused {
+  background: #f0f9ff;
+}
+
+.vl-select-option.is-selected {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Dark Theme Overrides
+   ========================================================================== */
+[data-coreui-theme='dark'] .vl-card,
+.dark-theme .vl-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-coreui-theme='dark'] .vl-card-header,
+.dark-theme .vl-card-header {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-coreui-theme='dark'] .vl-card-title,
+.dark-theme .vl-card-title {
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .vl-label,
+.dark-theme .vl-label {
+  color: #cbd5e1;
+}
+
+[data-coreui-theme='dark'] .vl-input,
+.dark-theme .vl-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .vl-input:focus,
+.dark-theme .vl-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.25);
+}
+
+[data-coreui-theme='dark'] .vl-btn-reset,
+.dark-theme .vl-btn-reset {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .vl-btn-reset:hover,
+.dark-theme .vl-btn-reset:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+[data-coreui-theme='dark'] .vl-active-filters-bar,
+.dark-theme .vl-active-filters-bar {
+  border-top-color: #334155;
+}
+
+[data-coreui-theme='dark'] .vl-active-filters-title,
+.dark-theme .vl-active-filters-title {
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .vl-filter-pill,
+.dark-theme .vl-filter-pill {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: rgba(2, 132, 199, 0.35);
+  color: #38bdf8;
+}
+
+[data-coreui-theme='dark'] .vl-filter-pill-remove,
+.dark-theme .vl-filter-pill-remove {
+  color: #38bdf8;
+}
+
+[data-coreui-theme='dark'] .vl-table-wrap,
+.dark-theme .vl-table-wrap {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-coreui-theme='dark'] .vl-table thead tr,
+.dark-theme .vl-table thead tr {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+[data-coreui-theme='dark'] .vl-table th,
+.dark-theme .vl-table th {
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .vl-table td,
+.dark-theme .vl-table td {
+  border-bottom-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-coreui-theme='dark'] .vl-table tbody tr:hover,
+.dark-theme .vl-table tbody tr:hover {
+  background: #162032;
+}
+
+[data-coreui-theme='dark'] .vl-veh-pill,
+.dark-theme .vl-veh-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-coreui-theme='dark'] .vl-license-pill,
+.dark-theme .vl-license-pill {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: rgba(2, 132, 199, 0.35);
+  color: #38bdf8;
+}
+
+[data-coreui-theme='dark'] .vl-excel-badge,
+.dark-theme .vl-excel-badge {
+  background: rgba(59, 130, 246, 0.14);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+[data-coreui-theme='dark'] .vl-manual-badge,
+.dark-theme .vl-manual-badge {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .vl-date-text,
+.dark-theme .vl-date-text {
+  color: #e2e8f0;
+}
+
+[data-coreui-theme='dark'] .vl-amount-text,
+.dark-theme .vl-amount-text {
+  color: #38bdf8;
+}
+
+[data-coreui-theme='dark'] .vl-btn-action.edit,
+.dark-theme .vl-btn-action.edit {
+  background: rgba(2, 132, 199, 0.12);
+  border-color: rgba(2, 132, 199, 0.3);
+  color: #38bdf8;
+}
+
+[data-coreui-theme='dark'] .vl-btn-action.edit:hover,
+.dark-theme .vl-btn-action.edit:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+[data-coreui-theme='dark'] .vl-btn-action.delete,
+.dark-theme .vl-btn-action.delete {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+[data-coreui-theme='dark'] .vl-btn-action.delete:hover,
+.dark-theme .vl-btn-action.delete:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+[data-coreui-theme='dark'] .vl-page-btn,
+.dark-theme .vl-page-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-coreui-theme='dark'] .vl-page-btn:hover:not(:disabled),
+.dark-theme .vl-page-btn:hover:not(:disabled) {
+  background: rgba(2, 132, 199, 0.15);
+  border-color: #0284c7;
+  color: #38bdf8;
+}
+
+[data-coreui-theme='dark'] .vl-page-btn.active,
+.dark-theme .vl-page-btn.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+[data-coreui-theme='dark'] .vl-select-option.is-focused,
+.dark-theme .vl-select-option.is-focused {
+  background: #1e293b;
+}
