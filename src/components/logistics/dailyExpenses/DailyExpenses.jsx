@@ -59,7 +59,6 @@ const EMPTY_FORM = {
   date: new Date().toISOString().split('T')[0],
   vehicleId: '',
   vehicleNumber: '',
-  description: '',
   amount: '',
 }
 
@@ -488,10 +487,8 @@ const DailyExpenses = () => {
           date: dateFilter || undefined,
           expenseDate: dateFilter || undefined,
           createdDate: createdDateFilter || undefined,
-          vehicleId: selectedVehicle?.value || undefined,
+          vehicleId: selectedVehicle?.value || selectedVehicle?.id || undefined,
           fileHistoryId: selectedExcel?.id ?? selectedExcel?.fileHistoryId ?? undefined,
-          fileName: selectedExcel?.fileName || undefined,
-          uploadedExcel: selectedExcel?.fileName || selectedExcel?.value || undefined,
         }
 
         const result = await dailyExpenseService.getDailyExpenses(params, abortRef.current.signal)
@@ -596,7 +593,6 @@ const DailyExpenses = () => {
       date: item.date || item.expenseDate ? (item.date || item.expenseDate).split('T')[0] : '',
       vehicleId: vehMatch.value,
       vehicleNumber: vehNum || vehMatch.label,
-      description: item.description || item.expenseType || item.category || '',
       amount: item.amount !== undefined && item.amount !== null ? String(item.amount) : '',
     })
     setFormVehicle(vehMatch)
@@ -614,9 +610,7 @@ const DailyExpenses = () => {
       expenseDate: form.date,
       vehicleId: form.vehicleId || undefined,
       vehicleNumber: form.vehicleNumber || undefined,
-      description: form.description?.trim() || undefined,
-      expenseType: form.description?.trim() || undefined,
-      amount: Number(form.amount),
+      expenses: Number(form.amount),
     }
 
     try {
@@ -698,6 +692,28 @@ const DailyExpenses = () => {
   // ─── Render Component ───────────────────────────────────────────────────────
   return (
     <div className="de-page">
+      {/* ── Page Header (Topic) ── */}
+      <div className="de-page-header">
+        <div className="de-header-left">
+          <div className="de-header-icon">
+            <CIcon icon={cilMoney} size="xl" />
+          </div>
+          <div>
+            <h1 className="de-page-title">Daily Expenses Management</h1>
+            <p className="de-page-subtitle">
+              View, filter, edit, and manage all logged vehicle expenses and daily operational costs
+            </p>
+          </div>
+        </div>
+
+        <div className="de-header-actions">
+          <button className="de-btn-add" onClick={openAddModal} id="btn-add-daily-expense">
+            <CIcon icon={cilPlus} />
+            <span>Add Daily Expense</span>
+          </button>
+        </div>
+      </div>
+
       {/* ── Filter Card ── */}
       <CCard className="de-card mb-4">
         <CCardHeader className="de-card-header">
@@ -706,18 +722,16 @@ const DailyExpenses = () => {
             <span>Filter Daily Expenses</span>
             {activeFiltersCount > 0 && (
               <span className="badge bg-success rounded-pill ms-2" style={{ fontSize: '0.75rem' }}>
-                {activeFiltersCount} active
+                {activeFiltersCount} Active
               </span>
             )}
           </div>
-          <div className="de-card-actions">
-            <button className="de-btn-reset" onClick={handleResetFilters}>
-              <CIcon icon={cilReload} size="sm" /> Reset Filters
+          {activeFiltersCount > 0 && (
+            <button className="de-btn-reset" onClick={handleResetFilters} id="btn-reset-filters">
+              <CIcon icon={cilReload} size="sm" />
+              <span>Reset Filters</span>
             </button>
-            <button className="de-btn-add" onClick={openAddModal} id="btn-add-daily-expense">
-              <CIcon icon={cilPlus} /> Add Daily Expense
-            </button>
-          </div>
+          )}
         </CCardHeader>
 
         <CCardBody className="p-3">
@@ -1062,19 +1076,7 @@ const DailyExpenses = () => {
                 styles={selectStyles}
                 menuPortalTarget={document.body}
               />
-              {errors.vehicleId && <div className="de-form-error">{errors.vehicleId}</div>}
-            </div>
-
-            {/* Expense Description / Category */}
-            <div className="de-filter-group mb-3">
-              <label className="de-label">Description / Category</label>
-              <input
-                type="text"
-                className="de-input"
-                placeholder="e.g. Fuel, Maintenance, Toll, Driver Allowance"
-                value={form.description}
-                onChange={(e) => setFormField('description', e.target.value)}
-              />
+              {errors.vehicleId && <div className="dr-form-error">{errors.vehicleId}</div>}
             </div>
 
             {/* Amount */}
