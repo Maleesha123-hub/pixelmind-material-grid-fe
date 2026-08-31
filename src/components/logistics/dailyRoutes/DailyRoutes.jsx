@@ -218,7 +218,7 @@ const formatVehicleOption = (v) => {
     v.vehicleNo ||
     v.registrationNumber ||
     (rawId ? `Vehicle #${rawId}` : '')
-  const cap = v.capacity ? `${v.capacity}m³` : ''
+  const cap = v.capacity ? `${v.capacity}cube` : ''
   const driver = v.driverName || v.driver || ''
 
   return {
@@ -249,7 +249,7 @@ const CustomVehicleOption = (props) => {
             {data.vehicleNumber || data.label}
           </span>
           {data.capacity && (
-            <span style={{ fontSize: '0.76rem', color: '#64748b' }}>({data.capacity}m³)</span>
+            <span style={{ fontSize: '0.76rem', color: '#64748b' }}>({data.capacity}cube)</span>
           )}
         </div>
         {data.driverName && (
@@ -1057,7 +1057,11 @@ const DailyRoutes = () => {
                           <td className="dr-excel-col">
                             {fileName ? (
                               <span className="dr-excel-badge" title={fileName}>
-                                <CIcon icon={cilFile} size="sm" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                <CIcon
+                                  icon={cilFile}
+                                  size="sm"
+                                  style={{ flexShrink: 0, marginTop: '2px' }}
+                                />
                                 <span className="dr-excel-badge-text">{fileName}</span>
                               </span>
                             ) : (

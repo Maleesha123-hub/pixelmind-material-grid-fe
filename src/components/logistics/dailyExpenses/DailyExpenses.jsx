@@ -209,7 +209,7 @@ const formatVehicleOption = (v) => {
   if (!v) return null
   const num = v.vehicleNumber || v.regNumber || v.number || (v.id ? `Vehicle #${v.id}` : '')
   const driver = v.driverName || v.assignedDriver || ''
-  const cap = v.capacity ? `${v.capacity}m³` : ''
+  const cap = v.capacity ? `${v.capacity}cube` : ''
   const labelText = [num, driver ? `(${driver})` : '', cap].filter(Boolean).join(' • ')
 
   return {
@@ -239,7 +239,7 @@ const CustomVehicleOption = (props) => {
             {data.vehicleNumber || data.label}
           </span>
           {data.capacity && (
-            <span style={{ fontSize: '0.76rem', color: '#64748b' }}>({data.capacity}m³)</span>
+            <span style={{ fontSize: '0.76rem', color: '#64748b' }}>({data.capacity}cube)</span>
           )}
         </div>
         {data.driverName && (

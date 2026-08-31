@@ -44,11 +44,11 @@ const ROUTES = [
 ]
 
 const SUPPLIER_ITEMS = [
-  { value: 1, label: 'River Sand — RS-001', name: 'River Sand', code: 'RS-001', transportPricePerKm: 2.5, unit: 'm³' },
+  { value: 1, label: 'River Sand — RS-001', name: 'River Sand', code: 'RS-001', transportPricePerKm: 2.5, unit: 'cube' },
   { value: 2, label: 'Blue Metal Gravel — BM-002', name: 'Blue Metal Gravel', code: 'BM-002', transportPricePerKm: 3.0, unit: 'MT' },
   { value: 3, label: 'Cement (Holcim) — CM-003', name: 'Cement (Holcim)', code: 'CM-003', transportPricePerKm: 1.8, unit: 'Bags' },
   { value: 4, label: 'Steel Rebar — SR-004', name: 'Steel Rebar', code: 'SR-004', transportPricePerKm: 4.2, unit: 'MT' },
-  { value: 5, label: 'Quarry Dust — QD-005', name: 'Quarry Dust', code: 'QD-005', transportPricePerKm: 2.1, unit: 'm³' },
+  { value: 5, label: 'Quarry Dust — QD-005', name: 'Quarry Dust', code: 'QD-005', transportPricePerKm: 2.1, unit: 'cube' },
 ]
 
 const DRIVERS = [

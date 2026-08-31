@@ -665,7 +665,7 @@ const Receipts = () => {
             <div>
               <div className="rc-kpi-label">Total Volume</div>
               <div className="rc-kpi-value">
-                {Number(totalCubes).toFixed(1)} <span style={{ fontSize: '0.85rem' }}>m³</span>
+                {Number(totalCubes).toFixed(1)} <span style={{ fontSize: '0.85rem' }}>cube</span>
               </div>
               <div className="rc-kpi-sub">Total material cubes</div>
             </div>

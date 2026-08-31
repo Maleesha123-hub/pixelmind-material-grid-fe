@@ -208,15 +208,15 @@ const formatVehicleOption = (v) => {
     v.vehicleNo ||
     v.registrationNumber ||
     (rawId ? `Vehicle #${rawId}` : '')
-  const cap = v.capacity || ''
+  const cap = v.capacity !== undefined && v.capacity !== null ? v.capacity : ''
   const driver = v.driverName || v.driver || ''
 
   return {
-    value: rawId,
+    value: rawId ?? num,
     id: rawId,
     vehicleId: rawId,
     vehicleNumber: num,
-    label: cap ? `${num} • ${cap}m³` : num || `Vehicle #${rawId}`,
+    label: cap ? `${num} (${cap}cube)` : num || `Vehicle #${rawId}`,
     capacity: cap,
     driverName: driver,
     raw: v,
@@ -234,7 +234,7 @@ const formatLicenseOption = (l) => {
       : ''
 
   return {
-    value: rawId,
+    value: rawId ?? code,
     id: rawId,
     licenseId: rawId,
     licenseCode: code,
@@ -260,6 +260,31 @@ const formatExcelOption = (f) => {
   }
 }
 
+// ─── Custom Filter Option for React-Select ───────────────────────────────────
+const customFilterOption = (candidate, input) => {
+  if (!input || !input.trim()) return true
+  const q = input.toLowerCase().trim()
+  const data = candidate.data || {}
+  const raw = data.raw || {}
+  const label = String(candidate.label || '').toLowerCase()
+  const value = String(candidate.value || '').toLowerCase()
+  const num = String(
+    data.vehicleNumber || raw.vehicleNumber || data.licenseCode || raw.licenseCode || '',
+  ).toLowerCase()
+  const driver = String(data.driverName || raw.driverName || '').toLowerCase()
+  const cap = String(data.capacity || raw.capacity || '').toLowerCase()
+  const fileName = String(data.fileName || raw.fileName || '').toLowerCase()
+
+  return (
+    label.includes(q) ||
+    value.includes(q) ||
+    num.includes(q) ||
+    driver.includes(q) ||
+    cap.includes(q) ||
+    fileName.includes(q)
+  )
+}
+
 // ─── Custom Select Option & SingleValue Components ───────────────────────────
 const CustomVehicleOption = (props) => {
   const { data } = props
@@ -272,7 +297,7 @@ const CustomVehicleOption = (props) => {
             {data.vehicleNumber || data.label}
           </span>
           {data.capacity && (
-            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>({data.capacity}m³)</span>
+            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>({data.capacity}cube)</span>
           )}
         </div>
         {data.driverName && (
@@ -306,7 +331,7 @@ const CustomVehicleSingleValue = (props) => {
         </span>
         {props.data.capacity && (
           <span style={{ fontSize: '0.75rem', color: '#64748b', marginLeft: '4px' }}>
-            ({props.data.capacity}m³)
+            ({props.data.capacity}cube)
           </span>
         )}
       </span>
@@ -511,13 +536,104 @@ const VehicleLicenseManagement = () => {
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState({})
 
+  // ─── Live Vehicle Search API Binder ─────────────────────────────────────────
+  const handleVehicleSearch = useRef(
+    debounce(async (query) => {
+      if (!query || !query.trim()) {
+        if (allVehiclesRef.current.length > 0) {
+          setVehicleOptions(allVehiclesRef.current)
+        }
+        return
+      }
+      try {
+        const res = await vehicleService.searchVehicles(query.trim())
+        if (Array.isArray(res) && res.length > 0) {
+          setVehicleOptions(res.map(formatVehicleOption).filter(Boolean))
+        } else {
+          const q = query.toLowerCase().trim()
+          const filtered = allVehiclesRef.current.filter(
+            (v) =>
+              (v.label && v.label.toLowerCase().includes(q)) ||
+              (v.vehicleNumber && v.vehicleNumber.toLowerCase().includes(q)) ||
+              (v.driverName && v.driverName.toLowerCase().includes(q)),
+          )
+          setVehicleOptions(filtered)
+        }
+      } catch (err) {
+        console.warn('Vehicle search error:', err)
+        const q = query.toLowerCase().trim()
+        const filtered = allVehiclesRef.current.filter(
+          (v) =>
+            (v.label && v.label.toLowerCase().includes(q)) ||
+            (v.vehicleNumber && v.vehicleNumber.toLowerCase().includes(q)) ||
+            (v.driverName && v.driverName.toLowerCase().includes(q)),
+        )
+        setVehicleOptions(filtered)
+      }
+    }, 300),
+  ).current
+
+  const onVehicleInputChange = useCallback(
+    (inputValue, { action }) => {
+      if (action === 'input-change') {
+        handleVehicleSearch(inputValue)
+      }
+    },
+    [handleVehicleSearch],
+  )
+
+  // ─── Live License Search API Binder ─────────────────────────────────────────
+  const handleLicenseSearch = useRef(
+    debounce(async (query) => {
+      if (!query || !query.trim()) {
+        if (allLicensesRef.current.length > 0) {
+          setLicenseOptions(allLicensesRef.current)
+        }
+        return
+      }
+      try {
+        const res = await licenseService.getLicenses({ search: query.trim(), size: 100 })
+        const lList = Array.isArray(res) ? res : res?.content || res?.data || []
+        if (Array.isArray(lList) && lList.length > 0) {
+          setLicenseOptions(lList.map(formatLicenseOption).filter(Boolean))
+        } else {
+          const q = query.toLowerCase().trim()
+          const filtered = allLicensesRef.current.filter(
+            (l) =>
+              (l.label && l.label.toLowerCase().includes(q)) ||
+              (l.licenseCode && l.licenseCode.toLowerCase().includes(q)),
+          )
+          setLicenseOptions(filtered)
+        }
+      } catch (err) {
+        console.warn('License search error:', err)
+        const q = query.toLowerCase().trim()
+        const filtered = allLicensesRef.current.filter(
+          (l) =>
+            (l.label && l.label.toLowerCase().includes(q)) ||
+            (l.licenseCode && l.licenseCode.toLowerCase().includes(q)),
+        )
+        setLicenseOptions(filtered)
+      }
+    }, 300),
+  ).current
+
+  const onLicenseInputChange = useCallback(
+    (inputValue, { action }) => {
+      if (action === 'input-change') {
+        handleLicenseSearch(inputValue)
+      }
+    },
+    [handleLicenseSearch],
+  )
+
   // ─── Fetch Initial Filter Options ───────────────────────────────────────────
   const loadFilterOptions = useCallback(async () => {
     setOptionsLoading(true)
     try {
       const [vehiclesRes, licRes, uploadsRes] = await Promise.allSettled([
-        vehicleService.getAllVehicles(),
-        licenseService.getLicenses({ size: 200 }),
+        vehicleService.getVehicles({ size: 300 }),
+        licenseService.getLicenses({ size: 300 }),
         fileHistoryService.getFilesByFileType('VEHICLE_LICENSE', ''),
       ])
 
@@ -525,6 +641,12 @@ const VehicleLicenseManagement = () => {
         const vList = Array.isArray(vehiclesRes.value)
           ? vehiclesRes.value
           : vehiclesRes.value?.content || vehiclesRes.value?.data || []
+        const vOpts = vList.map(formatVehicleOption).filter(Boolean)
+        allVehiclesRef.current = vOpts
+        setVehicleOptions(vOpts)
+      } else {
+        const fallback = await vehicleService.getAllVehicles().catch(() => [])
+        const vList = Array.isArray(fallback) ? fallback : fallback?.content || []
         const vOpts = vList.map(formatVehicleOption).filter(Boolean)
         allVehiclesRef.current = vOpts
         setVehicleOptions(vOpts)
@@ -666,6 +788,9 @@ const VehicleLicenseManagement = () => {
     setAssignDateFilter('')
     setCreatedDateFilter('')
     setSelectedExcel(null)
+    if (allVehiclesRef.current.length > 0) setVehicleOptions(allVehiclesRef.current)
+    if (allLicensesRef.current.length > 0) setLicenseOptions(allLicensesRef.current)
+    if (allExcelOptionsRef.current.length > 0) setExcelOptions(allExcelOptionsRef.current)
   }
 
   // Active filters count for visual badge
@@ -705,6 +830,8 @@ const VehicleLicenseManagement = () => {
     })
     setFormVehicle(null)
     setFormLicense(null)
+    if (allVehiclesRef.current.length > 0) setVehicleOptions(allVehiclesRef.current)
+    if (allLicensesRef.current.length > 0) setLicenseOptions(allLicensesRef.current)
     setErrors({})
     setModalVisible(true)
   }
@@ -721,60 +848,107 @@ const VehicleLicenseManagement = () => {
         : rawDate.substring(0, 10)
       : ''
 
-    const vehId = item.vehicle?.id ?? item.vehicleId ?? item.vehicle?.vehicleId ?? ''
-    const vehNum = item.vehicle?.vehicleNumber ?? item.vehicleNumber ?? item.vehicle?.number ?? ''
+    const vehId =
+      item.vehicle?.id ??
+      item.vehicleId ??
+      item.vehicle?.vehicleId ??
+      (typeof item.vehicle === 'number' ? item.vehicle : '')
+    const vehNum =
+      (typeof item.vehicle === 'string' ? item.vehicle : '') ||
+      item.vehicle?.vehicleNumber ||
+      item.vehicleNumber ||
+      item.vehicleNo ||
+      item.vehicle?.number ||
+      item.vehicle?.vehicleNo ||
+      item.vehicle?.registrationNumber ||
+      ''
 
-    const vehMatch =
+    let vehMatch =
       vehicleOptions.find(
         (v) =>
           (vehId && (String(v.value) === String(vehId) || String(v.id) === String(vehId))) ||
           (vehNum &&
             (v.vehicleNumber === vehNum ||
               v.raw?.vehicleNumber === vehNum ||
-              v.label?.includes(vehNum))),
+              v.label?.toLowerCase().includes(vehNum.toLowerCase()))),
       ) ||
-      (vehId || vehNum
-        ? {
-            value: vehId,
-            id: vehId,
-            vehicleId: vehId,
-            vehicleNumber: vehNum,
-            label: vehNum || `Vehicle #${vehId}`,
-            raw: item.vehicle || {},
-          }
-        : null)
+      allVehiclesRef.current.find(
+        (v) =>
+          (vehId && (String(v.value) === String(vehId) || String(v.id) === String(vehId))) ||
+          (vehNum &&
+            (v.vehicleNumber === vehNum ||
+              v.raw?.vehicleNumber === vehNum ||
+              v.label?.toLowerCase().includes(vehNum.toLowerCase()))),
+      )
 
-    const licId = item.license?.id ?? item.licenseId ?? item.license?.licenseId ?? ''
+    if (!vehMatch && (vehId || vehNum)) {
+      vehMatch = {
+        value: vehId || vehNum,
+        id: vehId || null,
+        vehicleId: vehId || null,
+        vehicleNumber: vehNum,
+        label: item.vehicle?.capacity
+          ? `${vehNum} (${item.vehicle.capacity}cube)`
+          : vehNum || `Vehicle #${vehId}`,
+        capacity: item.vehicle?.capacity || '',
+        driverName: item.vehicle?.driverName || '',
+        raw: typeof item.vehicle === 'object' ? item.vehicle : {},
+      }
+      setVehicleOptions((prev) => [
+        vehMatch,
+        ...prev.filter((p) => String(p.value) !== String(vehMatch.value)),
+      ])
+    }
+
+    const licId =
+      item.license?.id ??
+      item.licenseId ??
+      item.license?.licenseId ??
+      (typeof item.license === 'number' ? item.license : '')
     const licCode =
-      item.license?.licenseCode ??
-      item.licenseCode ??
-      item.license?.code ??
+      (typeof item.license === 'string' ? item.license : '') ||
+      item.license?.licenseCode ||
+      item.licenseCode ||
+      item.license?.code ||
       (licId ? `LIC-${licId}` : '')
 
-    const licMatch =
+    let licMatch =
       licenseOptions.find(
         (l) =>
           (licId && (String(l.value) === String(licId) || String(l.id) === String(licId))) ||
           (licCode &&
             (l.licenseCode === licCode ||
               l.raw?.licenseCode === licCode ||
-              l.label?.includes(licCode))),
+              l.label?.toLowerCase().includes(licCode.toLowerCase()))),
       ) ||
-      (licId || licCode
-        ? {
-            value: licId,
-            id: licId,
-            licenseId: licId,
-            licenseCode: licCode,
-            label: item.license ? formatLicenseOption(item.license)?.label || licCode : licCode,
-            raw: item.license || {},
-          }
-        : null)
+      allLicensesRef.current.find(
+        (l) =>
+          (licId && (String(l.value) === String(licId) || String(l.id) === String(licId))) ||
+          (licCode &&
+            (l.licenseCode === licCode ||
+              l.raw?.licenseCode === licCode ||
+              l.label?.toLowerCase().includes(licCode.toLowerCase()))),
+      )
+
+    if (!licMatch && (licId || licCode)) {
+      licMatch = {
+        value: licId || licCode,
+        id: licId || null,
+        licenseId: licId || null,
+        licenseCode: licCode,
+        label: item.license ? formatLicenseOption(item.license)?.label || licCode : licCode,
+        raw: typeof item.license === 'object' ? item.license : {},
+      }
+      setLicenseOptions((prev) => [
+        licMatch,
+        ...prev.filter((p) => String(p.value) !== String(licMatch.value)),
+      ])
+    }
 
     setForm({
-      vehicleId: vehMatch ? vehMatch.value : '',
+      vehicleId: vehMatch ? vehMatch.id || vehMatch.value : '',
       vehicleNumber: vehMatch ? vehMatch.vehicleNumber || vehMatch.label : '',
-      licenseId: licMatch ? licMatch.value : '',
+      licenseId: licMatch ? licMatch.id || licMatch.value : '',
       licenseCode: licMatch ? licMatch.licenseCode || licMatch.label : '',
       assignDate: formattedDate,
     })
@@ -937,6 +1111,8 @@ const VehicleLicenseManagement = () => {
                 options={licenseOptions}
                 value={selectedLicense}
                 onChange={setSelectedLicense}
+                onInputChange={onLicenseInputChange}
+                filterOption={customFilterOption}
                 components={{
                   Option: CustomLicenseOption,
                   SingleValue: CustomLicenseSingleValue,
@@ -960,6 +1136,8 @@ const VehicleLicenseManagement = () => {
                 options={vehicleOptions}
                 value={selectedVehicle}
                 onChange={setSelectedVehicle}
+                onInputChange={onVehicleInputChange}
+                filterOption={customFilterOption}
                 components={{
                   Option: CustomVehicleOption,
                   SingleValue: CustomVehicleSingleValue,
@@ -1012,6 +1190,7 @@ const VehicleLicenseManagement = () => {
                 value={selectedExcel}
                 onChange={setSelectedExcel}
                 onInputChange={onExcelInputChange}
+                filterOption={customFilterOption}
                 components={{
                   Option: CustomExcelOption,
                   SingleValue: CustomExcelSingleValue,
@@ -1327,12 +1506,14 @@ const VehicleLicenseManagement = () => {
                 value={formVehicle}
                 onChange={(opt) => {
                   setFormVehicle(opt)
-                  setFormField('vehicleId', opt ? opt.value : '')
+                  setFormField('vehicleId', opt ? opt.id || opt.value : '')
                   setFormField(
                     'vehicleNumber',
                     opt ? opt.vehicleNumber || opt.raw?.vehicleNumber || opt.label : '',
                   )
                 }}
+                onInputChange={onVehicleInputChange}
+                filterOption={customFilterOption}
                 components={{
                   Option: CustomVehicleOption,
                   SingleValue: CustomVehicleSingleValue,
@@ -1357,12 +1538,14 @@ const VehicleLicenseManagement = () => {
                 value={formLicense}
                 onChange={(opt) => {
                   setFormLicense(opt)
-                  setFormField('licenseId', opt ? opt.value : '')
+                  setFormField('licenseId', opt ? opt.id || opt.value : '')
                   setFormField(
                     'licenseCode',
                     opt ? opt.licenseCode || opt.raw?.licenseCode || opt.label : '',
                   )
                 }}
+                onInputChange={onLicenseInputChange}
+                filterOption={customFilterOption}
                 components={{
                   Option: CustomLicenseOption,
                   SingleValue: CustomLicenseSingleValue,
