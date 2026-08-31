@@ -1308,8 +1308,8 @@ const VehicleLicenseManagement = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '48px' }}>#</th>
-                      <th>License Code</th>
                       <th>Vehicle Number</th>
+                      <th>License Code</th>
                       <th>License Assigned Date</th>
                       <th className="vl-excel-col">Uploaded Excel / Source</th>
                       <th>Created Date</th>
@@ -1332,19 +1332,19 @@ const VehicleLicenseManagement = () => {
                         <tr key={item.id || idx}>
                           <td className="vl-td-num">{currentPage * PAGE_SIZE + idx + 1}</td>
 
-                          {/* License Code */}
-                          <td>
-                            <span className="vl-license-pill">
-                              <CIcon icon={cilContact} size="sm" />
-                              {licCode}
-                            </span>
-                          </td>
-
                           {/* Vehicle Number */}
                           <td>
                             <span className="vl-veh-pill">
                               <CIcon icon={cilTruck} size="sm" className="text-secondary" />
                               {vehNum}
+                            </span>
+                          </td>
+
+                          {/* License Code */}
+                          <td>
+                            <span className="vl-license-pill">
+                              <CIcon icon={cilContact} size="sm" />
+                              {licCode}
                             </span>
                           </td>
 
