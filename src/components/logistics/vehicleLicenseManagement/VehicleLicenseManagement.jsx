@@ -814,7 +814,6 @@ const VehicleLicenseManagement = () => {
     const e = {}
     if (!form.vehicleId && !form.vehicleNumber) e.vehicleId = 'Please select a vehicle'
     if (!form.licenseId && !form.licenseCode) e.licenseId = 'Please select a license'
-    if (!form.assignDate) e.assignDate = 'Please select a license assigned date'
 
     setErrors(e)
     return Object.keys(e).length === 0
@@ -823,11 +822,7 @@ const VehicleLicenseManagement = () => {
   const openAddModal = () => {
     setEditMode(false)
     setSelectedId(null)
-    const today = new Date().toISOString().split('T')[0]
-    setForm({
-      ...EMPTY_FORM,
-      assignDate: today,
-    })
+    setForm(EMPTY_FORM)
     setFormVehicle(null)
     setFormLicense(null)
     if (allVehiclesRef.current.length > 0) setVehicleOptions(allVehiclesRef.current)
@@ -1324,9 +1319,22 @@ const VehicleLicenseManagement = () => {
                         item.license?.licenseCode ||
                         item.licenseCode ||
                         `License #${item.license?.id || item.licenseId || '—'}`
-                      const assignDate = item.assignDate || item.assignedDate || item.date
+                      const assignDate =
+                        item.assignDate ||
+                        item.assignedDate ||
+                        item.date ||
+                        item.licenseAssignedDate ||
+                        item.assignedAt
                       const createdDate = item.createdDate || item.createdAt
                       const amountVal = item.license?.price ?? item.price ?? item.amount
+                      const hasAssignedDate = Boolean(
+                        assignDate &&
+                          String(assignDate).trim() !== '' &&
+                          String(assignDate).trim() !== '-' &&
+                          String(assignDate).trim() !== '—' &&
+                          String(assignDate).trim() !== 'null' &&
+                          String(assignDate).trim() !== 'undefined',
+                      )
 
                       return (
                         <tr key={item.id || idx}>
@@ -1393,22 +1401,28 @@ const VehicleLicenseManagement = () => {
 
                           {/* Actions */}
                           <td style={{ textAlign: 'center' }}>
-                            <div className="vl-actions-cell" style={{ justifyContent: 'center' }}>
-                              <button
-                                className="vl-btn-action edit"
-                                title="Edit License Record"
-                                onClick={() => openEditModal(item)}
-                              >
-                                <CIcon icon={cilPencil} size="sm" />
-                              </button>
-                              <button
-                                className="vl-btn-action delete"
-                                title="Delete License Record"
-                                onClick={() => handleDelete(item)}
-                              >
-                                <CIcon icon={cilTrash} size="sm" />
-                              </button>
-                            </div>
+                            {hasAssignedDate ? (
+                              <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+                                —
+                              </span>
+                            ) : (
+                              <div className="vl-actions-cell" style={{ justifyContent: 'center' }}>
+                                <button
+                                  className="vl-btn-action edit"
+                                  title="Edit License Record"
+                                  onClick={() => openEditModal(item)}
+                                >
+                                  <CIcon icon={cilPencil} size="sm" />
+                                </button>
+                                <button
+                                  className="vl-btn-action delete"
+                                  title="Delete License Record"
+                                  onClick={() => handleDelete(item)}
+                                >
+                                  <CIcon icon={cilTrash} size="sm" />
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       )
@@ -1555,21 +1569,6 @@ const VehicleLicenseManagement = () => {
                 menuPortalTarget={document.body}
               />
               {errors.licenseId && <div className="vl-form-error">{errors.licenseId}</div>}
-            </div>
-
-            {/* License Assigned Date */}
-            <div className="vl-filter-group mb-3">
-              <label className="vl-label">
-                <CIcon icon={cilCalendar} size="sm" />
-                License Assigned Date <span className="req">*</span>
-              </label>
-              <input
-                type="date"
-                className={`vl-input ${errors.assignDate ? 'error' : ''}`}
-                value={form.assignDate}
-                onChange={(e) => setFormField('assignDate', e.target.value)}
-              />
-              {errors.assignDate && <div className="vl-form-error">{errors.assignDate}</div>}
             </div>
           </div>
         </CModalBody>
