@@ -58,6 +58,7 @@ const EMPTY_FORM = {
   vehicleNumber: '',
   licenseId: '',
   licenseCode: '',
+  assignDate: '',
 }
 
 // ─── Debounce Helper ──────────────────────────────────────────────────────────
@@ -319,7 +320,6 @@ const CustomLicenseOption = (props) => {
   const hasDates = raw.startDate || raw.endDate
   const priceFormatted =
     raw.price !== undefined && raw.price !== null ? formatCurrency(raw.price) : null
-
   return (
     <components.Option {...props}>
       <div className="d-flex align-items-center justify-content-between gap-2">
@@ -689,6 +689,7 @@ const VehicleLicenseManagement = () => {
     const e = {}
     if (!form.vehicleId && !form.vehicleNumber) e.vehicleId = 'Please select a vehicle'
     if (!form.licenseId && !form.licenseCode) e.licenseId = 'Please select a license'
+    if (!form.assignDate) e.assignDate = 'Please select a license assigned date'
 
     setErrors(e)
     return Object.keys(e).length === 0
@@ -697,7 +698,11 @@ const VehicleLicenseManagement = () => {
   const openAddModal = () => {
     setEditMode(false)
     setSelectedId(null)
-    setForm(EMPTY_FORM)
+    const today = new Date().toISOString().split('T')[0]
+    setForm({
+      ...EMPTY_FORM,
+      assignDate: today,
+    })
     setFormVehicle(null)
     setFormLicense(null)
     setErrors({})
@@ -708,6 +713,13 @@ const VehicleLicenseManagement = () => {
   const openEditModal = (item) => {
     setEditMode(true)
     setSelectedId(item.id)
+
+    const rawDate = item.assignDate || item.assignedDate || item.date || ''
+    const formattedDate = rawDate
+      ? rawDate.includes('T')
+        ? rawDate.split('T')[0]
+        : rawDate.substring(0, 10)
+      : ''
 
     const vehId = item.vehicle?.id ?? item.vehicleId ?? item.vehicle?.vehicleId ?? ''
     const vehNum = item.vehicle?.vehicleNumber ?? item.vehicleNumber ?? item.vehicle?.number ?? ''
@@ -764,6 +776,7 @@ const VehicleLicenseManagement = () => {
       vehicleNumber: vehMatch ? vehMatch.vehicleNumber || vehMatch.label : '',
       licenseId: licMatch ? licMatch.value : '',
       licenseCode: licMatch ? licMatch.licenseCode || licMatch.label : '',
+      assignDate: formattedDate,
     })
     setFormVehicle(vehMatch)
     setFormLicense(licMatch)
@@ -781,6 +794,9 @@ const VehicleLicenseManagement = () => {
       vehicleNumber: form.vehicleNumber || undefined,
       licenseId: form.licenseId || undefined,
       licenseCode: form.licenseCode || undefined,
+      assignDate: form.assignDate || undefined,
+      assignedDate: form.assignDate || undefined,
+      date: form.assignDate || undefined,
     }
 
     try {
@@ -984,7 +1000,7 @@ const VehicleLicenseManagement = () => {
             </div>
 
             {/* Filter: Uploaded Excel */}
-            <div className="vl-filter-group vl-filter-group--wide">
+            <div className="vl-filter-group">
               <label className="vl-label">
                 <CIcon icon={cilDescription} size="sm" />
                 Uploaded Excel
@@ -1301,6 +1317,7 @@ const VehicleLicenseManagement = () => {
             {/* Vehicle Selection */}
             <div className="vl-filter-group mb-3">
               <label className="vl-label">
+                <CIcon icon={cilTruck} size="sm" />
                 Vehicle <span className="req">*</span>
               </label>
               <Select
@@ -1330,6 +1347,7 @@ const VehicleLicenseManagement = () => {
             {/* License Selection */}
             <div className="vl-filter-group mb-3">
               <label className="vl-label">
+                <CIcon icon={cilContact} size="sm" />
                 License <span className="req">*</span>
               </label>
               <Select
@@ -1354,6 +1372,21 @@ const VehicleLicenseManagement = () => {
                 menuPortalTarget={document.body}
               />
               {errors.licenseId && <div className="vl-form-error">{errors.licenseId}</div>}
+            </div>
+
+            {/* License Assigned Date */}
+            <div className="vl-filter-group mb-3">
+              <label className="vl-label">
+                <CIcon icon={cilCalendar} size="sm" />
+                License Assigned Date <span className="req">*</span>
+              </label>
+              <input
+                type="date"
+                className={`vl-input ${errors.assignDate ? 'error' : ''}`}
+                value={form.assignDate}
+                onChange={(e) => setFormField('assignDate', e.target.value)}
+              />
+              {errors.assignDate && <div className="vl-form-error">{errors.assignDate}</div>}
             </div>
           </div>
         </CModalBody>
