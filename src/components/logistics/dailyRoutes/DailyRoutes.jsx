@@ -1165,7 +1165,7 @@ const DailyRoutes = () => {
         <CModalBody className="p-4">
           <div className="dr-modal-grid">
             {/* Daily Route Date */}
-            <div className="dr-filter-group mb-3">
+            {/* <div className="dr-filter-group mb-3">
               <label className="dr-label">
                 Daily Route Date <span className="req">*</span>
               </label>
@@ -1177,7 +1177,7 @@ const DailyRoutes = () => {
                 onChange={(e) => setFormField('date', e.target.value)}
               />
               {errors.date && <div className="dr-form-error">{errors.date}</div>}
-            </div>
+            </div> */}
 
             {/* Bill Number */}
             <div className="dr-filter-group mb-3">
@@ -1195,7 +1195,7 @@ const DailyRoutes = () => {
             </div>
 
             {/* Vehicle Selection */}
-            <div className="dr-filter-group mb-3">
+            {/* <div className="dr-filter-group mb-3">
               <label className="dr-label">
                 Vehicle <span className="req">*</span>
               </label>
@@ -1217,7 +1217,7 @@ const DailyRoutes = () => {
                 menuPortalTarget={document.body}
               />
               {errors.vehicleId && <div className="dr-form-error">{errors.vehicleId}</div>}
-            </div>
+            </div> */}
 
             {/* Route Selection (Add New Daily Route only) */}
             {!editMode && (
