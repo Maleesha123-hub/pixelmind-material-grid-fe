@@ -594,11 +594,12 @@ const DailyRoutes = () => {
 
   const validateForm = () => {
     const e = {}
-    if (!form.date) e.date = 'Daily route date is required'
-    if (!form.billNumber.trim()) e.billNumber = 'Bill number is required'
-    if (!form.vehicleId && !form.vehicleNumber) e.vehicleId = 'Please select or enter a vehicle'
-    if (!editMode && !form.routeId && !form.routeCode) {
-      e.routeId = 'Please select or enter a route'
+    if (!form.billNumber || !form.billNumber.trim()) e.billNumber = 'Bill number is required'
+
+    if (!editMode) {
+      if (!form.date) e.date = 'Daily route date is required'
+      if (!form.vehicleId && !form.vehicleNumber) e.vehicleId = 'Please select or enter a vehicle'
+      if (!form.routeId && !form.routeCode) e.routeId = 'Please select or enter a route'
     }
 
     setErrors(e)
@@ -1164,20 +1165,21 @@ const DailyRoutes = () => {
 
         <CModalBody className="p-4">
           <div className="dr-modal-grid">
-            {/* Daily Route Date */}
-            {/* <div className="dr-filter-group mb-3">
-              <label className="dr-label">
-                Daily Route Date <span className="req">*</span>
-              </label>
-              <input
-                type="date"
-                className={`dr-input ${errors.date ? 'error' : ''}`}
-                value={form.date}
-                disabled={editMode}
-                onChange={(e) => setFormField('date', e.target.value)}
-              />
-              {errors.date && <div className="dr-form-error">{errors.date}</div>}
-            </div> */}
+            {/* Daily Route Date (Add New Daily Route only) */}
+            {!editMode && (
+              <div className="dr-filter-group mb-3">
+                <label className="dr-label">
+                  Daily Route Date <span className="req">*</span>
+                </label>
+                <input
+                  type="date"
+                  className={`dr-input ${errors.date ? 'error' : ''}`}
+                  value={form.date}
+                  onChange={(e) => setFormField('date', e.target.value)}
+                />
+                {errors.date && <div className="dr-form-error">{errors.date}</div>}
+              </div>
+            )}
 
             {/* Bill Number */}
             <div className="dr-filter-group mb-3">
@@ -1194,30 +1196,31 @@ const DailyRoutes = () => {
               {errors.billNumber && <div className="dr-form-error">{errors.billNumber}</div>}
             </div>
 
-            {/* Vehicle Selection */}
-            {/* <div className="dr-filter-group mb-3">
-              <label className="dr-label">
-                Vehicle <span className="req">*</span>
-              </label>
-              <Select
-                isClearable={!editMode}
-                isSearchable={!editMode}
-                isDisabled={editMode}
-                options={vehicleOptions}
-                value={formVehicle}
-                onChange={(opt) => {
-                  setFormVehicle(opt)
-                  setFormField('vehicleId', opt ? opt.value : '')
-                  setFormField('vehicleNumber', opt ? opt.raw?.vehicleNumber || opt.label : '')
-                }}
-                onInputChange={onVehicleInputChange}
-                components={{ Option: CustomVehicleOption }}
-                placeholder="Select vehicle..."
-                styles={selectStyles}
-                menuPortalTarget={document.body}
-              />
-              {errors.vehicleId && <div className="dr-form-error">{errors.vehicleId}</div>}
-            </div> */}
+            {/* Vehicle Selection (Add New Daily Route only) */}
+            {!editMode && (
+              <div className="dr-filter-group mb-3">
+                <label className="dr-label">
+                  Vehicle <span className="req">*</span>
+                </label>
+                <Select
+                  isClearable
+                  isSearchable
+                  options={vehicleOptions}
+                  value={formVehicle}
+                  onChange={(opt) => {
+                    setFormVehicle(opt)
+                    setFormField('vehicleId', opt ? opt.value : '')
+                    setFormField('vehicleNumber', opt ? opt.raw?.vehicleNumber || opt.label : '')
+                  }}
+                  onInputChange={onVehicleInputChange}
+                  components={{ Option: CustomVehicleOption }}
+                  placeholder="Select vehicle..."
+                  styles={selectStyles}
+                  menuPortalTarget={document.body}
+                />
+                {errors.vehicleId && <div className="dr-form-error">{errors.vehicleId}</div>}
+              </div>
+            )}
 
             {/* Route Selection (Add New Daily Route only) */}
             {!editMode && (
