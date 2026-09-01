@@ -43,8 +43,8 @@ export default defineConfig(() => {
       allowedHosts: [
         'meskoramaterialgrid.com',
         'www.meskoramaterialgrid.com',
-        'uat.meskoramaterialgrid.com',
-        'www.uat.meskoramaterialgrid.com',
+        'qa.meskoramaterialgrid.com',
+        'www.qa.meskoramaterialgrid.com',
       ],
     },
   }
