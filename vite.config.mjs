@@ -39,8 +39,13 @@ export default defineConfig(() => {
     // Production preview server
     preview: {
       host: '0.0.0.0',
-      port: 8080,
-      allowedHosts: ['meskoramaterialgrid.com', 'www.meskoramaterialgrid.com'],
+      port: 3000,
+      allowedHosts: [
+        'meskoramaterialgrid.com',
+        'www.meskoramaterialgrid.com',
+        'uat.meskoramaterialgrid.com',
+        'www.uat.meskoramaterialgrid.com',
+      ],
     },
   }
 })
