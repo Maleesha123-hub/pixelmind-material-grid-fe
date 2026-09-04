@@ -160,6 +160,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Persons',
+    to: '/persons',
+    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Vehicles',
     to: '/vehicles',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
