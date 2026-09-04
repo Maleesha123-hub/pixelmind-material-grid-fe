@@ -4,7 +4,7 @@
    Applied automatically when [data-coreui-theme="dark"] is active
    ═════════════════════════════════════════════════════════════════════════════ */
 
-[data-coreui-theme="dark"] {
+[data-coreui-theme='dark'] {
   // ─── Global Canvas & Theme Variables ───────────────────────────────────────
   --cui-body-bg: #090d16 !important;
   --cui-body-color: #f1f5f9 !important;
@@ -92,13 +92,19 @@
   }
 
   // ─── Page Titles & Headers ────────────────────────────────────────────────
-  h1, h2, h3, h4, h5, h6,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
   .vm-page-title,
   .vlm-page-title,
   .rt-page-title,
   .rc-page-title,
   .bu-page-title,
-  .pt-page-title {
+  .pt-page-title,
+  .pm-page-title {
     color: #f8fafc !important;
   }
 
@@ -108,6 +114,7 @@
   .rc-page-subtitle,
   .bu-page-subtitle,
   .pt-page-subtitle,
+  .pm-page-subtitle,
   .text-body-secondary,
   .text-muted {
     color: #94a3b8 !important;
@@ -118,7 +125,8 @@
   .rt-header-icon,
   .rc-header-icon,
   .bu-header-icon,
-  .pt-header-icon {
+  .pt-header-icon,
+  .pm-header-icon {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
     border: 1px solid #334155 !important;
     color: #f59e0b !important;
@@ -132,7 +140,8 @@
   .rt-card,
   .rc-card,
   .bu-card,
-  .pt-card {
+  .pt-card,
+  .pm-card {
     background-color: #0f172a !important;
     border: 1px solid #1e293b !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
@@ -145,7 +154,8 @@
   .rt-card-header,
   .rc-card-header,
   .bu-card-header,
-  .pt-card-header {
+  .pt-card-header,
+  .pm-card-header {
     background: linear-gradient(90deg, #131d31 0%, #0f172a 100%) !important;
     border-bottom: 1px solid #1e293b !important;
     color: #f8fafc !important;
@@ -157,7 +167,8 @@
   .rt-card-title,
   .rc-card-title,
   .bu-card-title,
-  .pt-card-title {
+  .pt-card-title,
+  .pm-card-title {
     color: #f8fafc !important;
   }
 
@@ -167,7 +178,8 @@
   .rt-card-body,
   .rc-card-body,
   .bu-card-body,
-  .pt-card-body {
+  .pt-card-body,
+  .pm-card-body {
     color: #cbd5e1 !important;
   }
 
@@ -178,10 +190,13 @@
   .vlm-input,
   .rt-input,
   .rc-input,
+  .pm-input,
+  .pm-select,
   .bu-search-input,
   .vlm-search-input,
   .vm-search-input,
   .rt-search-input,
+  .pm-search-input,
   .pt-input,
   .vm-select,
   .vlm-select,
@@ -212,6 +227,7 @@
   .vlm-label,
   .rt-label,
   .rc-label,
+  .pm-label,
   .form-label {
     color: #cbd5e1 !important;
   }
@@ -220,7 +236,8 @@
   .vlm-search-icon,
   .vm-search-icon,
   .rt-search-icon,
-  .rc-search-icon {
+  .rc-search-icon,
+  .pm-search-icon {
     color: #64748b !important;
   }
 
@@ -234,7 +251,8 @@
   .vlm-btn-reset,
   .vm-btn-reset,
   .rt-btn-reset,
-  .rc-btn-reset {
+  .rc-btn-reset,
+  .pm-btn-reset {
     background: #131d31 !important;
     border: 1px solid #334155 !important;
     color: #cbd5e1 !important;
@@ -255,7 +273,8 @@
   .rt-table,
   .rc-table,
   .bu-table,
-  .pt-table {
+  .pt-table,
+  .pm-table {
     background-color: #0f172a !important;
     color: #cbd5e1 !important;
     border-color: #1e293b !important;
@@ -297,7 +316,8 @@
   .rt-table-wrap,
   .rc-table-wrap,
   .bu-table-wrap,
-  .pt-table-wrap {
+  .pt-table-wrap,
+  .pm-table-wrap {
     background-color: #0f172a !important;
     border: 1px solid #1e293b !important;
     border-radius: 12px;
@@ -306,7 +326,8 @@
   .bu-td-num,
   .vm-td-num,
   .vlm-td-num,
-  .rc-td-num {
+  .rc-td-num,
+  .pm-td-num {
     color: #64748b !important;
   }
 
@@ -315,6 +336,7 @@
   .vm-table-footer,
   .rt-table-footer,
   .rc-table-footer,
+  .pm-table-footer,
   .bu-pagination-bar,
   .vm-pagination-bar,
   .rc-pagination-bar,
@@ -335,7 +357,8 @@
     .vm-count-chip,
     .vlm-count-chip,
     .rt-count-chip,
-    .rc-count-chip {
+    .rc-count-chip,
+    .pm-count-chip {
       background: #1e293b !important;
       border: 1px solid #334155 !important;
       color: #fbbf24 !important;
@@ -349,7 +372,8 @@
     .vm-page-btn,
     .rc-page-btn,
     .rt-page-btn,
-    .bu-page-btn {
+    .bu-page-btn,
+    .pm-page-btn {
       background: #131d31 !important;
       border: 1px solid #334155 !important;
       color: #cbd5e1 !important;
@@ -377,18 +401,45 @@
     }
   }
 
-  // ─── Badges, Code Pills & Chips in Dark Mode ──────────────────────────────
   // License & Vehicle Code Badges
   .vlm-code-pill,
   .vm-pill,
   .vm-reg-pill,
   .bu-veh-pill,
-  .rc-veh-pill {
-    background: #1e293b !important;
-    color: #f8fafc !important;
-    border: 1px solid #334155 !important;
+  .rc-veh-pill,
+  .pm-code-badge {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.35) !important;
     font-weight: 700;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  // Person Name Cell & Avatar
+  .pm-name-cell {
+    color: #f8fafc !important;
+    font-weight: 600 !important;
+  }
+
+  .pm-avatar-mini {
+    background: linear-gradient(135deg, #1e293b 0%, #172554 100%) !important;
+    color: #60a5fa !important;
+    border: 1px solid #1e3a8a !important;
+  }
+
+  // Person Type Pills
+  .pm-type-badge {
+    &.mount-owner {
+      background: rgba(16, 185, 129, 0.15) !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+      color: #34d399 !important;
+    }
+
+    &.excavator-owner {
+      background: rgba(59, 130, 246, 0.15) !important;
+      border: 1px solid rgba(59, 130, 246, 0.35) !important;
+      color: #60a5fa !important;
+    }
   }
 
   // Vehicle Capacity Pill
@@ -523,7 +574,8 @@
   // ─── Table Action Icon Buttons ─────────────────────────────────────────────
   .vlm-icon-btn,
   .vm-icon-btn,
-  .rt-icon-btn {
+  .rt-icon-btn,
+  .pm-icon-btn {
     background: #131d31 !important;
     border: 1px solid #334155 !important;
     color: #cbd5e1 !important;
@@ -593,6 +645,7 @@
   .vm-btn-cancel,
   .rt-btn-cancel,
   .pt-btn-cancel,
+  .pm-btn-cancel,
   .modal-footer .btn-light,
   .modal-footer .btn-secondary {
     background: #131d31 !important;
@@ -858,6 +911,7 @@
   .vm-modal,
   .vlm-modal,
   .rt-modal,
+  .pm-modal,
   .vm-bulk-modal {
     background-color: #0f172a !important;
     border: 1px solid #334155 !important;
@@ -867,7 +921,8 @@
     .modal-header,
     .vm-modal-header,
     .vlm-modal-header,
-    .rt-modal-header {
+    .rt-modal-header,
+    .pm-modal-header {
       background: linear-gradient(90deg, #131d31 0%, #0f172a 100%) !important;
       border-bottom: 1px solid #1e293b !important;
       color: #f8fafc !important;
@@ -876,14 +931,16 @@
     .modal-title,
     .vm-modal-title,
     .vlm-modal-title,
-    .rt-modal-title {
+    .rt-modal-title,
+    .pm-modal-title {
       color: #f8fafc !important;
     }
 
     .modal-body,
     .vm-modal-body,
     .vlm-modal-body,
-    .rt-modal-body {
+    .rt-modal-body,
+    .pm-modal-body {
       background-color: #0f172a !important;
       color: #cbd5e1 !important;
     }
@@ -891,7 +948,8 @@
     .modal-footer,
     .vm-modal-footer,
     .vlm-modal-footer,
-    .rt-modal-footer {
+    .rt-modal-footer,
+    .pm-modal-footer {
       background-color: #0f172a !important;
       border-top: 1px solid #1e293b !important;
     }
