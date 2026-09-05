@@ -823,6 +823,38 @@
           color: #0369a1 !important;
         }
       }
+
+      &--inspection.active {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.45) !important;
+        border-color: transparent !important;
+
+        .bu-tab-count {
+          background: #ffffff !important;
+          color: #7c3aed !important;
+        }
+      }
+
+      &--routes:hover:not(.active) {
+        background: rgba(245, 158, 11, 0.12) !important;
+        color: #fcd34d !important;
+      }
+
+      &--expenses:hover:not(.active) {
+        background: rgba(16, 185, 129, 0.12) !important;
+        color: #6ee7b7 !important;
+      }
+
+      &--licenses:hover:not(.active) {
+        background: rgba(2, 132, 199, 0.12) !important;
+        color: #7dd3fc !important;
+      }
+
+      &--inspection:hover:not(.active) {
+        background: rgba(124, 58, 237, 0.15) !important;
+        color: #c4b5fd !important;
+      }
     }
   }
 
