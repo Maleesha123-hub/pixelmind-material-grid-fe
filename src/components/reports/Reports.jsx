@@ -64,11 +64,46 @@ const ALL_VEHICLES_OPTION = {
 
 // ─── Fallback Mock Data for UI Demonstration ────────────────────────────────
 const MOCK_PERSONS = [
-  { value: '1', id: 1, label: 'Kasun Fernando', name: 'Kasun Fernando', personCode: 'PER000017', personType: 'MOUNT_OWNER' },
-  { value: '2', id: 2, label: 'Jayantha Silva', name: 'Jayantha Silva', personCode: 'PER000016', personType: 'MOUNT_OWNER' },
-  { value: '3', id: 3, label: 'Gamini Perera', name: 'Gamini Perera', personCode: 'PER000015', personType: 'EXCAVATOR_OWNER' },
-  { value: '4', id: 4, label: 'Farhan Mohamed', name: 'Farhan Mohamed', personCode: 'PER000014', personType: 'MOUNT_OWNER' },
-  { value: '5', id: 5, label: 'Lalith Kumara', name: 'Lalith Kumara', personCode: 'PER000013', personType: 'EXCAVATOR_OWNER' },
+  {
+    value: '1',
+    id: 1,
+    label: 'Kasun Fernando',
+    name: 'Kasun Fernando',
+    personCode: 'PER000017',
+    personType: 'MOUNT_OWNER',
+  },
+  {
+    value: '2',
+    id: 2,
+    label: 'Jayantha Silva',
+    name: 'Jayantha Silva',
+    personCode: 'PER000016',
+    personType: 'MOUNT_OWNER',
+  },
+  {
+    value: '3',
+    id: 3,
+    label: 'Gamini Perera',
+    name: 'Gamini Perera',
+    personCode: 'PER000015',
+    personType: 'EXCAVATOR_OWNER',
+  },
+  {
+    value: '4',
+    id: 4,
+    label: 'Farhan Mohamed',
+    name: 'Farhan Mohamed',
+    personCode: 'PER000014',
+    personType: 'MOUNT_OWNER',
+  },
+  {
+    value: '5',
+    id: 5,
+    label: 'Lalith Kumara',
+    name: 'Lalith Kumara',
+    personCode: 'PER000013',
+    personType: 'EXCAVATOR_OWNER',
+  },
 ]
 
 const MOCK_VEHICLES = [
@@ -154,11 +189,11 @@ const formatCurrency = (val) => {
 const getCustomSelectStyles = (isDark) => ({
   control: (base, state) => ({
     ...base,
-    minHeight: '38px',
+    minHeight: '42px',
     borderRadius: '8px',
     borderColor: state.isFocused ? '#f59e0b' : isDark ? '#334155' : '#cbd5e1',
-    boxShadow: state.isFocused ? '0 0 0 2px rgba(245,158,11,0.22)' : 'none',
-    fontSize: '0.84rem',
+    boxShadow: state.isFocused ? '0 0 0 3px rgba(245,158,11,0.22)' : 'none',
+    fontSize: '0.875rem',
     backgroundColor: isDark ? '#131d31' : '#ffffff',
     color: isDark ? '#f8fafc' : '#0f172a',
     cursor: 'pointer',
@@ -263,23 +298,27 @@ const CustomPersonOption = (props) => {
   const isAll = data.value === 'ALL'
   return (
     <components.Option {...props}>
-      <div className="d-flex align-items-center justify-content-between gap-2" style={{ minWidth: 0 }}>
+      <div
+        className="d-flex align-items-center justify-content-between gap-2"
+        style={{ minWidth: 0 }}
+      >
         <div className="d-flex align-items-center gap-2" style={{ minWidth: 0, flex: 1 }}>
           <div
             className={`rp-select-icon-box ${isAll ? '' : 'rp-select-icon-box--person'}`}
             style={
               isSelected
-                ? { background: 'rgba(255,255,255,0.25)', color: '#ffffff', borderColor: 'transparent' }
+                ? {
+                    background: 'rgba(255,255,255,0.25)',
+                    color: '#ffffff',
+                    borderColor: 'transparent',
+                  }
                 : undefined
             }
           >
             <CIcon icon={cilUser} size="sm" />
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              className="rp-select-title"
-              style={isSelected ? { color: '#ffffff' } : undefined}
-            >
+            <div className="rp-select-title" style={isSelected ? { color: '#ffffff' } : undefined}>
               {data.personCode && data.name
                 ? `${data.personCode} - ${data.name}`
                 : data.name || data.label}
@@ -337,7 +376,7 @@ const CustomPersonSingleValue = (props) => {
             color: 'inherit',
           }}
         >
-          {props.data.value === 'ALL' ? 'All Persons (Owners)' : props.data.label}
+          {props.data.value === 'ALL' ? 'Select a Person (Owner)' : props.data.label}
         </span>
       </span>
     </components.SingleValue>
@@ -790,7 +829,7 @@ const Reports = () => {
         <CCardBody className="rp-card-body">
           <CRow className="g-3">
             {/* Start Date */}
-            <CCol xs={12} sm={4} md={4}>
+            <CCol xs={12} sm={6} md={3}>
               <label className="rp-label" htmlFor="rp-start-date">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
                 Start Date
@@ -806,7 +845,7 @@ const Reports = () => {
             </CCol>
 
             {/* End Date */}
-            <CCol xs={12} sm={4} md={4}>
+            <CCol xs={12} sm={6} md={3}>
               <label className="rp-label" htmlFor="rp-end-date">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
                 End Date
@@ -822,7 +861,7 @@ const Reports = () => {
             </CCol>
 
             {/* Person Searchable Dropdown */}
-            <CCol xs={12} sm={4} md={4}>
+            <CCol xs={12} md={6}>
               <label className="rp-label">
                 <CIcon icon={cilUser} size="sm" className="text-warning" />
                 Person (Owner)
@@ -939,8 +978,6 @@ const Reports = () => {
         </CCardBody>
       </CCard>
 
-
-
       {/* ══════════ MODAL: REPORT PREVIEW (Real PDF Stream) ══════════ */}
       <CModal
         size="xl"
@@ -1002,21 +1039,12 @@ const Reports = () => {
 
           <div className="d-flex align-items-center gap-2">
             {previewPdfUrl && (
-              <a
-                href={previewPdfUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="rp-btn-open-tab"
-              >
+              <a href={previewPdfUrl} target="_blank" rel="noreferrer" className="rp-btn-open-tab">
                 <CIcon icon={cilExternalLink} /> Open in New Tab
               </a>
             )}
 
-            <button
-              type="button"
-              className="rp-btn-close"
-              onClick={handleClosePreviewModal}
-            >
+            <button type="button" className="rp-btn-close" onClick={handleClosePreviewModal}>
               Close
             </button>
 
