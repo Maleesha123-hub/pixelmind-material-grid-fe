@@ -862,22 +862,38 @@ const BulkUpload = () => {
 
         <div className="bu-header-actions">
           {activeTab === 'trips' && (
-            <button className="bu-btn-download" onClick={downloadTripsTemplate} id="btn-dl-routes-tpl">
+            <button
+              className="bu-btn-download bu-btn-download--routes"
+              onClick={downloadTripsTemplate}
+              id="btn-dl-routes-tpl"
+            >
               <CIcon icon={cilCloudDownload} /> Download Routes Template
             </button>
           )}
           {activeTab === 'expenses' && (
-            <button className="bu-btn-download" onClick={downloadExpensesTemplate} id="btn-dl-expenses-tpl">
+            <button
+              className="bu-btn-download bu-btn-download--expenses"
+              onClick={downloadExpensesTemplate}
+              id="btn-dl-expenses-tpl"
+            >
               <CIcon icon={cilCloudDownload} /> Download Expenses Template
             </button>
           )}
           {activeTab === 'licenses' && (
-            <button className="bu-btn-download" onClick={downloadLicensesTemplate} id="btn-dl-licenses-tpl">
+            <button
+              className="bu-btn-download bu-btn-download--licenses"
+              onClick={downloadLicensesTemplate}
+              id="btn-dl-licenses-tpl"
+            >
               <CIcon icon={cilCloudDownload} /> Download Licenses Template
             </button>
           )}
           {activeTab === 'inspection' && (
-            <button className="bu-btn-download" onClick={downloadInspectionTemplate} id="btn-dl-inspection-tpl">
+            <button
+              className="bu-btn-download bu-btn-download--inspection"
+              onClick={downloadInspectionTemplate}
+              id="btn-dl-inspection-tpl"
+            >
               <CIcon icon={cilCloudDownload} /> Download Inspection Template
             </button>
           )}
