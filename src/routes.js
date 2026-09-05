@@ -40,6 +40,9 @@ const VehicleLicenseManagement = React.lazy(
 // Receipts
 const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
 
+// Operations — Reports
+const Reports = React.lazy(() => import('./components/reports/Reports.jsx'))
+
 // Vehicles
 const Vehicle = React.lazy(() => import('./components/vehicles/vehicle/Vehicle.jsx'))
 const VehicleLicense = React.lazy(() => import('./components/vehicles/license/VehicleLicense.jsx'))
@@ -82,6 +85,7 @@ export const routes = [
     element: VehicleLicenseManagement,
   },
   { path: '/receipts', name: 'Receipts', element: Receipts },
+  { path: '/reports', name: 'Reports', element: Reports },
   { path: '/persons', name: 'Persons', element: Persons },
   { path: '/person', name: 'Person', element: Persons },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
