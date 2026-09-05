@@ -20,14 +20,7 @@ import React, { useState, useRef, useMemo } from 'react'
 import * as XLSX from 'xlsx'
 import Swal from 'sweetalert2'
 import CIcon from '@coreui/icons-react'
-import {
-  CRow,
-  CCol,
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CSpinner,
-} from '@coreui/react'
+import { CRow, CCol, CCard, CCardBody, CCardHeader, CSpinner } from '@coreui/react'
 import {
   cilCloudUpload,
   cilCloudDownload,
@@ -127,12 +120,7 @@ const BulkUpload = () => {
       ['2026-08-07', 'LK-5177', '7904', 'RT000001'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
-    ws['!cols'] = [
-      { wch: 14 },
-      { wch: 18 },
-      { wch: 16 },
-      { wch: 16 },
-    ]
+    ws['!cols'] = [{ wch: 14 }, { wch: 18 }, { wch: 16 }, { wch: 16 }]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Daily Routes')
     XLSX.writeFile(wb, 'Daily_Routes_Template.xlsx')
@@ -148,11 +136,7 @@ const BulkUpload = () => {
       ['2026-08-07', 'LI-8790', 10000],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
-    ws['!cols'] = [
-      { wch: 14 },
-      { wch: 18 },
-      { wch: 16 },
-    ]
+    ws['!cols'] = [{ wch: 14 }, { wch: 18 }, { wch: 16 }]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Daily Expenses')
     XLSX.writeFile(wb, 'Daily_Expenses_Template.xlsx')
@@ -170,10 +154,7 @@ const BulkUpload = () => {
       ['LM-4565', 'LIC000003'],
     ]
     const ws = XLSX.utils.aoa_to_sheet(wsData)
-    ws['!cols'] = [
-      { wch: 18 },
-      { wch: 18 },
-    ]
+    ws['!cols'] = [{ wch: 18 }, { wch: 18 }]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Vehicle Licenses')
     XLSX.writeFile(wb, 'Vehicle_Licenses_Template.xlsx')
@@ -270,9 +251,7 @@ const BulkUpload = () => {
               routeCode: String(rawRouteCode).trim(),
             }
           })
-          .filter(
-            (item) => item.vehicleNumber || item.billNumber || item.routeCode || item.date,
-          )
+          .filter((item) => item.vehicleNumber || item.billNumber || item.routeCode || item.date)
 
         setTripsData(formatted)
         setTripsPage(0)
@@ -323,12 +302,12 @@ const BulkUpload = () => {
               row['Expense'] !== undefined && row['Expense'] !== ''
                 ? Number(String(row['Expense']).replace(/,/g, '')) || 0
                 : row['Amount (LKR)'] !== undefined && row['Amount (LKR)'] !== ''
-                ? Number(String(row['Amount (LKR)']).replace(/,/g, '')) || 0
-                : row['Amount'] !== undefined && row['Amount'] !== ''
-                ? Number(String(row['Amount']).replace(/,/g, '')) || 0
-                : row['amount'] !== undefined && row['amount'] !== ''
-                ? Number(String(row['amount']).replace(/,/g, '')) || 0
-                : 0
+                  ? Number(String(row['Amount (LKR)']).replace(/,/g, '')) || 0
+                  : row['Amount'] !== undefined && row['Amount'] !== ''
+                    ? Number(String(row['Amount']).replace(/,/g, '')) || 0
+                    : row['amount'] !== undefined && row['amount'] !== ''
+                      ? Number(String(row['amount']).replace(/,/g, '')) || 0
+                      : 0
 
             return {
               date: String(rawDate).trim(),
@@ -513,11 +492,7 @@ const BulkUpload = () => {
       })
     } catch (err) {
       console.error('Trip upload error:', err)
-      const rawErrors =
-        err.errors ||
-        err.response?.data?.errors ||
-        err.response?.errors ||
-        []
+      const rawErrors = err.errors || err.response?.data?.errors || err.response?.errors || []
       const summaryData = err.response?.data || null
 
       if (rawErrors.length > 0) {
@@ -567,11 +542,7 @@ const BulkUpload = () => {
       })
     } catch (err) {
       console.error('Expense upload error:', err)
-      const rawErrors =
-        err.errors ||
-        err.response?.data?.errors ||
-        err.response?.errors ||
-        []
+      const rawErrors = err.errors || err.response?.data?.errors || err.response?.errors || []
       const summaryData = err.response?.data || null
 
       if (rawErrors.length > 0) {
@@ -621,11 +592,7 @@ const BulkUpload = () => {
       })
     } catch (err) {
       console.error('License upload error:', err)
-      const rawErrors =
-        err.errors ||
-        err.response?.data?.errors ||
-        err.response?.errors ||
-        []
+      const rawErrors = err.errors || err.response?.data?.errors || err.response?.errors || []
       const summaryData = err.response?.data || null
 
       if (rawErrors.length > 0) {
@@ -641,7 +608,9 @@ const BulkUpload = () => {
         Swal.fire({
           icon: 'error',
           title: 'Upload Failed',
-          text: err.message || 'Unable to upload vehicle licenses sheet. Please check your data format.',
+          text:
+            err.message ||
+            'Unable to upload vehicle licenses sheet. Please check your data format.',
           confirmButtonColor: '#dc2626',
         })
       }
@@ -706,11 +675,7 @@ const BulkUpload = () => {
       })
     } catch (err) {
       console.error('Inspection upload error:', err)
-      const rawErrors =
-        err.errors ||
-        err.response?.data?.errors ||
-        err.response?.errors ||
-        []
+      const rawErrors = err.errors || err.response?.data?.errors || err.response?.errors || []
       const summaryData = err.response?.data || null
 
       if (rawErrors.length > 0) {
@@ -759,7 +724,8 @@ const BulkUpload = () => {
   }, [tripsData, tripsSearch])
 
   const totalTripsCount = tripsData.length
-  const uniqueVehiclesCount = new Set(tripsData.map((item) => item.vehicleNumber).filter(Boolean)).size
+  const uniqueVehiclesCount = new Set(tripsData.map((item) => item.vehicleNumber).filter(Boolean))
+    .size
   const uniqueRoutesCount = new Set(tripsData.map((item) => item.routeCode).filter(Boolean)).size
   const uniqueDatesCount = new Set(tripsData.map((item) => item.date).filter(Boolean)).size
 
@@ -782,7 +748,10 @@ const BulkUpload = () => {
   }, [expensesData, expensesSearch])
 
   const totalExpenseCount = expensesData.length
-  const totalExpenseAmount = expensesData.reduce((sum, item) => sum + (Number(item.expense) || 0), 0)
+  const totalExpenseAmount = expensesData.reduce(
+    (sum, item) => sum + (Number(item.expense) || 0),
+    0,
+  )
   const uniqueExpenseVehiclesCount = new Set(
     expensesData.map((item) => item.vehicleNumber).filter(Boolean),
   ).size
@@ -808,9 +777,8 @@ const BulkUpload = () => {
   const uniqueLicenseVehiclesCount = new Set(
     licensesData.map((item) => item.vehicleNumber).filter(Boolean),
   ).size
-  const uniqueLicensesCount = new Set(
-    licensesData.map((item) => item.licenseCode).filter(Boolean),
-  ).size
+  const uniqueLicensesCount = new Set(licensesData.map((item) => item.licenseCode).filter(Boolean))
+    .size
 
   const licensesTotalPages = Math.ceil(filteredLicenses.length / PREVIEW_PAGE_SIZE) || 1
   const paginatedLicenses = filteredLicenses.slice(
@@ -919,7 +887,9 @@ const BulkUpload = () => {
         >
           <CIcon icon={cilMoney} size="lg" />
           <span>Daily Expenses Sheet</span>
-          {expensesData.length > 0 && <span className="bu-tab-count">{expensesData.length} records</span>}
+          {expensesData.length > 0 && (
+            <span className="bu-tab-count">{expensesData.length} records</span>
+          )}
         </button>
 
         <button
@@ -929,7 +899,9 @@ const BulkUpload = () => {
         >
           <CIcon icon={cilContact} size="lg" />
           <span>Vehicle Licenses Sheet</span>
-          {licensesData.length > 0 && <span className="bu-tab-count">{licensesData.length} records</span>}
+          {licensesData.length > 0 && (
+            <span className="bu-tab-count">{licensesData.length} records</span>
+          )}
         </button>
 
         <button
@@ -992,7 +964,9 @@ const BulkUpload = () => {
                   <div className="bu-dropzone-icon">
                     <CIcon icon={cilCloudUpload} size="xl" />
                   </div>
-                  <h4 className="bu-dropzone-heading">Drag &amp; drop your routes Excel sheet here</h4>
+                  <h4 className="bu-dropzone-heading">
+                    Drag &amp; drop your routes Excel sheet here
+                  </h4>
                   <p className="bu-dropzone-sub">
                     or <span className="bu-browse-link">browse from your computer</span>
                   </p>
@@ -1079,7 +1053,9 @@ const BulkUpload = () => {
                         {tripsErrors.map((err, idx) => (
                           <tr key={idx}>
                             <td>
-                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                              <span className="bu-val-row-pill">
+                                Row {err.rowNumber ?? idx + 1}
+                              </span>
                             </td>
                             <td>
                               <span className="bu-val-field">{err.field || '—'}</span>
@@ -1110,7 +1086,8 @@ const BulkUpload = () => {
                     </table>
                   </div>
                   <div className="bu-val-footer-hint mt-2">
-                    💡 Please fix these rows in your Excel file (e.g. ensure valid license dates exist or correct the dates), then re-upload.
+                    💡 Please fix these rows in your Excel file (e.g. ensure valid license dates
+                    exist or correct the dates), then re-upload.
                   </div>
                 </div>
               )}
@@ -1136,7 +1113,9 @@ const BulkUpload = () => {
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Active Vehicles</span>
-                    <span className="bu-metric-value highlight">{uniqueVehiclesCount} vehicles</span>
+                    <span className="bu-metric-value highlight">
+                      {uniqueVehiclesCount} vehicles
+                    </span>
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Route Codes</span>
@@ -1302,7 +1281,9 @@ const BulkUpload = () => {
                   <div className="bu-dropzone-icon">
                     <CIcon icon={cilCloudUpload} size="xl" />
                   </div>
-                  <h4 className="bu-dropzone-heading">Drag &amp; drop your expenses Excel sheet here</h4>
+                  <h4 className="bu-dropzone-heading">
+                    Drag &amp; drop your expenses Excel sheet here
+                  </h4>
                   <p className="bu-dropzone-sub">
                     or <span className="bu-browse-link">browse from your computer</span>
                   </p>
@@ -1389,7 +1370,9 @@ const BulkUpload = () => {
                         {expensesErrors.map((err, idx) => (
                           <tr key={idx}>
                             <td>
-                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                              <span className="bu-val-row-pill">
+                                Row {err.rowNumber ?? idx + 1}
+                              </span>
                             </td>
                             <td>
                               <span className="bu-val-field">{err.field || '—'}</span>
@@ -1420,7 +1403,8 @@ const BulkUpload = () => {
                     </table>
                   </div>
                   <div className="bu-val-footer-hint mt-2">
-                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers, expense amounts, or dates), then re-upload.
+                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers, expense
+                    amounts, or dates), then re-upload.
                   </div>
                 </div>
               )}
@@ -1446,11 +1430,15 @@ const BulkUpload = () => {
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Total Expense</span>
-                    <span className="bu-metric-value highlight">Rs. {formatCurrency(totalExpenseAmount)}</span>
+                    <span className="bu-metric-value highlight">
+                      Rs. {formatCurrency(totalExpenseAmount)}
+                    </span>
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Active Vehicles</span>
-                    <span className="bu-metric-value green">{uniqueExpenseVehiclesCount} vehicles</span>
+                    <span className="bu-metric-value green">
+                      {uniqueExpenseVehiclesCount} vehicles
+                    </span>
                   </div>
                 </div>
 
@@ -1494,7 +1482,9 @@ const BulkUpload = () => {
                     <tbody>
                       {paginatedExpenses.map((item, idx) => (
                         <tr key={idx}>
-                          <td className="bu-td-num">{expensesPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
+                          <td className="bu-td-num">
+                            {expensesPage * PREVIEW_PAGE_SIZE + idx + 1}
+                          </td>
                           <td>{item.date || '—'}</td>
                           <td>
                             <span className="bu-veh-pill">
@@ -1502,7 +1492,10 @@ const BulkUpload = () => {
                               {item.vehicleNumber || '—'}
                             </span>
                           </td>
-                          <td className="bu-currency-pill" style={{ color: '#dc2626', fontWeight: 700 }}>
+                          <td
+                            className="bu-currency-pill"
+                            style={{ color: '#dc2626', fontWeight: 700 }}
+                          >
                             Rs. {formatCurrency(item.expense)}
                           </td>
                         </tr>
@@ -1514,7 +1507,8 @@ const BulkUpload = () => {
                 {/* Pagination Controls */}
                 <div className="bu-pagination-bar">
                   <span>
-                    Showing {filteredExpenses.length === 0 ? 0 : expensesPage * PREVIEW_PAGE_SIZE + 1}–
+                    Showing{' '}
+                    {filteredExpenses.length === 0 ? 0 : expensesPage * PREVIEW_PAGE_SIZE + 1}–
                     {Math.min((expensesPage + 1) * PREVIEW_PAGE_SIZE, filteredExpenses.length)} of{' '}
                     <strong>{filteredExpenses.length}</strong> preview records
                   </span>
@@ -1541,7 +1535,9 @@ const BulkUpload = () => {
                         ))}
                       <button
                         className="bu-page-btn"
-                        onClick={() => setExpensesPage((p) => Math.min(expensesTotalPages - 1, p + 1))}
+                        onClick={() =>
+                          setExpensesPage((p) => Math.min(expensesTotalPages - 1, p + 1))
+                        }
                         disabled={expensesPage >= expensesTotalPages - 1}
                       >
                         <CIcon icon={cilChevronRight} size="sm" />
@@ -1602,7 +1598,9 @@ const BulkUpload = () => {
                   <div className="bu-dropzone-icon">
                     <CIcon icon={cilCloudUpload} size="xl" />
                   </div>
-                  <h4 className="bu-dropzone-heading">Drag &amp; drop your vehicle licenses Excel sheet here</h4>
+                  <h4 className="bu-dropzone-heading">
+                    Drag &amp; drop your vehicle licenses Excel sheet here
+                  </h4>
                   <p className="bu-dropzone-sub">
                     or <span className="bu-browse-link">browse from your computer</span>
                   </p>
@@ -1689,7 +1687,9 @@ const BulkUpload = () => {
                         {licensesErrors.map((err, idx) => (
                           <tr key={idx}>
                             <td>
-                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                              <span className="bu-val-row-pill">
+                                Row {err.rowNumber ?? idx + 1}
+                              </span>
                             </td>
                             <td>
                               <span className="bu-val-field">{err.field || '—'}</span>
@@ -1720,7 +1720,8 @@ const BulkUpload = () => {
                     </table>
                   </div>
                   <div className="bu-val-footer-hint mt-2">
-                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers or license codes), then re-upload.
+                    💡 Please fix these rows in your Excel file (e.g. check vehicle numbers or
+                    license codes), then re-upload.
                   </div>
                 </div>
               )}
@@ -1746,7 +1747,9 @@ const BulkUpload = () => {
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Active Vehicles</span>
-                    <span className="bu-metric-value highlight">{uniqueLicenseVehiclesCount} vehicles</span>
+                    <span className="bu-metric-value highlight">
+                      {uniqueLicenseVehiclesCount} vehicles
+                    </span>
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">License Codes</span>
@@ -1795,7 +1798,9 @@ const BulkUpload = () => {
                     <tbody>
                       {paginatedLicenses.map((item, idx) => (
                         <tr key={idx}>
-                          <td className="bu-td-num">{licensesPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
+                          <td className="bu-td-num">
+                            {licensesPage * PREVIEW_PAGE_SIZE + idx + 1}
+                          </td>
                           <td>
                             <span className="bu-veh-pill">
                               <CIcon icon={cilTruck} size="sm" style={{ color: '#0284c7' }} />
@@ -1803,7 +1808,14 @@ const BulkUpload = () => {
                             </span>
                           </td>
                           <td>
-                            <span className="bu-code-badge" style={{ background: '#e0f2fe', color: '#0369a1', borderColor: '#bae6fd' }}>
+                            <span
+                              className="bu-code-badge"
+                              style={{
+                                background: '#e0f2fe',
+                                color: '#0369a1',
+                                borderColor: '#bae6fd',
+                              }}
+                            >
                               {item.licenseCode || '—'}
                             </span>
                           </td>
@@ -1816,7 +1828,8 @@ const BulkUpload = () => {
                 {/* Pagination Controls */}
                 <div className="bu-pagination-bar">
                   <span>
-                    Showing {filteredLicenses.length === 0 ? 0 : licensesPage * PREVIEW_PAGE_SIZE + 1}–
+                    Showing{' '}
+                    {filteredLicenses.length === 0 ? 0 : licensesPage * PREVIEW_PAGE_SIZE + 1}–
                     {Math.min((licensesPage + 1) * PREVIEW_PAGE_SIZE, filteredLicenses.length)} of{' '}
                     <strong>{filteredLicenses.length}</strong> preview records
                   </span>
@@ -1843,7 +1856,9 @@ const BulkUpload = () => {
                         ))}
                       <button
                         className="bu-page-btn"
-                        onClick={() => setLicensesPage((p) => Math.min(licensesTotalPages - 1, p + 1))}
+                        onClick={() =>
+                          setLicensesPage((p) => Math.min(licensesTotalPages - 1, p + 1))
+                        }
                         disabled={licensesPage >= licensesTotalPages - 1}
                       >
                         <CIcon icon={cilChevronRight} size="sm" />
@@ -1901,12 +1916,20 @@ const BulkUpload = () => {
                       }
                     }}
                   />
-                  <div className="bu-dropzone-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+                  <div
+                    className="bu-dropzone-icon"
+                    style={{ background: '#f5f3ff', color: '#7c3aed' }}
+                  >
                     <CIcon icon={cilCloudUpload} size="xl" />
                   </div>
-                  <h4 className="bu-dropzone-heading">Drag &amp; drop your Excavator Inspection &amp; Checked By sheet here</h4>
+                  <h4 className="bu-dropzone-heading">
+                    Drag &amp; drop your Excavator Inspection &amp; Checked By sheet here
+                  </h4>
                   <p className="bu-dropzone-sub">
-                    or <span className="bu-browse-link" style={{ color: '#7c3aed' }}>browse from your computer</span>
+                    or{' '}
+                    <span className="bu-browse-link" style={{ color: '#7c3aed' }}>
+                      browse from your computer
+                    </span>
                   </p>
                   <span className="bu-format-pill">Accepts .xlsx, .xls, .csv</span>
                 </div>
@@ -1914,7 +1937,10 @@ const BulkUpload = () => {
                 /* Selected File Card */
                 <div className="bu-file-card">
                   <div className="bu-file-left">
-                    <div className="bu-file-icon" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+                    <div
+                      className="bu-file-icon"
+                      style={{ background: '#f5f3ff', color: '#7c3aed' }}
+                    >
                       <CIcon icon={cilDescription} />
                     </div>
                     <div>
@@ -1940,7 +1966,10 @@ const BulkUpload = () => {
                     </button>
                     <button
                       className="bu-btn-upload-now"
-                      style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', borderColor: '#7c3aed' }}
+                      style={{
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                        borderColor: '#7c3aed',
+                      }}
                       onClick={handleUploadInspection}
                       disabled={inspectionLoading}
                       id="btn-submit-inspection-file"
@@ -1992,7 +2021,9 @@ const BulkUpload = () => {
                         {inspectionErrors.map((err, idx) => (
                           <tr key={idx}>
                             <td>
-                              <span className="bu-val-row-pill">Row {err.rowNumber ?? idx + 1}</span>
+                              <span className="bu-val-row-pill">
+                                Row {err.rowNumber ?? idx + 1}
+                              </span>
                             </td>
                             <td>
                               <span className="bu-val-field">{err.field || '—'}</span>
@@ -2023,7 +2054,8 @@ const BulkUpload = () => {
                     </table>
                   </div>
                   <div className="bu-val-footer-hint mt-2">
-                    💡 Please fix these rows in your Excel file (e.g. check person codes, vehicle numbers, or date formats), then re-upload.
+                    💡 Please fix these rows in your Excel file (e.g. check person codes, vehicle
+                    numbers, or date formats), then re-upload.
                   </div>
                 </div>
               )}
@@ -2049,7 +2081,9 @@ const BulkUpload = () => {
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Assigned Vehicles</span>
-                    <span className="bu-metric-value highlight">{uniqueInspectionVehiclesCount} vehicles</span>
+                    <span className="bu-metric-value highlight">
+                      {uniqueInspectionVehiclesCount} vehicles
+                    </span>
                   </div>
                   <div className="bu-metric-card">
                     <span className="bu-metric-label">Assigned Persons</span>
@@ -2099,7 +2133,9 @@ const BulkUpload = () => {
                     <tbody>
                       {paginatedInspection.map((item, idx) => (
                         <tr key={idx}>
-                          <td className="bu-td-num">{inspectionPage * PREVIEW_PAGE_SIZE + idx + 1}</td>
+                          <td className="bu-td-num">
+                            {inspectionPage * PREVIEW_PAGE_SIZE + idx + 1}
+                          </td>
                           <td>
                             <span style={{ fontWeight: 600, color: '#334155' }}>
                               {item.date || '—'}
@@ -2108,7 +2144,11 @@ const BulkUpload = () => {
                           <td>
                             <span
                               className="bu-code-badge"
-                              style={{ background: '#f5f3ff', color: '#7c3aed', borderColor: '#ddd6fe' }}
+                              style={{
+                                background: '#f5f3ff',
+                                color: '#7c3aed',
+                                borderColor: '#ddd6fe',
+                              }}
                             >
                               <CIcon icon={cilUser} size="sm" style={{ marginRight: 4 }} />
                               {item.personCode || '—'}
@@ -2129,9 +2169,10 @@ const BulkUpload = () => {
                 {/* Pagination Controls */}
                 <div className="bu-pagination-bar">
                   <span>
-                    Showing {filteredInspection.length === 0 ? 0 : inspectionPage * PREVIEW_PAGE_SIZE + 1}–
-                    {Math.min((inspectionPage + 1) * PREVIEW_PAGE_SIZE, filteredInspection.length)} of{' '}
-                    <strong>{filteredInspection.length}</strong> preview records
+                    Showing{' '}
+                    {filteredInspection.length === 0 ? 0 : inspectionPage * PREVIEW_PAGE_SIZE + 1}–
+                    {Math.min((inspectionPage + 1) * PREVIEW_PAGE_SIZE, filteredInspection.length)}{' '}
+                    of <strong>{filteredInspection.length}</strong> preview records
                   </span>
 
                   {inspectionTotalPages > 1 && (
@@ -2156,7 +2197,9 @@ const BulkUpload = () => {
                         ))}
                       <button
                         className="bu-page-btn"
-                        onClick={() => setInspectionPage((p) => Math.min(inspectionTotalPages - 1, p + 1))}
+                        onClick={() =>
+                          setInspectionPage((p) => Math.min(inspectionTotalPages - 1, p + 1))
+                        }
                         disabled={inspectionPage >= inspectionTotalPages - 1}
                       >
                         <CIcon icon={cilChevronRight} size="sm" />
