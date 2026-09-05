@@ -36,9 +36,11 @@ import {
   cilCloudDownload,
   cilCheckCircle,
   cilPrint,
+  cilExternalLink,
 } from '@coreui/icons'
 import personService from '../../service/personService'
 import vehicleService from '../../service/vehicleService'
+import personVehicleDetailService from '../../service/personVehicleDetailService'
 import './Reports.css'
 
 // ─── Default Consolidated Dropdown Options ─────────────────────────────────
@@ -394,6 +396,17 @@ const Reports = () => {
   const [previewLoading, setPreviewLoading] = useState(false)
   const [downloadLoading, setDownloadLoading] = useState(false)
   const [previewModalVisible, setPreviewModalVisible] = useState(false)
+  const [previewPdfUrl, setPreviewPdfUrl] = useState(null)
+  const [previewMeta, setPreviewMeta] = useState(null)
+
+  // ── Clean up Object URL on unmount or URL change ──────────────────────────
+  useEffect(() => {
+    return () => {
+      if (previewPdfUrl) {
+        URL.revokeObjectURL(previewPdfUrl)
+      }
+    }
+  }, [previewPdfUrl])
 
   // ── Detect Dark Mode from document attribute ──────────────────────────────
   const [isDark, setIsDark] = useState(
@@ -459,29 +472,149 @@ const Reports = () => {
     setSelectedVehicle(ALL_VEHICLES_OPTION)
   }
 
-  // ── Action: Preview Report ────────────────────────────────────────────────
-  const handlePreviewReport = () => {
+  // ── Action: Preview Report (Streams PDF from PersonVehicleDetailReportController) ──
+  const handlePreviewReport = async () => {
+    const personId = selectedPerson?.id || selectedPerson?.personId
+    if (!selectedPerson || selectedPerson.value === 'ALL' || !personId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Person (Owner) Required',
+        text: 'Please select a specific person to preview the vehicle details report.',
+        confirmButtonColor: '#d97706',
+      })
+      return
+    }
+
+    if (!startDate || !endDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Date Range Required',
+        text: 'Please select both Start Date and End Date to generate the report.',
+        confirmButtonColor: '#d97706',
+      })
+      return
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Date Range',
+        text: 'Start Date cannot be after End Date.',
+        confirmButtonColor: '#d97706',
+      })
+      return
+    }
+
     setPreviewLoading(true)
-    setTimeout(() => {
-      setPreviewLoading(false)
+    try {
+      const blob = await personVehicleDetailService.getReportPdfPreviewBlob({
+        personId,
+        startDate,
+        endDate,
+      })
+
+      if (previewPdfUrl) {
+        URL.revokeObjectURL(previewPdfUrl)
+      }
+
+      const blobUrl = URL.createObjectURL(blob)
+      setPreviewPdfUrl(blobUrl)
+      setPreviewMeta({
+        personName: selectedPerson?.name || selectedPerson?.label || `Person #${personId}`,
+        personCode: selectedPerson?.personCode || '',
+        dateRange: `${startDate} to ${endDate}`,
+        personId,
+      })
       setPreviewModalVisible(true)
-    }, 450)
+    } catch (err) {
+      console.error('Person Vehicle Detail report preview failed:', err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Report Preview Failed',
+        text: err.message || 'Unable to generate PDF report from server. Please try again.',
+        confirmButtonColor: '#dc2626',
+      })
+    } finally {
+      setPreviewLoading(false)
+    }
   }
 
-  // ── Action: Download Report ───────────────────────────────────────────────
-  const handleDownloadReport = () => {
-    setDownloadLoading(true)
-    setTimeout(() => {
-      setDownloadLoading(false)
+  // ── Action: Download Report (Downloads PDF from PersonVehicleDetailReportController) ──
+  const handleDownloadReport = async () => {
+    const personId = selectedPerson?.id || selectedPerson?.personId
+    if (!selectedPerson || selectedPerson.value === 'ALL' || !personId) {
       Swal.fire({
-        icon: 'success',
-        title: 'Report Downloaded',
-        text: `Operations Report for ${selectedPerson?.name} (${selectedVehicle?.vehicleNumber}) has been generated.`,
+        icon: 'warning',
+        title: 'Person (Owner) Required',
+        text: 'Please select a specific person to download the vehicle details report.',
         confirmButtonColor: '#d97706',
-        timer: 2500,
+      })
+      return
+    }
+
+    if (!startDate || !endDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Date Range Required',
+        text: 'Please select both Start Date and End Date to download the report.',
+        confirmButtonColor: '#d97706',
+      })
+      return
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Date Range',
+        text: 'Start Date cannot be after End Date.',
+        confirmButtonColor: '#d97706',
+      })
+      return
+    }
+
+    const pNameClean = (selectedPerson?.name || `Person_${personId}`).replace(/\s+/g, '_')
+    const fileName = `Person_Vehicle_Report_${pNameClean}_${startDate}_to_${endDate}.pdf`
+
+    setDownloadLoading(true)
+    try {
+      await personVehicleDetailService.downloadReportPdf({
+        personId,
+        startDate,
+        endDate,
+        fileName,
+      })
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3500,
         timerProgressBar: true,
       })
-    }, 600)
+
+      Toast.fire({
+        icon: 'success',
+        title: 'Report downloaded successfully',
+      })
+    } catch (err) {
+      console.error('Person Vehicle Detail report download failed:', err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Report Download Failed',
+        text: err.message || 'Unable to download report from server. Please try again.',
+        confirmButtonColor: '#dc2626',
+      })
+    } finally {
+      setDownloadLoading(false)
+    }
+  }
+
+  const handleClosePreviewModal = () => {
+    setPreviewModalVisible(false)
+    if (previewPdfUrl) {
+      URL.revokeObjectURL(previewPdfUrl)
+      setPreviewPdfUrl(null)
+    }
   }
 
   // ── Filtered Records for Display ──────────────────────────────────────────
@@ -615,7 +748,7 @@ const Reports = () => {
             </CCol>
 
             {/* Vehicle Searchable Dropdown */}
-            <CCol xs={12} md={6}>
+            {/* <CCol xs={12} md={6}>
               <label className="rp-label">
                 <CIcon icon={cilTruck} size="sm" className="text-warning" />
                 Vehicle Number
@@ -641,7 +774,7 @@ const Reports = () => {
                 }
                 loadingMessage={() => 'Searching fleet vehicles…'}
               />
-            </CCol>
+            </CCol> */}
           </CRow>
 
           {/* Action Bar with Matching Preview & Download Buttons */}
@@ -704,119 +837,102 @@ const Reports = () => {
 
 
 
-      {/* ══════════ MODAL: REPORT PREVIEW ══════════ */}
+      {/* ══════════ MODAL: REPORT PREVIEW (Real PDF Stream) ══════════ */}
       <CModal
-        size="lg"
+        size="xl"
         visible={previewModalVisible}
-        onClose={() => setPreviewModalVisible(false)}
-        className="rp-preview-modal"
+        onClose={handleClosePreviewModal}
+        className="rp-pdf-modal"
         backdrop="static"
       >
-        <CModalHeader className="rp-modal-header">
-          <CModalTitle className="rp-modal-title">
+        <CModalHeader className="rp-modal-header d-flex align-items-center justify-content-between">
+          <CModalTitle className="rp-modal-title d-flex align-items-center gap-2">
             <CIcon icon={cilFindInPage} style={{ color: '#f59e0b' }} />
-            Official Operations Report Preview
+            <span>Person Vehicle Details Report Preview</span>
           </CModalTitle>
-        </CModalHeader>
-
-        <CModalBody className="rp-modal-body">
-          <div className="rp-report-paper">
-            <div className="rp-paper-header">
-              <div>
-                <h3 className="rp-paper-title">MESKORA MATERIAL GRID</h3>
-                <div className="rp-paper-sub">Operations Transport Settlement &amp; Dispatch Statement</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <span className="rp-status-badge rp-status-badge--completed">OFFICIAL REPORT</span>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: 4 }}>
-                  Generated: {new Date().toLocaleDateString()}
-                </div>
-              </div>
-            </div>
-
-            <div className="rp-meta-grid">
-              <div className="rp-meta-item">
-                <span className="rp-meta-label">Selected Person:</span>
-                <span className="rp-meta-val">{selectedPerson?.name}</span>
-              </div>
-              <div className="rp-meta-item">
-                <span className="rp-meta-label">Assigned Vehicle:</span>
-                <span className="rp-meta-val">{selectedVehicle?.vehicleNumber}</span>
-              </div>
-              <div className="rp-meta-item">
-                <span className="rp-meta-label">Date Coverage:</span>
-                <span className="rp-meta-val">
-                  {startDate} to {endDate}
-                </span>
-              </div>
-              <div className="rp-meta-item">
-                <span className="rp-meta-label">Total Dispatches:</span>
-                <span className="rp-meta-val">{totalTrips} Trips</span>
-              </div>
-            </div>
-
-            <table className="rp-table" style={{ marginTop: '1rem' }}>
-              <thead>
-                <tr>
-                  <th>Trip #</th>
-                  <th>Date</th>
-                  <th>Route</th>
-                  <th>Cube</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRecords.map((r) => (
-                  <tr key={r.id}>
-                    <td>{r.id}</td>
-                    <td>{r.date}</td>
-                    <td>{r.route}</td>
-                    <td>{r.capacity} cube</td>
-                    <td className="fw-bold">Rs. {formatCurrency(r.amount)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div
-              className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top"
-              style={{ fontSize: '0.95rem' }}
-            >
-              <span className="fw-bold">Total Net Statement:</span>
-              <span className="fw-bolder" style={{ color: '#d97706', fontSize: '1.2rem' }}>
-                Rs. {formatCurrency(totalGrossAmount)}
+          {previewMeta && (
+            <div className="d-flex align-items-center gap-2 me-3">
+              <span className="rp-modal-pill">
+                <CIcon icon={cilUser} size="sm" /> {previewMeta.personName}
+              </span>
+              <span className="rp-modal-pill rp-modal-pill--amber">
+                <CIcon icon={cilCalendar} size="sm" /> {previewMeta.dateRange}
               </span>
             </div>
-          </div>
+          )}
+        </CModalHeader>
+
+        <CModalBody className="p-2">
+          {previewLoading ? (
+            <div className="text-center py-5">
+              <CSpinner color="warning" />
+              <p className="text-muted mt-2">
+                Streaming official Person Vehicle Details PDF report…
+              </p>
+            </div>
+          ) : previewPdfUrl ? (
+            <div className="rp-pdf-preview-wrapper">
+              <object data={previewPdfUrl} type="application/pdf" className="rp-pdf-iframe">
+                <iframe
+                  src={previewPdfUrl}
+                  title="Person Vehicle Details Report Preview"
+                  className="rp-pdf-iframe"
+                />
+              </object>
+            </div>
+          ) : (
+            <div className="text-center py-5">
+              <p className="text-muted">No PDF report available. Please try again.</p>
+            </div>
+          )}
         </CModalBody>
 
-        <CModalFooter className="rp-modal-footer">
-          <button
-            type="button"
-            className="rp-btn-close"
-            onClick={() => setPreviewModalVisible(false)}
-          >
-            Close
-          </button>
-          <button
-            type="button"
-            className="rp-btn-preview"
-            onClick={() => window.print()}
-            style={{ padding: '0.55rem 1.1rem' }}
-          >
-            <CIcon icon={cilPrint} /> Print Statement
-          </button>
-          <button
-            type="button"
-            className="rp-btn-download"
-            onClick={() => {
-              setPreviewModalVisible(false)
-              handleDownloadReport()
-            }}
-            style={{ padding: '0.55rem 1.25rem' }}
-          >
-            <CIcon icon={cilCloudDownload} /> Download PDF
-          </button>
+        <CModalFooter className="d-flex justify-content-between align-items-center">
+          <div className="text-muted" style={{ fontSize: '0.85rem' }}>
+            {previewMeta?.personCode && (
+              <span>
+                Person Code: <strong>{previewMeta.personCode}</strong>
+              </span>
+            )}
+          </div>
+
+          <div className="d-flex align-items-center gap-2">
+            {previewPdfUrl && (
+              <a
+                href={previewPdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rp-btn-open-tab"
+              >
+                <CIcon icon={cilExternalLink} /> Open in New Tab
+              </a>
+            )}
+
+            <button
+              type="button"
+              className="rp-btn-close"
+              onClick={handleClosePreviewModal}
+            >
+              Close
+            </button>
+
+            <button
+              type="button"
+              className="rp-btn-download"
+              onClick={handleDownloadReport}
+              disabled={downloadLoading}
+            >
+              {downloadLoading ? (
+                <>
+                  <CSpinner size="sm" className="me-1" /> Downloading…
+                </>
+              ) : (
+                <>
+                  <CIcon icon={cilCloudDownload} /> Download PDF Now
+                </>
+              )}
+            </button>
+          </div>
         </CModalFooter>
       </CModal>
     </div>

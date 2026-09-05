@@ -36,6 +36,9 @@ const DailyExpenses = React.lazy(
 const VehicleLicenseManagement = React.lazy(
   () => import('./components/logistics/vehicleLicenseManagement/VehicleLicenseManagement.jsx'),
 )
+const ExcavatorInspection = React.lazy(
+  () => import('./components/logistics/excavatorInspection/ExcavatorInspection.jsx'),
+)
 
 // Receipts
 const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
@@ -84,10 +87,15 @@ export const routes = [
     name: 'Vehicle License',
     element: VehicleLicenseManagement,
   },
+  {
+    path: '/logistics/excavator-inspection',
+    name: 'Excavator Inspection',
+    element: ExcavatorInspection,
+  },
   { path: '/receipts', name: 'Receipts', element: Receipts },
-  { path: '/reports', name: 'Reports', element: Reports },
   { path: '/persons', name: 'Persons', element: Persons },
   { path: '/person', name: 'Person', element: Persons },
+  { path: '/reports', name: 'Reports', element: Reports },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
   { path: '/license', name: 'License', element: VehicleLicense },
   { path: '/routes', name: 'Routes', element: RoutesPage },

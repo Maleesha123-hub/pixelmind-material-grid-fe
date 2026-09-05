@@ -147,6 +147,12 @@ const _nav = [
         to: '/logistics/vehicle-license-management',
         icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
       },
+      {
+        component: CNavItem,
+        name: 'Exc & Check By',
+        to: '/logistics/excavator-inspection',
+        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+      },
     ],
   },
   {

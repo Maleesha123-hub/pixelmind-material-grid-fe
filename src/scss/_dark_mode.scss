@@ -635,7 +635,6 @@
     }
   }
 
-  .bu-btn-download,
   .vm-btn-upload-excel {
     background: #131d31 !important;
     border: 1.5px solid #059669 !important;
@@ -647,6 +646,59 @@
       border-color: #10b981 !important;
       color: #6ee7b7 !important;
       transform: translateY(-1px);
+    }
+  }
+
+  .bu-btn-download {
+    background: #131d31 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+
+    &.bu-btn-download--routes {
+      border: 1.5px solid #d97706 !important;
+      color: #fbbf24 !important;
+
+      &:hover {
+        background: rgba(217, 119, 6, 0.2) !important;
+        border-color: #f59e0b !important;
+        color: #fde68a !important;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.bu-btn-download--expenses {
+      border: 1.5px solid #059669 !important;
+      color: #34d399 !important;
+
+      &:hover {
+        background: rgba(5, 150, 105, 0.2) !important;
+        border-color: #10b981 !important;
+        color: #6ee7b7 !important;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.bu-btn-download--licenses {
+      border: 1.5px solid #0284c7 !important;
+      color: #38bdf8 !important;
+
+      &:hover {
+        background: rgba(2, 132, 199, 0.2) !important;
+        border-color: #38bdf8 !important;
+        color: #bae6fd !important;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.bu-btn-download--inspection {
+      border: 1.5px solid #7c3aed !important;
+      color: #a78bfa !important;
+
+      &:hover {
+        background: rgba(124, 58, 237, 0.2) !important;
+        border-color: #a78bfa !important;
+        color: #ddd6fe !important;
+        transform: translateY(-1px);
+      }
     }
   }
 
@@ -770,6 +822,38 @@
           background: #ffffff !important;
           color: #0369a1 !important;
         }
+      }
+
+      &--inspection.active {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.45) !important;
+        border-color: transparent !important;
+
+        .bu-tab-count {
+          background: #ffffff !important;
+          color: #7c3aed !important;
+        }
+      }
+
+      &--routes:hover:not(.active) {
+        background: rgba(245, 158, 11, 0.12) !important;
+        color: #fcd34d !important;
+      }
+
+      &--expenses:hover:not(.active) {
+        background: rgba(16, 185, 129, 0.12) !important;
+        color: #6ee7b7 !important;
+      }
+
+      &--licenses:hover:not(.active) {
+        background: rgba(2, 132, 199, 0.12) !important;
+        color: #7dd3fc !important;
+      }
+
+      &--inspection:hover:not(.active) {
+        background: rgba(124, 58, 237, 0.15) !important;
+        color: #c4b5fd !important;
       }
     }
   }
@@ -1097,6 +1181,228 @@
     .vlm-empty-icon {
       background: rgba(245, 158, 11, 0.15) !important;
       color: #f59e0b !important;
+    }
+  }
+
+  // ─── Excavator Inspection & Checked By ───────────────────────────────────────
+  .ei-page-title {
+    color: #f8fafc !important;
+  }
+  .ei-page-subtitle {
+    color: #94a3b8 !important;
+  }
+  .ei-header-icon {
+    background: linear-gradient(135deg, #2e1065 0%, #0f172a 100%) !important;
+    border: 1px solid #4c1d95 !important;
+    color: #c4b5fd !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  }
+  .ei-btn-refresh {
+    background: #131d31 !important;
+    border: 1.5px solid #334155 !important;
+    color: #cbd5e1 !important;
+    &:hover:not(:disabled) {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+      color: #ffffff !important;
+    }
+  }
+  .ei-card {
+    background-color: #0f172a !important;
+    border: 1px solid #1e293b !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  }
+  .ei-card-header {
+    background: linear-gradient(90deg, #131d31 0%, #0f172a 100%) !important;
+    border-bottom: 1px solid #1e293b !important;
+    color: #f8fafc !important;
+  }
+  .ei-card-title {
+    color: #f8fafc !important;
+  }
+  .ei-records-count-badge {
+    background: rgba(124, 58, 237, 0.2) !important;
+    color: #c4b5fd !important;
+    border-color: #7c3aed !important;
+  }
+  .ei-label {
+    color: #cbd5e1 !important;
+  }
+  .ei-input {
+    background-color: #131d31 !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+    &:focus {
+      border-color: #7c3aed !important;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25) !important;
+      background-color: #162238 !important;
+    }
+  }
+  .ei-btn-reset-filters {
+    background: #131d31 !important;
+    border: 1px solid #334155 !important;
+    color: #cbd5e1 !important;
+    &:hover {
+      background: #1e293b !important;
+      border-color: #dc2626 !important;
+      color: #ef4444 !important;
+    }
+  }
+  .ei-metric-card {
+    background: #131d31 !important;
+    border: 1px solid #1e293b !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    .ei-metric-label {
+      color: #94a3b8 !important;
+    }
+    .ei-metric-value {
+      color: #f8fafc !important;
+      &.highlight {
+        color: #fbbf24 !important;
+      }
+    }
+  }
+  .ei-table-wrap {
+    background-color: #0f172a !important;
+    border: 1px solid #1e293b !important;
+  }
+  .ei-table {
+    background-color: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #1e293b !important;
+    thead th {
+      background-color: #131d31 !important;
+      color: #94a3b8 !important;
+      border-bottom: 1px solid #1e293b !important;
+    }
+    tbody tr {
+      background-color: #0f172a !important;
+      border-bottom: 1px solid #17233d !important;
+      &:hover {
+        background-color: #1e1b4b !important;
+      }
+    }
+    tbody td {
+      color: #cbd5e1 !important;
+      border-bottom: 1px solid #17233d !important;
+    }
+  }
+  .ei-td-num {
+    color: #64748b !important;
+  }
+  .ei-date-text {
+    color: #cbd5e1 !important;
+  }
+  .ei-person-name {
+    color: #f8fafc !important;
+  }
+  .ei-person-code-badge {
+    background: rgba(124, 58, 237, 0.2) !important;
+    color: #c4b5fd !important;
+    border-color: #6d28d9 !important;
+  }
+  .ei-veh-pill {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+  }
+  .ei-created-date {
+    color: #94a3b8 !important;
+  }
+  .ei-source-file-badge {
+    background: rgba(2, 132, 199, 0.2) !important;
+    color: #7dd3fc !important;
+    border-color: #0284c7 !important;
+  }
+  .ei-manual-pill {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
+  }
+  .ei-btn-action-edit {
+    background: rgba(124, 58, 237, 0.2) !important;
+    border-color: #6d28d9 !important;
+    color: #c4b5fd !important;
+    &:hover {
+      background: rgba(124, 58, 237, 0.35) !important;
+      color: #ffffff !important;
+    }
+  }
+  .ei-btn-action-delete {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: #991b1b !important;
+    color: #f87171 !important;
+    &:hover {
+      background: rgba(239, 68, 68, 0.3) !important;
+      color: #ffffff !important;
+    }
+  }
+  .ei-pagination-bar {
+    border-top-color: #1e293b !important;
+    color: #94a3b8 !important;
+  }
+  .ei-page-btn {
+    background: #131d31 !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+    &:hover:not(:disabled) {
+      border-color: #7c3aed !important;
+      color: #c4b5fd !important;
+      background: #1e1b4b !important;
+    }
+    &.active {
+      background: #7c3aed !important;
+      color: #ffffff !important;
+      border-color: #7c3aed !important;
+    }
+  }
+  .ei-empty {
+    background: #131d31 !important;
+    border: 1.5px dashed #334155 !important;
+    border-radius: 12px;
+    h3 {
+      color: #f8fafc !important;
+    }
+    p {
+      color: #94a3b8 !important;
+    }
+    .ei-empty-icon {
+      background: rgba(124, 58, 237, 0.15) !important;
+      color: #a78bfa !important;
+    }
+  }
+  .ei-modal {
+    .modal-content {
+      background-color: #0f172a !important;
+      border: 1px solid #1e293b !important;
+      color: #f1f5f9 !important;
+    }
+    .ei-modal-header {
+      background: linear-gradient(90deg, #131d31 0%, #0f172a 100%) !important;
+      border-bottom: 1px solid #1e293b !important;
+      .ei-modal-title {
+        color: #f8fafc !important;
+      }
+    }
+    .ei-modal-footer {
+      background: #131d31 !important;
+      border-top: 1px solid #1e293b !important;
+    }
+    .ei-modal-label {
+      color: #cbd5e1 !important;
+    }
+    .ei-modal-input {
+      background-color: #131d31 !important;
+      border: 1px solid #334155 !important;
+      color: #f8fafc !important;
+    }
+    .ei-btn-modal-cancel {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+      color: #cbd5e1 !important;
+      &:hover:not(:disabled) {
+        background: #334155 !important;
+        color: #ffffff !important;
+      }
     }
   }
 }
