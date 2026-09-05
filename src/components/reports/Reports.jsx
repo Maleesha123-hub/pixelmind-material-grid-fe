@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import AsyncSelect from 'react-select/async'
+import { components } from 'react-select'
 import Swal from 'sweetalert2'
 import {
   CRow,
@@ -47,7 +48,7 @@ import './Reports.css'
 const ALL_PERSONS_OPTION = {
   value: 'ALL',
   id: 'ALL',
-  label: 'All Persons (Mount & Excavator Owners)',
+  label: 'All Persons (Owners)',
   name: 'All Persons',
   personCode: 'ALL',
   personType: 'ALL',
@@ -153,20 +154,36 @@ const formatCurrency = (val) => {
 const getCustomSelectStyles = (isDark) => ({
   control: (base, state) => ({
     ...base,
-    minHeight: '42px',
+    minHeight: '38px',
     borderRadius: '8px',
     borderColor: state.isFocused ? '#f59e0b' : isDark ? '#334155' : '#cbd5e1',
-    boxShadow: state.isFocused ? '0 0 0 3px rgba(245,158,11,0.22)' : 'none',
-    fontSize: '0.875rem',
+    boxShadow: state.isFocused ? '0 0 0 2px rgba(245,158,11,0.22)' : 'none',
+    fontSize: '0.84rem',
     backgroundColor: isDark ? '#131d31' : '#ffffff',
     color: isDark ? '#f8fafc' : '#0f172a',
     cursor: 'pointer',
     '&:hover': { borderColor: '#f59e0b' },
   }),
+  valueContainer: (base) => ({
+    ...base,
+    padding: '2px 8px',
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'nowrap',
+    overflow: 'hidden',
+  }),
+  indicatorsContainer: (base) => ({
+    ...base,
+    display: 'flex',
+    alignItems: 'center',
+  }),
   menuPortal: (base) => ({ ...base, zIndex: 99999 }),
   menu: (base) => ({
     ...base,
     borderRadius: '10px',
+    minWidth: '100%',
+    width: 'max-content',
+    maxWidth: '520px',
     zIndex: 99999,
     boxShadow: isDark ? '0 16px 36px rgba(0, 0, 0, 0.65)' : '0 12px 28px rgba(15, 23, 42, 0.16)',
     backgroundColor: isDark ? '#0f172a' : '#ffffff',
@@ -189,68 +206,141 @@ const getCustomSelectStyles = (isDark) => ({
           : '#fef3c7'
         : 'transparent',
     color: state.isSelected ? '#ffffff' : isDark ? '#f8fafc' : '#0f172a',
-    fontSize: '0.85rem',
+    fontSize: '0.82rem',
     cursor: 'pointer',
     borderRadius: '6px',
-    padding: '8px 12px',
+    padding: '7px 10px',
     marginBottom: '2px',
     transition: 'all 0.12s ease',
   }),
   input: (base) => ({
     ...base,
     color: isDark ? '#f8fafc' : '#0f172a',
+    margin: 0,
+    padding: 0,
   }),
   placeholder: (base) => ({
     ...base,
     color: isDark ? '#64748b' : '#94a3b8',
-    fontSize: '0.85rem',
+    fontSize: '0.82rem',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   }),
   singleValue: (base) => ({
     ...base,
     color: isDark ? '#f8fafc' : '#0f172a',
-    fontSize: '0.875rem',
+    fontSize: '0.84rem',
     fontWeight: 600,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    maxWidth: 'calc(100% - 6px)',
   }),
   indicatorSeparator: (base) => ({
     ...base,
     backgroundColor: isDark ? '#334155' : '#e2e8f0',
+    marginTop: '6px',
+    marginBottom: '6px',
   }),
   dropdownIndicator: (base) => ({
     ...base,
+    padding: '2px 5px',
     color: isDark ? '#94a3b8' : '#64748b',
     '&:hover': { color: '#f59e0b' },
   }),
   clearIndicator: (base) => ({
     ...base,
+    padding: '2px 5px',
     color: isDark ? '#94a3b8' : '#64748b',
     '&:hover': { color: '#ef4444' },
   }),
 })
 
 // ─── Custom Option UI for Person Select ─────────────────────────────────────
-const CustomPersonOption = ({ data, innerRef, innerProps }) => {
+const CustomPersonOption = (props) => {
+  const { data, isSelected } = props
   const isAll = data.value === 'ALL'
   return (
-    <div ref={innerRef} {...innerProps} className="rp-select-option">
-      <div className="rp-select-option-main">
-        <div className={`rp-select-icon-box ${isAll ? '' : 'rp-select-icon-box--person'}`}>
-          <CIcon icon={cilUser} size="sm" />
+    <components.Option {...props}>
+      <div className="d-flex align-items-center justify-content-between gap-2" style={{ minWidth: 0 }}>
+        <div className="d-flex align-items-center gap-2" style={{ minWidth: 0, flex: 1 }}>
+          <div
+            className={`rp-select-icon-box ${isAll ? '' : 'rp-select-icon-box--person'}`}
+            style={
+              isSelected
+                ? { background: 'rgba(255,255,255,0.25)', color: '#ffffff', borderColor: 'transparent' }
+                : undefined
+            }
+          >
+            <CIcon icon={cilUser} size="sm" />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              className="rp-select-title"
+              style={isSelected ? { color: '#ffffff' } : undefined}
+            >
+              {data.personCode && data.name
+                ? `${data.personCode} - ${data.name}`
+                : data.name || data.label}
+            </div>
+            {!isAll && data.personCode && (
+              <div
+                className="rp-select-sub"
+                style={isSelected ? { color: 'rgba(255,255,255,0.85)' } : undefined}
+              >
+                Code: {data.personCode}
+              </div>
+            )}
+          </div>
         </div>
-        <div>
-          <div className="rp-select-title">{data.name}</div>
-          {!isAll && data.personCode && <div className="rp-select-sub">{data.personCode}</div>}
-        </div>
+        {!isAll && (data.personTypeLabel || data.personType) && (
+          <span
+            className={`rp-type-chip ${
+              data.personType === 'MOUNT_OWNER' ? 'rp-type-chip--mount' : 'rp-type-chip--excavator'
+            }`}
+            style={
+              isSelected
+                ? {
+                    background: 'rgba(255,255,255,0.25)',
+                    color: '#ffffff',
+                    borderColor: 'rgba(255,255,255,0.4)',
+                  }
+                : undefined
+            }
+          >
+            {data.personTypeLabel ||
+              (data.personType === 'MOUNT_OWNER' ? 'Mount Owner' : 'Excavator Owner')}
+          </span>
+        )}
       </div>
-      {!isAll && data.personType && (
+    </components.Option>
+  )
+}
+
+// ─── Custom Single Value UI for Person Select ───────────────────────────────
+const CustomPersonSingleValue = (props) => {
+  return (
+    <components.SingleValue {...props}>
+      <span
+        className="d-inline-flex align-items-center gap-1.5"
+        style={{ maxWidth: '100%', overflow: 'hidden' }}
+      >
+        <CIcon icon={cilUser} size="sm" className="text-warning" style={{ flexShrink: 0 }} />
         <span
-          className={`rp-type-chip ${
-            data.personType === 'MOUNT_OWNER' ? 'rp-type-chip--mount' : 'rp-type-chip--excavator'
-          }`}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontWeight: 600,
+            fontSize: '0.84rem',
+            color: 'inherit',
+          }}
         >
-          {data.personType === 'MOUNT_OWNER' ? 'Mount' : 'Excavator'}
+          {props.data.value === 'ALL' ? 'All Persons (Owners)' : props.data.label}
         </span>
-      )}
-    </div>
+      </span>
+    </components.SingleValue>
   )
 }
 
@@ -296,16 +386,28 @@ const Reports = () => {
   ])
   const [selectedVehicle, setSelectedVehicle] = useState(ALL_VEHICLES_OPTION)
 
-  // ── Format Options Callbacks ──────────────────────────────────────────────
+  const formatPersonTypeLabel = (type) => {
+    if (!type) return ''
+    if (type === 'MOUNT_OWNER') return 'Mount Owner'
+    if (type === 'EXCAVATOR_OWNER') return 'Excavator Owner'
+    return String(type).replace(/_/g, ' ')
+  }
+
   const formatPersonOption = useCallback((p) => {
     if (!p) return null
     const rawId = p.id ?? p.personId ?? null
-    const name = p.name || `Person #${rawId}`
-    const code = p.personCode || (rawId ? `PER-${rawId}` : '')
-    const type = p.personType || ''
+    const code = p.personCode || p.code || (rawId ? `PER-${rawId}` : '')
+    const name = p.name || p.personName || ''
+    const type = p.personType || p.type || ''
+    const typeLabel = formatPersonTypeLabel(type)
 
-    let label = name
-    if (code) label += ` (${code})`
+    const parts = []
+    if (code) parts.push(code)
+    if (name) parts.push(name)
+    let displayLabel = parts.join(' - ') || (rawId ? `Person #${rawId}` : '')
+    if (typeLabel) {
+      displayLabel = displayLabel ? `${displayLabel} (${typeLabel})` : typeLabel
+    }
 
     return {
       value: rawId ? String(rawId) : code || name || 'ALL',
@@ -314,7 +416,8 @@ const Reports = () => {
       name,
       personCode: code,
       personType: type,
-      label,
+      personTypeLabel: typeLabel,
+      label: displayLabel,
       data: p,
     }
   }, [])
@@ -687,7 +790,7 @@ const Reports = () => {
         <CCardBody className="rp-card-body">
           <CRow className="g-3">
             {/* Start Date */}
-            <CCol xs={12} sm={6}>
+            <CCol xs={12} sm={4} md={4}>
               <label className="rp-label" htmlFor="rp-start-date">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
                 Start Date
@@ -703,7 +806,7 @@ const Reports = () => {
             </CCol>
 
             {/* End Date */}
-            <CCol xs={12} sm={6}>
+            <CCol xs={12} sm={4} md={4}>
               <label className="rp-label" htmlFor="rp-end-date">
                 <CIcon icon={cilCalendar} size="sm" className="text-warning" />
                 End Date
@@ -719,7 +822,7 @@ const Reports = () => {
             </CCol>
 
             {/* Person Searchable Dropdown */}
-            <CCol xs={12} md={6}>
+            <CCol xs={12} sm={4} md={4}>
               <label className="rp-label">
                 <CIcon icon={cilUser} size="sm" className="text-warning" />
                 Person (Owner)
@@ -738,6 +841,7 @@ const Reports = () => {
                 styles={selectStyles}
                 components={{
                   Option: CustomPersonOption,
+                  SingleValue: CustomPersonSingleValue,
                 }}
                 classNamePrefix="rp-select"
                 noOptionsMessage={({ inputValue }) =>

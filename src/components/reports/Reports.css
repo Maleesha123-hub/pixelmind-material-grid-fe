@@ -127,26 +127,27 @@
 }
 
 .rp-card-body {
-  padding: 1.5rem;
+  padding: 1.1rem 1.25rem;
 }
 
 .rp-label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #334155;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.28rem;
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  white-space: nowrap;
 }
 
 .rp-input {
   width: 100%;
-  height: 42px;
+  height: 38px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 0 0.85rem;
-  font-size: 0.875rem;
+  padding: 0 0.75rem;
+  font-size: 0.84rem;
   color: #0f172a;
   background-color: #ffffff;
   outline: none;
@@ -156,7 +157,7 @@
 
 .rp-input:focus {
   border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
 }
 
 .rp-btn-reset {
@@ -785,6 +786,13 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
+[data-coreui-theme='dark'] .rp-badge-tag,
+.dark-theme .rp-badge-tag {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
 [data-coreui-theme='dark'] .rp-btn-refresh,
 .dark-theme .rp-btn-refresh {
   background: #131d31 !important;
@@ -861,6 +869,44 @@
   background: #131d31 !important;
   border-color: #334155 !important;
   color: #cbd5e1 !important;
+}
+
+[data-coreui-theme='dark'] .rp-select-icon-box,
+.dark-theme .rp-select-icon-box {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+  border: 1px solid #334155 !important;
+}
+
+[data-coreui-theme='dark'] .rp-select-icon-box--person,
+.dark-theme .rp-select-icon-box--person {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+[data-coreui-theme='dark'] .rp-select-title,
+.dark-theme .rp-select-title {
+  color: #f8fafc !important;
+}
+
+[data-coreui-theme='dark'] .rp-select-sub,
+.dark-theme .rp-select-sub {
+  color: #94a3b8 !important;
+}
+
+[data-coreui-theme='dark'] .rp-type-chip--mount,
+.dark-theme .rp-type-chip--mount {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+[data-coreui-theme='dark'] .rp-type-chip--excavator,
+.dark-theme .rp-type-chip--excavator {
+  background: rgba(99, 102, 241, 0.18) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
 }
 
 [data-coreui-theme='dark'] .rp-kpi-card,
