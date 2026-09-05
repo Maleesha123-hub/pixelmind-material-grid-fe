@@ -8,7 +8,12 @@
   padding: 1.25rem;
   max-width: 1360px;
   margin: 0 auto;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 /* ── Page Header ─────────────────────────────────────────────────────────── */
@@ -74,6 +79,7 @@
   font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease;
   box-shadow: 0 1px 2px rgba(16, 185, 129, 0.08);
 }
@@ -89,13 +95,14 @@
 /* ── Segmented Tab Switcher ──────────────────────────────────────────────── */
 .bu-tab-container {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   background: #ffffff;
-  padding: 0.4rem;
+  padding: 0.35rem;
   border-radius: 14px;
   border: 1px solid #e2e8f0;
   margin-bottom: 1.5rem;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  overflow-x: auto;
 }
 
 .bu-tab-btn {
@@ -103,15 +110,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
-  padding: 0.75rem 1.25rem;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.2s ease-in-out;
 }
 
@@ -170,6 +178,25 @@
 .bu-tab-btn--licenses.active .bu-tab-count {
   background: #ffffff;
   color: #0369a1;
+}
+
+/* ── Excavator Inspection Tab (Royal Violet / Indigo Theme) ── */
+.bu-tab-btn--inspection:hover:not(.active) {
+  color: #7c3aed;
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+}
+
+.bu-tab-btn--inspection.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  border-color: transparent !important;
+}
+
+.bu-tab-btn--inspection.active .bu-tab-count {
+  background: #ffffff;
+  color: #7c3aed;
 }
 
 .bu-tab-count {
@@ -619,7 +646,9 @@
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .bu-search-input:focus {

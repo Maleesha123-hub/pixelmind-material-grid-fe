@@ -93,10 +93,15 @@
 
   // ─── Page Titles & Headers ────────────────────────────────────────────────
   h1,
+ 
   h2,
+ 
   h3,
+ 
   h4,
+ 
   h5,
+ 
   h6,
   .vm-page-title,
   .vlm-page-title,
@@ -104,7 +109,8 @@
   .rc-page-title,
   .bu-page-title,
   .pt-page-title,
-  .pm-page-title {
+  .pm-page-title,
+  .rp-page-title {
     color: #f8fafc !important;
   }
 
@@ -115,6 +121,7 @@
   .bu-page-subtitle,
   .pt-page-subtitle,
   .pm-page-subtitle,
+  .rp-page-subtitle,
   .text-body-secondary,
   .text-muted {
     color: #94a3b8 !important;
@@ -126,7 +133,8 @@
   .rc-header-icon,
   .bu-header-icon,
   .pt-header-icon,
-  .pm-header-icon {
+  .pm-header-icon,
+  .rp-header-icon {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
     border: 1px solid #334155 !important;
     color: #f59e0b !important;
@@ -141,7 +149,8 @@
   .rc-card,
   .bu-card,
   .pt-card,
-  .pm-card {
+  .pm-card,
+  .rp-card {
     background-color: #0f172a !important;
     border: 1px solid #1e293b !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
@@ -155,7 +164,8 @@
   .rc-card-header,
   .bu-card-header,
   .pt-card-header,
-  .pm-card-header {
+  .pm-card-header,
+  .rp-card-header {
     background: linear-gradient(90deg, #131d31 0%, #0f172a 100%) !important;
     border-bottom: 1px solid #1e293b !important;
     color: #f8fafc !important;
@@ -168,7 +178,8 @@
   .rc-card-title,
   .bu-card-title,
   .pt-card-title,
-  .pm-card-title {
+  .pm-card-title,
+  .rp-card-title {
     color: #f8fafc !important;
   }
 
@@ -179,7 +190,8 @@
   .rc-card-body,
   .bu-card-body,
   .pt-card-body,
-  .pm-card-body {
+  .pm-card-body,
+  .rp-card-body {
     color: #cbd5e1 !important;
   }
 
@@ -228,6 +240,7 @@
   .rt-label,
   .rc-label,
   .pm-label,
+  .rp-label,
   .form-label {
     color: #cbd5e1 !important;
   }
@@ -252,7 +265,8 @@
   .vm-btn-reset,
   .rt-btn-reset,
   .rc-btn-reset,
-  .pm-btn-reset {
+  .pm-btn-reset,
+  .rp-btn-reset {
     background: #131d31 !important;
     border: 1px solid #334155 !important;
     color: #cbd5e1 !important;
@@ -274,7 +288,8 @@
   .rc-table,
   .bu-table,
   .pt-table,
-  .pm-table {
+  .pm-table,
+  .rp-table {
     background-color: #0f172a !important;
     color: #cbd5e1 !important;
     border-color: #1e293b !important;

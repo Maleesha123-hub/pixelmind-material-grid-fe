@@ -36,6 +36,7 @@ import {
   cilLockLocked,
   cilContact,
   cilMoney,
+  cilNotes,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -153,6 +154,12 @@ const _nav = [
     name: 'Receipts',
     to: '/receipts',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Reports',
+    to: '/reports',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
