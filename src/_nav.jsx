@@ -36,6 +36,7 @@ import {
   cilLockLocked,
   cilContact,
   cilMoney,
+  cilNotes,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -146,6 +147,12 @@ const _nav = [
         to: '/logistics/vehicle-license-management',
         icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
       },
+      {
+        component: CNavItem,
+        name: 'Exc & Check By',
+        to: '/logistics/excavator-inspection',
+        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+      },
     ],
   },
   {
@@ -155,8 +162,20 @@ const _nav = [
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Reports',
+    to: '/reports',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'MASTER DATA',
+  },
+  {
+    component: CNavItem,
+    name: 'Persons',
+    to: '/persons',
+    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

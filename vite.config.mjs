@@ -40,7 +40,12 @@ export default defineConfig(() => {
     preview: {
       host: '0.0.0.0',
       port: 8080,
-      allowedHosts: ['meskoramaterialgrid.com', 'www.meskoramaterialgrid.com'],
+      allowedHosts: [
+        'meskoramaterialgrid.com',
+        'www.meskoramaterialgrid.com',
+        'qa.meskoramaterialgrid.com',
+        'www.qa.meskoramaterialgrid.com',
+      ],
     },
   }
 })

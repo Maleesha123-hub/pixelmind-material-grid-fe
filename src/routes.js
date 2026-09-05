@@ -30,13 +30,21 @@ const Route = React.lazy(() => import('./components/transportTrip/route/Route.js
 // Logistics
 const BulkUpload = React.lazy(() => import('./components/logistics/bulkUpload/BulkUpload.jsx'))
 const DailyRoutes = React.lazy(() => import('./components/logistics/dailyRoutes/DailyRoutes.jsx'))
-const DailyExpenses = React.lazy(() => import('./components/logistics/dailyExpenses/DailyExpenses.jsx'))
+const DailyExpenses = React.lazy(
+  () => import('./components/logistics/dailyExpenses/DailyExpenses.jsx'),
+)
 const VehicleLicenseManagement = React.lazy(
   () => import('./components/logistics/vehicleLicenseManagement/VehicleLicenseManagement.jsx'),
+)
+const ExcavatorInspection = React.lazy(
+  () => import('./components/logistics/excavatorInspection/ExcavatorInspection.jsx'),
 )
 
 // Receipts
 const Receipts = React.lazy(() => import('./components/receipts/Receipts.jsx'))
+
+// Operations — Reports
+const Reports = React.lazy(() => import('./components/reports/Reports.jsx'))
 
 // Vehicles
 const Vehicle = React.lazy(() => import('./components/vehicles/vehicle/Vehicle.jsx'))
@@ -44,6 +52,9 @@ const VehicleLicense = React.lazy(() => import('./components/vehicles/license/Ve
 
 // Master Data — Routes
 const RoutesPage = React.lazy(() => import('./components/routes/Routes.jsx'))
+
+// Master Data — Persons
+const Persons = React.lazy(() => import('./components/persons/Persons.jsx'))
 
 /**
  * Array of route configuration objects
@@ -76,7 +87,15 @@ export const routes = [
     name: 'Vehicle License',
     element: VehicleLicenseManagement,
   },
+  {
+    path: '/logistics/excavator-inspection',
+    name: 'Excavator Inspection',
+    element: ExcavatorInspection,
+  },
   { path: '/receipts', name: 'Receipts', element: Receipts },
+  { path: '/persons', name: 'Persons', element: Persons },
+  { path: '/person', name: 'Person', element: Persons },
+  { path: '/reports', name: 'Reports', element: Reports },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
   { path: '/license', name: 'License', element: VehicleLicense },
   { path: '/routes', name: 'Routes', element: RoutesPage },
