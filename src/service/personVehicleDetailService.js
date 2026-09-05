@@ -73,6 +73,39 @@ const apiFetch = async (url, options = {}) => {
   return response.text()
 }
 
+// ─── Shared Binary Blob Fetcher for Backend PDF ──────────────────────────────
+const apiFetchBlob = async (url, options = {}) => {
+  const headers = {
+    Accept: 'application/pdf, application/octet-stream, */*',
+    ...(options.headers || {}),
+  }
+
+  const response = await fetch(url, {
+    headers,
+    ...options,
+  })
+
+  if (!response.ok) {
+    let errorMessage = `Server returned status: ${response.status}`
+    try {
+      const errJson = await response.json()
+      errorMessage = errJson.message || errJson.error || JSON.stringify(errJson)
+    } catch {
+      const errText = await response.text().catch(() => '')
+      if (errText) errorMessage = errText
+    }
+    throw new Error(errorMessage)
+  }
+
+  const blob = await response.blob()
+
+  // Ensure blob has application/pdf type
+  if (!blob.type || blob.type === 'application/octet-stream' || !blob.type.includes('pdf')) {
+    return new Blob([blob], { type: 'application/pdf' })
+  }
+  return blob
+}
+
 export const personVehicleDetailService = {
   /**
    * GET /api/v1/person-vehicle-details
@@ -192,6 +225,57 @@ export const personVehicleDetailService = {
       signal,
     })
     return unwrap(result)
+  },
+
+  /**
+   * GET /api/v1/person-vehicle-details/report/preview
+   * Retrieve PDF report blob for inline preview.
+   *
+   * @param {Object} params
+   * @param {number|string} params.personId
+   * @param {string} params.startDate - YYYY-MM-DD
+   * @param {string} params.endDate - YYYY-MM-DD
+   * @param {AbortSignal} [signal]
+   * @returns {Promise<Blob>}
+   */
+  getReportPdfPreviewBlob: async ({ personId, startDate, endDate }, signal) => {
+    const qs = buildQuery({ personId, startDate, endDate })
+    const url = `${API_BASE}/report/preview?${qs}`
+    return apiFetchBlob(url, { method: 'GET', signal })
+  },
+
+  /**
+   * GET /api/v1/person-vehicle-details/report/download
+   * Directly download the PDF report attachment.
+   *
+   * @param {Object} params
+   * @param {number|string} params.personId
+   * @param {string} params.startDate - YYYY-MM-DD
+   * @param {string} params.endDate - YYYY-MM-DD
+   * @param {string} [params.fileName]
+   * @param {AbortSignal} [signal]
+   */
+  downloadReportPdf: async ({ personId, startDate, endDate, fileName }, signal) => {
+    const qs = buildQuery({ personId, startDate, endDate })
+    const url = `${API_BASE}/report/download?${qs}`
+    const blob = await apiFetchBlob(url, { method: 'GET', signal })
+
+    const dateLabel =
+      startDate && endDate ? `${startDate}_to_${endDate}` : startDate || endDate || 'report'
+    const resolvedFileName =
+      fileName || `Person_Vehicle_Report_Person_${personId}_${dateLabel}.pdf`
+
+    const blobUrl = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = resolvedFileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl)
+    }, 1000)
   },
 }
 

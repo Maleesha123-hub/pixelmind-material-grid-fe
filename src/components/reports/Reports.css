@@ -678,6 +678,68 @@
   border-color: #94a3b8;
 }
 
+/* ── PDF Preview Modal Styling ───────────────────────────────────────────── */
+.rp-pdf-modal .modal-content {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+}
+
+.rp-modal-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 0.25rem 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rp-modal-pill--amber {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+  font-weight: 700;
+}
+
+.rp-pdf-preview-wrapper {
+  background: #0f172a;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 640px;
+  width: 100%;
+}
+
+.rp-pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.rp-btn-open-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.rp-btn-open-tab:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .rp-page {
@@ -931,4 +993,43 @@
   background: #131d31 !important;
   border-color: #334155 !important;
   color: #cbd5e1 !important;
+}
+
+[data-coreui-theme='dark'] .rp-pdf-modal .modal-content,
+.dark-theme .rp-pdf-modal .modal-content {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-coreui-theme='dark'] .rp-modal-pill,
+.dark-theme .rp-modal-pill {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+[data-coreui-theme='dark'] .rp-modal-pill--amber,
+.dark-theme .rp-modal-pill--amber {
+  background: rgba(217, 119, 6, 0.2) !important;
+  border-color: rgba(217, 119, 6, 0.4) !important;
+  color: #fbbf24 !important;
+}
+
+[data-coreui-theme='dark'] .rp-btn-open-tab,
+.dark-theme .rp-btn-open-tab {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+[data-coreui-theme='dark'] .rp-btn-open-tab:hover,
+.dark-theme .rp-btn-open-tab:hover {
+  background: #334155 !important;
+  color: #ffffff !important;
+}
+
+[data-coreui-theme='dark'] .rp-pdf-preview-wrapper,
+.dark-theme .rp-pdf-preview-wrapper {
+  border-color: #334155 !important;
 }
