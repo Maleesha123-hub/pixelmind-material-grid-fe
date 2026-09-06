@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="cabGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#c2410c"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ffedd5"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1" flood-color="#7c2d12" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded App Icon Background -->
+  <rect width="64" height="64" rx="14" fill="url(#bgGrad)"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="#ea580c" stroke-width="1.5" stroke-opacity="0.35"/>
+
+  <!-- Cargo (Building Materials / Sand & Stones) -->
+  <path d="M12 28 Q18 20 25 21 Q32 19 39 28 Z" fill="#78716c"/>
+  <path d="M15 27 Q22 21 30 22 Q35 21 38 27 Z" fill="#a8a29e"/>
+
+  <!-- Dump Truck Body / Cargo Bed -->
+  <path d="M10 27 L39 27 L36 39 L10 39 Z" fill="url(#bodyGrad)" filter="url(#shadow)"/>
+  <line x1="18" y1="28" x2="17" y2="38" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="26" y1="28" x2="25" y2="38" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="34" y1="28" x2="33" y2="38" stroke="#9a3412" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Cab Main Structure -->
+  <path d="M39 23 L47 23 L53 32 L53 40 L39 40 Z" fill="url(#cabGrad)" filter="url(#shadow)"/>
+
+  <!-- Windshield / Window -->
+  <path d="M41 25 L46 25 L50 31 L41 31 Z" fill="#0284c7"/>
+  <path d="M42 26 L45 26 L47 29 L42 29 Z" fill="#38bdf8" opacity="0.8"/>
+
+  <!-- Headlight & Bumper -->
+  <rect x="52" y="36" width="2" height="3" rx="1" fill="#fef08a"/>
+  <path d="M38 39 L54 39 L54 42 L38 42 Z" fill="url(#metalGrad)" rx="1"/>
+
+  <!-- Chassis / Undercarriage -->
+  <rect x="12" y="39" width="27" height="3" fill="#334155"/>
+  <rect x="25" y="38.5" width="8" height="4" rx="1" fill="#64748b"/>
+
+  <!-- Wheels -->
+  <!-- Rear Wheel 1 -->
+  <circle cx="17" cy="43" r="6" fill="#1e293b"/>
+  <circle cx="17" cy="43" r="3" fill="#94a3b8"/>
+  <circle cx="17" cy="43" r="1.5" fill="#0f172a"/>
+
+  <!-- Rear Wheel 2 -->
+  <circle cx="28" cy="43" r="6" fill="#1e293b"/>
+  <circle cx="28" cy="43" r="3" fill="#94a3b8"/>
+  <circle cx="28" cy="43" r="1.5" fill="#0f172a"/>
+
+  <!-- Front Wheel -->
+  <circle cx="46" cy="43" r="6" fill="#1e293b"/>
+  <circle cx="46" cy="43" r="3" fill="#94a3b8"/>
+  <circle cx="46" cy="43" r="1.5" fill="#0f172a"/>
+</svg>

@@ -162,10 +162,18 @@ const _nav = [
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
   {
-    component: CNavItem,
+    component: CNavGroup,
     name: 'Reports',
     to: '/reports',
     icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Exc & Check By Report',
+        to: '/reports/excavator-check-by',
+        icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+      },
+    ],
   },
   {
     component: CNavTitle,
