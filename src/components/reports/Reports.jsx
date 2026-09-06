@@ -1,5 +1,5 @@
 /**
- * Operations Reports & Analytics Page
+ * Excavator & Check By Detail Report Page
  *
  * Provides comprehensive filtration (Date range, Person searchable dropdown,
  * Vehicle searchable dropdown) and report preview / download actions matching
@@ -862,14 +862,13 @@ const Reports = () => {
           </div>
           <div>
             <div className="d-flex align-items-center gap-2 flex-wrap">
-              <h1 className="rp-page-title">Operations Reports &amp; Analytics</h1>
+              <h1 className="rp-page-title">Excavator &amp; Check By Detail Report</h1>
               <span className="rp-badge-tag">
                 <CIcon icon={cilCheckCircle} size="sm" /> Live Data Module
               </span>
             </div>
             <p className="rp-page-subtitle">
-              Generate, preview, and download comprehensive transport vouchers, settlements, and
-              fleet reports
+              Generate, preview, and download comprehensive Excavator &amp; Check By inspection receipts and vouchers (PDF / Excel)
             </p>
           </div>
         </div>
@@ -1081,7 +1080,7 @@ const Reports = () => {
         <CModalHeader className="rp-modal-header d-flex align-items-center justify-content-between">
           <CModalTitle className="rp-modal-title d-flex align-items-center gap-2">
             <CIcon icon={cilFindInPage} style={{ color: '#f59e0b' }} />
-            <span>Person Vehicle Details Report Preview</span>
+            <span>Excavator &amp; Check By Detail Report Preview</span>
           </CModalTitle>
           {previewMeta && (
             <div className="d-flex align-items-center gap-2 me-3">

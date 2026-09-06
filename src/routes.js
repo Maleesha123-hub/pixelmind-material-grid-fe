@@ -96,6 +96,7 @@ export const routes = [
   { path: '/persons', name: 'Persons', element: Persons },
   { path: '/person', name: 'Person', element: Persons },
   { path: '/reports', name: 'Reports', element: Reports },
+  { path: '/reports/excavator-check-by', name: 'Exc & Check By Report', element: Reports },
   { path: '/vehicles', name: 'Vehicles', element: Vehicle },
   { path: '/license', name: 'License', element: VehicleLicense },
   { path: '/routes', name: 'Routes', element: RoutesPage },
