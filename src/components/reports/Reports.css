@@ -257,6 +257,36 @@
   cursor: not-allowed;
 }
 
+.rp-btn-excel {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border: none;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 0.6rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.rp-btn-excel:hover:not(:disabled) {
+  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.45);
+}
+
+.rp-btn-excel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ── Custom React Select Options ─────────────────────────────────────────── */
 .rp-select-option {
   display: flex;
@@ -752,7 +782,8 @@
     width: 100%;
   }
   .rp-btn-preview,
-  .rp-btn-download {
+  .rp-btn-download,
+  .rp-btn-excel {
     width: 100%;
     justify-content: center;
   }
