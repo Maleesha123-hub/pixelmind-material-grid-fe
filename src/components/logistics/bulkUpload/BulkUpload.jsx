@@ -62,6 +62,81 @@ const formatCurrency = (val) => {
   })
 }
 
+/**
+ * Accurately parse dates from Excel rows without timezone shift bugs.
+ * Handles Excel serial numbers (e.g. 46262 -> 2026-08-28), Date instances, and string formats.
+ * Avoids the SheetJS numdate / UTC toISOString() 1-day underflow bug.
+ */
+const formatExcelDate = (rawDate) => {
+  if (rawDate === null || rawDate === undefined || rawDate === '') return ''
+
+  // 1. If it is a number (Excel serial date number like 46262) or a purely numeric string
+  if (
+    typeof rawDate === 'number' ||
+    (typeof rawDate === 'string' && /^\d+(\.\d+)?$/.test(rawDate.trim()))
+  ) {
+    const num = Number(rawDate)
+    if (num >= 1 && num <= 100000 && XLSX?.SSF?.parse_date_code) {
+      const parsed = XLSX.SSF.parse_date_code(num)
+      if (parsed && parsed.y && parsed.m && parsed.d) {
+        return `${parsed.y}-${String(parsed.m).padStart(2, '0')}-${String(parsed.d).padStart(2, '0')}`
+      }
+    }
+  }
+
+  // 2. If it is a Date instance (e.g. if cellDates was passed)
+  if (rawDate instanceof Date && !isNaN(rawDate.getTime())) {
+    // Add 12 hours (43,200,000 ms) to safely resolve near-midnight underflows from SheetJS timezone offset discrepancies
+    const adjusted = new Date(rawDate.getTime() + 12 * 60 * 60 * 1000)
+    const y = adjusted.getUTCFullYear()
+    const m = String(adjusted.getUTCMonth() + 1).padStart(2, '0')
+    const d = String(adjusted.getUTCDate()).padStart(2, '0')
+    return `${y}-${m}-${d}`
+  }
+
+  // 3. If it is a string format
+  if (typeof rawDate === 'string') {
+    const str = rawDate.trim()
+    if (!str) return ''
+
+    // YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD
+    const ymd = str.match(/^(\d{4})[/.\-](\d{1,2})[/.\-](\d{1,2})/)
+    if (ymd) {
+      return `${ymd[1]}-${ymd[2].padStart(2, '0')}-${ymd[3].padStart(2, '0')}`
+    }
+
+    // DD/MM/YYYY or MM/DD/YYYY
+    const dmy = str.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})/)
+    if (dmy) {
+      const p1 = parseInt(dmy[1], 10)
+      const p2 = parseInt(dmy[2], 10)
+      const yyyy = dmy[3]
+      if (p1 > 12) {
+        // Definitely DD/MM/YYYY
+        return `${yyyy}-${String(p2).padStart(2, '0')}-${String(p1).padStart(2, '0')}`
+      } else if (p2 > 12) {
+        // Definitely MM/DD/YYYY
+        return `${yyyy}-${String(p1).padStart(2, '0')}-${String(p2).padStart(2, '0')}`
+      } else {
+        // Month/Day/Year default matching Excel default
+        return `${yyyy}-${String(p1).padStart(2, '0')}-${String(p2).padStart(2, '0')}`
+      }
+    }
+
+    // ISO string with T (e.g. 2026-08-28T00:00:00.000Z)
+    if (str.includes('T')) {
+      const parts = str.split('T')[0].split('-')
+      if (parts.length === 3) {
+        return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`
+      }
+    }
+
+    return str
+  }
+
+  return String(rawDate).trim()
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 const BulkUpload = () => {
   const [activeTab, setActiveTab] = useState('trips') // 'trips' | 'expenses' | 'licenses'
@@ -199,26 +274,14 @@ const BulkUpload = () => {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result)
-        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
+        const workbook = XLSX.read(data, { type: 'array' })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
         const formatted = json
           .map((row) => {
-            let rawDate = row['Date'] || row['date'] || ''
-            if (rawDate instanceof Date) {
-              rawDate = rawDate.toISOString().split('T')[0]
-            } else if (typeof rawDate === 'string' && rawDate.trim()) {
-              const str = rawDate.trim()
-              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
-              if (mdy) {
-                const mm = mdy[1].padStart(2, '0')
-                const dd = mdy[2].padStart(2, '0')
-                const yyyy = mdy[3]
-                rawDate = `${yyyy}-${mm}-${dd}`
-              }
-            }
+            const rawDate = formatExcelDate(row['Date'] || row['date'] || '')
 
             const rawVeh =
               row['Vehicle Number'] ||
@@ -245,7 +308,7 @@ const BulkUpload = () => {
               ''
 
             return {
-              date: String(rawDate).trim(),
+              date: rawDate,
               vehicleNumber: String(rawVeh).trim(),
               billNumber: String(rawBill).trim(),
               routeCode: String(rawRouteCode).trim(),
@@ -268,26 +331,14 @@ const BulkUpload = () => {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result)
-        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
+        const workbook = XLSX.read(data, { type: 'array' })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
         const formatted = json
           .map((row) => {
-            let rawDate = row['Date'] || row['date'] || ''
-            if (rawDate instanceof Date) {
-              rawDate = rawDate.toISOString().split('T')[0]
-            } else if (typeof rawDate === 'string' && rawDate.trim()) {
-              const str = rawDate.trim()
-              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
-              if (mdy) {
-                const mm = mdy[1].padStart(2, '0')
-                const dd = mdy[2].padStart(2, '0')
-                const yyyy = mdy[3]
-                rawDate = `${yyyy}-${mm}-${dd}`
-              }
-            }
+            const rawDate = formatExcelDate(row['Date'] || row['date'] || '')
 
             const rawVeh =
               row['Vehicle Number'] ||
@@ -310,7 +361,7 @@ const BulkUpload = () => {
                       : 0
 
             return {
-              date: String(rawDate).trim(),
+              date: rawDate,
               vehicleNumber: String(rawVeh).trim(),
               expense: rawExpense,
             }
@@ -332,7 +383,7 @@ const BulkUpload = () => {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result)
-        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
+        const workbook = XLSX.read(data, { type: 'array' })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
@@ -378,26 +429,14 @@ const BulkUpload = () => {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result)
-        const workbook = XLSX.read(data, { type: 'array', cellDates: true })
+        const workbook = XLSX.read(data, { type: 'array' })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' })
 
         const formatted = json
           .map((row) => {
-            let rawDate = row['Date'] || row['date'] || ''
-            if (rawDate instanceof Date) {
-              rawDate = rawDate.toISOString().split('T')[0]
-            } else if (typeof rawDate === 'string' && rawDate.trim()) {
-              const str = rawDate.trim()
-              const mdy = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
-              if (mdy) {
-                const mm = mdy[1].padStart(2, '0')
-                const dd = mdy[2].padStart(2, '0')
-                const yyyy = mdy[3]
-                rawDate = `${yyyy}-${mm}-${dd}`
-              }
-            }
+            const rawDate = formatExcelDate(row['Date'] || row['date'] || '')
 
             const rawPersonCode =
               row['Person Code'] ||
@@ -417,7 +456,7 @@ const BulkUpload = () => {
               ''
 
             return {
-              date: String(rawDate).trim(),
+              date: rawDate,
               personCode: String(rawPersonCode).trim().toUpperCase(),
               vehicleNumber: String(rawVeh).trim().toUpperCase(),
             }
