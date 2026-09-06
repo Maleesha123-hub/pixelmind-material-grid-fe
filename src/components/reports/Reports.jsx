@@ -35,6 +35,7 @@ import {
   cilReload,
   cilFindInPage,
   cilCloudDownload,
+  cilSpreadsheet,
   cilCheckCircle,
   cilPrint,
   cilExternalLink,
@@ -537,6 +538,7 @@ const Reports = () => {
   // ── Loading & Modal States ────────────────────────────────────────────────
   const [previewLoading, setPreviewLoading] = useState(false)
   const [downloadLoading, setDownloadLoading] = useState(false)
+  const [excelLoading, setExcelLoading] = useState(false)
   const [previewModalVisible, setPreviewModalVisible] = useState(false)
   const [previewPdfUrl, setPreviewPdfUrl] = useState(null)
   const [previewMeta, setPreviewMeta] = useState(null)
@@ -751,6 +753,76 @@ const Reports = () => {
     }
   }
 
+  // ── Action: Download Excel (Downloads XLSX from PersonVehicleDetailReportController) ──
+  const handleDownloadExcel = async () => {
+    const personId = selectedPerson?.id || selectedPerson?.personId
+    if (!selectedPerson || selectedPerson.value === 'ALL' || !personId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Person (Owner) Required',
+        text: 'Please select a specific person to download the vehicle details Excel report.',
+        confirmButtonColor: '#059669',
+      })
+      return
+    }
+
+    if (!startDate || !endDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Date Range Required',
+        text: 'Please select both Start Date and End Date to download the Excel report.',
+        confirmButtonColor: '#059669',
+      })
+      return
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Date Range',
+        text: 'Start Date cannot be after End Date.',
+        confirmButtonColor: '#059669',
+      })
+      return
+    }
+
+    const pNameClean = (selectedPerson?.name || `Person_${personId}`).replace(/\s+/g, '_')
+    const fileName = `Person_Vehicle_Report_${pNameClean}_${startDate}_to_${endDate}.xlsx`
+
+    setExcelLoading(true)
+    try {
+      await personVehicleDetailService.downloadReportExcel({
+        personId,
+        startDate,
+        endDate,
+        fileName,
+      })
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3500,
+        timerProgressBar: true,
+      })
+
+      Toast.fire({
+        icon: 'success',
+        title: 'Excel report downloaded successfully',
+      })
+    } catch (err) {
+      console.error('Person Vehicle Detail Excel report download failed:', err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Excel Download Failed',
+        text: err.message || 'Unable to download Excel report from server. Please try again.',
+        confirmButtonColor: '#dc2626',
+      })
+    } finally {
+      setExcelLoading(false)
+    }
+  }
+
   const handleClosePreviewModal = () => {
     setPreviewModalVisible(false)
     if (previewPdfUrl) {
@@ -942,7 +1014,7 @@ const Reports = () => {
               <button
                 className="rp-btn-preview"
                 onClick={handlePreviewReport}
-                disabled={previewLoading || downloadLoading}
+                disabled={previewLoading || downloadLoading || excelLoading}
                 id="btn-preview-report"
               >
                 {previewLoading ? (
@@ -956,20 +1028,40 @@ const Reports = () => {
                 )}
               </button>
 
-              {/* Download Button — Exact Match with Receipts Page */}
+              {/* PDF Download Button */}
               <button
                 className="rp-btn-download"
                 onClick={handleDownloadReport}
-                disabled={previewLoading || downloadLoading}
-                id="btn-download-report"
+                disabled={previewLoading || downloadLoading || excelLoading}
+                id="btn-download-pdf-report"
+                title="Download Person Vehicle Details report as PDF"
               >
                 {downloadLoading ? (
                   <>
-                    <CSpinner size="sm" className="me-1" /> Preparing Download…
+                    <CSpinner size="sm" className="me-1" /> Preparing PDF…
                   </>
                 ) : (
                   <>
-                    <CIcon icon={cilCloudDownload} /> Download Report
+                    <CIcon icon={cilCloudDownload} /> PDF Download
+                  </>
+                )}
+              </button>
+
+              {/* Excel Download Button */}
+              <button
+                className="rp-btn-excel"
+                onClick={handleDownloadExcel}
+                disabled={previewLoading || downloadLoading || excelLoading}
+                id="btn-download-excel-report"
+                title="Download Person Vehicle Details report as Excel spreadsheet (.xlsx)"
+              >
+                {excelLoading ? (
+                  <>
+                    <CSpinner size="sm" className="me-1" /> Preparing Excel…
+                  </>
+                ) : (
+                  <>
+                    <CIcon icon={cilSpreadsheet} /> Excel Download
                   </>
                 )}
               </button>
@@ -1052,15 +1144,34 @@ const Reports = () => {
               type="button"
               className="rp-btn-download"
               onClick={handleDownloadReport}
-              disabled={downloadLoading}
+              disabled={downloadLoading || excelLoading}
+              id="btn-modal-download-pdf"
             >
               {downloadLoading ? (
                 <>
-                  <CSpinner size="sm" className="me-1" /> Downloading…
+                  <CSpinner size="sm" className="me-1" /> Downloading PDF…
                 </>
               ) : (
                 <>
                   <CIcon icon={cilCloudDownload} /> Download PDF Now
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="rp-btn-excel"
+              onClick={handleDownloadExcel}
+              disabled={downloadLoading || excelLoading}
+              id="btn-modal-download-excel"
+            >
+              {excelLoading ? (
+                <>
+                  <CSpinner size="sm" className="me-1" /> Downloading Excel…
+                </>
+              ) : (
+                <>
+                  <CIcon icon={cilSpreadsheet} /> Download Excel Now
                 </>
               )}
             </button>

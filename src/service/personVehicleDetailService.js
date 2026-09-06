@@ -94,7 +94,9 @@ const apiFetchBlob = async (url, options = {}) => {
       const errText = await response.text().catch(() => '')
       if (errText) errorMessage = errText
     }
-    throw new Error(errorMessage)
+    const error = new Error(errorMessage)
+    error.status = response.status
+    throw error
   }
 
   const blob = await response.blob()
@@ -104,6 +106,54 @@ const apiFetchBlob = async (url, options = {}) => {
     return new Blob([blob], { type: 'application/pdf' })
   }
   return blob
+}
+
+// ─── Shared Binary Blob Fetcher for Backend Excel ────────────────────────────
+const apiFetchExcelBlob = async (url, options = {}) => {
+  const headers = {
+    Accept:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/octet-stream, */*',
+    ...(options.headers || {}),
+  }
+
+  const response = await fetch(url, {
+    headers,
+    ...options,
+  })
+
+  if (!response.ok) {
+    let errorMessage = `Server returned status: ${response.status}`
+    try {
+      const errJson = await response.json()
+      errorMessage = errJson.message || errJson.error || JSON.stringify(errJson)
+    } catch {
+      const errText = await response.text().catch(() => '')
+      if (errText) errorMessage = errText
+    }
+    const error = new Error(errorMessage)
+    error.status = response.status
+    throw error
+  }
+
+  // Extract filename from Content-Disposition if present
+  let headerFileName = ''
+  const disposition = response.headers.get('content-disposition')
+  if (disposition && disposition.includes('filename=')) {
+    const match = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition)
+    if (match && match[1]) {
+      headerFileName = match[1].replace(/['"]/g, '').trim()
+    }
+  }
+
+  const blob = await response.blob()
+  const excelBlob =
+    !blob.type || blob.type === 'application/octet-stream'
+      ? new Blob([blob], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        })
+      : blob
+
+  return { blob: excelBlob, fileName: headerFileName }
 }
 
 export const personVehicleDetailService = {
@@ -264,6 +314,69 @@ export const personVehicleDetailService = {
       startDate && endDate ? `${startDate}_to_${endDate}` : startDate || endDate || 'report'
     const resolvedFileName =
       fileName || `Person_Vehicle_Report_Person_${personId}_${dateLabel}.pdf`
+
+    const blobUrl = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = resolvedFileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl)
+    }, 1000)
+  },
+
+  /**
+   * GET /api/v1/person-vehicle-details/report/excel/download (or /excel/download)
+   * Directly download the Person Vehicle Details receipt as an Excel (.xlsx) attachment.
+   *
+   * @param {Object} params
+   * @param {number|string} params.personId
+   * @param {string} params.startDate - YYYY-MM-DD
+   * @param {string} params.endDate - YYYY-MM-DD
+   * @param {string} [params.fileName]
+   * @param {AbortSignal} [signal]
+   */
+  downloadReportExcel: async ({ personId, startDate, endDate, fileName }, signal) => {
+    const qs = buildQuery({ personId, startDate, endDate })
+
+    // Try /report/excel/download first, fallback to /excel/download if 404
+    const endpoints = [
+      `${API_BASE}/report/excel/download?${qs}`,
+      `${API_BASE}/excel/download?${qs}`,
+    ]
+
+    let downloadResult = null
+    let lastError = null
+
+    for (let i = 0; i < endpoints.length; i++) {
+      try {
+        downloadResult = await apiFetchExcelBlob(endpoints[i], { method: 'GET', signal })
+        if (downloadResult) break
+      } catch (err) {
+        if (signal?.aborted) throw err
+        lastError = err
+        // Only fallback if the error is 404
+        if (err.status !== 404) {
+          throw err
+        }
+      }
+    }
+
+    if (!downloadResult) {
+      throw lastError || new Error('Failed to download Excel report from server')
+    }
+
+    const { blob, fileName: headerFileName } = downloadResult
+
+    const dateLabel =
+      startDate && endDate ? `${startDate}_to_${endDate}` : startDate || endDate || 'report'
+    const resolvedFileName =
+      fileName ||
+      headerFileName ||
+      `Person_Vehicle_Report_Person_${personId}_${dateLabel}.xlsx`
 
     const blobUrl = URL.createObjectURL(blob)
     const link = document.createElement('a')
