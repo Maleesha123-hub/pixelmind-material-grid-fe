@@ -199,7 +199,7 @@ const getTodayStr = () => new Date().toISOString().split('T')[0]
 
 const Receipts = () => {
   // ─── Color Mode (Dark / Light) ────────────────────────────────────────────
-  const { colorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const { colorMode } = useColorModes('malshi-suppliers-theme')
   const selectStyles = useMemo(() => getSelectStyles(colorMode === 'dark'), [colorMode])
 
   // ─── Filter State ─────────────────────────────────────────────────────────

@@ -1,11 +1,16 @@
 {
-  "short_name": "Material Grid",
-  "name": "Material Grid - Hardware & Logistics",
+  "short_name": "Malshi Suppliers",
+  "name": "Malshi Suppliers - Building Materials & Transport Services",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
+    },
+    {
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
     },
     {
       "src": "/android-chrome-192x192.png",
@@ -18,8 +23,8 @@
       "type": "image/png"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#d97706",
+  "background_color": "#0f172a"
 }

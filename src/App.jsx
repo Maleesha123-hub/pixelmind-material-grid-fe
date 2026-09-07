@@ -56,10 +56,16 @@ const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
  * ReactDOM.render(<App />, document.getElementById('root'))
  */
 const App = () => {
-  const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const { isColorModeSet, setColorMode } = useColorModes('malshi-suppliers-theme')
   const storedTheme = useSelector((state) => state.theme)
 
   useEffect(() => {
+    if (!localStorage.getItem('malshi-suppliers-theme') && localStorage.getItem('coreui-free-react-admin-template-theme')) {
+      const oldTheme = localStorage.getItem('coreui-free-react-admin-template-theme')
+      localStorage.setItem('malshi-suppliers-theme', oldTheme)
+      localStorage.removeItem('coreui-free-react-admin-template-theme')
+    }
+
     const urlParams = new URLSearchParams(window.location.href.split('?')[1])
     const theme = urlParams.get('theme') && urlParams.get('theme').match(/^[A-Za-z0-9\s]+/)[0]
     if (theme) {
