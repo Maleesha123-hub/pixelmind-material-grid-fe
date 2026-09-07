@@ -344,7 +344,7 @@ const CustomExcelOption = (props) => {
 
 const DailyExpenses = () => {
   // ─── Color Mode (Theme Detection) ───────────────────────────────────────────
-  const { colorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const { colorMode } = useColorModes('malshi-suppliers-theme')
   const selectStyles = useMemo(() => getSelectStyles(colorMode === 'dark'), [colorMode])
 
   // ─── Filter States ──────────────────────────────────────────────────────────

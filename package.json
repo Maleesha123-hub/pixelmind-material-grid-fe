@@ -1,21 +1,10 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
-  "version": "5.6.0",
-  "description": "CoreUI Free React Admin Template",
+  "name": "pixelmind-material-grid-fe",
+  "version": "1.0.0",
+  "description": "Malshi Suppliers - Building Materials & Transport Services Dashboard",
   "homepage": ".",
-  "bugs": {
-    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
-  },
-  "engines": {
-    "node": ">=22.12.0",
-    "npm": ">=10"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
-  },
-  "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "license": "UNLICENSED",
+  "author": "MESKORA Technologies (PVT) Ltd",
   "scripts": {
     "build": "vite build",
     "lint": "eslint",
@@ -61,6 +50,8 @@
     "postcss": "^8.5.8",
     "prettier": "3.8.1",
     "sass": "^1.98.0",
+    "sharp": "^0.35.4",
+    "to-ico": "^1.1.5",
     "vite": "^8.0.3"
   }
 }
